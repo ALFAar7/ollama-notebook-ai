@@ -1,0 +1,4 @@
+Flask
+PyPDF2
+requests
+Werkzeug
