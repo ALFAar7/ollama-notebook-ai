@@ -2,21 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gemma4 PDF Translator</title>
     <link rel="stylesheet" href="/static/style.css">
-    <script src="/static/pdf.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="pdf-viewer" id="pdfViewer"></div>
-        <div class="translation-area" id="translationArea">
-            <h2>Translation will appear here</h2>
-        </div>
-        <div class="controls">
-            <input type="file" id="pdfInput" accept="application/pdf">
-            <button id="translateBtn">Translate to English</button>
-        </div>
-    </div>
+    <main class="app-shell">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Local Ollama Translation</p>
+                <h1>Gemma4 PDF Translator</h1>
+                <p class="subtitle">Upload a PDF, view it side by side with extracted text, and translate it with your local Gemma4 model.</p>
+            </div>
+            <div class="model-badge" id="modelBadge">Gemma4</div>
+        </header>
+
+        <section class="toolbar">
+            <div class="upload-box">
+                <label for="pdfInput" class="upload-label">
+                    <span class="upload-icon">PDF</span>
+                    <span>
+                        <strong>Choose PDF</strong>
+                        <small>or drag it here</small>
+                    </span>
+                </label>
+                <input type="file" id="pdfInput" accept="application/pdf">
+            </div>
+
+            <div class="translate-controls">
+                <label>
+                    <span>From</span>
+                    <select id="sourceLanguage">
+                        <option value="auto">Auto detect</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Persian">Persian</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Chinese">Chinese</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span>To</span>
+                    <select id="targetLanguage">
+                        <option value="English" selected>English</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Persian">Persian</option>
+                    </select>
+                </label>
+
+                <button id="translateBtn" class="primary-btn">Translate PDF</button>
+            </div>
+        </section>
+
+        <section class="recent-files">
+            <div class="section-title">
+                <h2>Last uploaded files</h2>
+                <span id="fileCount">0 files</span>
+            </div>
+            <div id="fileList" class="file-list">
+                <p class="empty-state">No PDFs uploaded yet.</p>
+            </div>
+        </section>
+
+        <section class="workspace">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Original PDF</h2>
+                        <p id="pdfMeta">Upload a PDF to begin</p>
+                    </div>
+                    <button id="copyOriginalBtn" class="ghost-btn">Copy text</button>
+                </div>
+                <div class="pdf-frame-wrap">
+                    <iframe id="pdfFrame" title="Uploaded PDF"></iframe>
+                </div>
+                <details class="text-details">
+                    <summary>Extracted text</summary>
+                    <pre id="originalText"></pre>
+                </details>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Translation</h2>
+                        <p id="translationMeta">Waiting for translation</p>
+                    </div>
+                    <button id="copyTranslationBtn" class="ghost-btn">Copy text</button>
+                </div>
+                <div id="translationArea" class="translation-area">
+                    <div class="empty-state centered">
+                        <strong>Ready when you are</strong>
+                        <span>Upload a PDF, then translate it with Gemma4.</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <div id="statusMessage" class="status-message hidden"></div>
+    </main>
+
     <script src="/static/app.js"></script>
 </body>
 </html>
