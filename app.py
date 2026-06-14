@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import os
 import re
+from urllib.parse import quote
 import requests
 
 app = Flask(__name__)
@@ -218,9 +219,53 @@ def get_models():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/files')
+def list_files():
+    files = []
+    for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.isfile(path) and filename.lower().endswith('.pdf'):
+            files.append({
+                'name': filename,
+                'size': os.path.getsize(path),
+                'modified': os.path.getmtime(path)
+            })
+
+    files.sort(key=lambda item: item['modified'], reverse=True)
+    return jsonify({
+        'success': True,
+        'files': files[:10]
+    })
+
+
+@app.route('/api/file/<path:filename>')
+def get_file_text(filename):
+    safe_name = os.path.basename(filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], safe_name)
+
+    if not os.path.isfile(filepath):
+        return jsonify({'error': 'File not found'}), 404
+
+    try:
+        text = extract_text_from_pdf(filepath)
+        return jsonify({
+            'success': True,
+            'filename': safe_name,
+            'text': text
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to extract text from PDF: {str(e)}'}), 500
+
+
 @app.route('/outputs/<filename>')
 def serve_output(filename):
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
+
+
+@app.route('/uploads/<path:filename>')
+def serve_upload(filename):
+    safe_name = os.path.basename(filename)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], safe_name)
 
 
 if __name__ == '__main__':
