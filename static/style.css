@@ -166,12 +166,56 @@ h1 {
     min-width: 0;
 }
 
-label {
+label,
+.page-control {
     display: grid;
     gap: 8px;
     color: var(--muted);
     font-size: 0.86rem;
     font-weight: 800;
+}
+
+.page-control input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    font: inherit;
+    font-weight: 800;
+}
+
+.page-controls {
+    display: grid;
+    grid-template-columns: 42px minmax(72px, 1fr) 42px;
+    gap: 8px;
+    align-items: end;
+}
+
+.page-control.compact {
+    gap: 4px;
+}
+
+.page-control.compact span {
+    font-size: 0.76rem;
+}
+
+.page-control.compact input {
+    min-height: 40px;
+    text-align: center;
+}
+
+.icon-btn {
+    min-height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 1.3rem;
+    font-weight: 900;
 }
 
 select,
@@ -195,6 +239,14 @@ select {
 .ghost-btn {
     cursor: pointer;
     transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.primary-btn.small,
+.ghost-btn.small {
+    min-height: 38px;
+    min-width: auto;
+    padding: 0 14px;
+    font-size: 0.84rem;
 }
 
 .primary-btn {
@@ -319,6 +371,12 @@ select {
     margin-bottom: 0;
     color: var(--muted);
     font-size: 0.9rem;
+}
+
+.page-meta {
+    margin-top: 4px !important;
+    color: var(--accent-2) !important;
+    font-weight: 800;
 }
 
 .pdf-frame-wrap {
