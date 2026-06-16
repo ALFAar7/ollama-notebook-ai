@@ -57,7 +57,17 @@
                     </select>
                 </label>
 
-                <button id="translateBtn" class="primary-btn">Translate PDF</button>
+                <div class="page-controls">
+                    <button id="prevPageBtn" class="icon-btn" type="button">‹</button>
+                    <label class="page-control compact">
+                        <span>Page</span>
+                        <input id="pageNumber" type="number" min="1" value="1">
+                    </label>
+                    <button id="nextPageBtn" class="icon-btn" type="button">›</button>
+                </div>
+
+                <button id="translateBtn" class="primary-btn">Translate page</button>
+                <button id="translateAllBtn" class="ghost-btn">Translate all</button>
             </div>
         </section>
 
@@ -77,6 +87,7 @@
                     <div>
                         <h2>Original PDF</h2>
                         <p id="pdfMeta">Upload a PDF to begin</p>
+                        <p id="pageMeta" class="page-meta"></p>
                     </div>
                     <button id="copyOriginalBtn" class="ghost-btn">Copy text</button>
                 </div>
