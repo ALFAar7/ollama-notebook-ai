@@ -10,7 +10,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 OUTPUT_FOLDER = os.path.join(os.path.dirname(__file__), 'outputs')
 ALLOWED_EXTENSIONS = {'pdf'}
-OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://localhost:11434')
+OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')
 DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma4:e2b')
 _MODEL_NAME = None
 
@@ -195,7 +195,7 @@ Text to translate:
         response.raise_for_status()
         return response.json().get('response', '')
     except requests.exceptions.ConnectionError:
-        raise Exception("Could not connect to Ollama. Make sure Ollama is running on localhost:11434")
+        raise Exception("Could not connect to Ollama. Make sure Ollama is running on 192.168.1.3:11434")
     except requests.exceptions.Timeout:
         raise Exception("Translation timed out. Try shorter text or increase timeout.")
     except Exception as e:
