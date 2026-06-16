@@ -11,7 +11,8 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 OUTPUT_FOLDER = os.path.join(os.path.dirname(__file__), 'outputs')
 ALLOWED_EXTENSIONS = {'pdf'}
 OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://localhost:11434')
-DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma4')
+DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma4:e2b')
+_MODEL_NAME = None
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
@@ -112,7 +113,66 @@ def split_text_for_translation(text, max_chars=3000):
     return chunks or [text]
 
 
+def resolve_model_name(preferred=None):
+    global _MODEL_NAME
+
+    preferred = preferred or DEFAULT_MODEL
+
+    try:
+        response = requests.get(f'{OLLAMA_URL}/api/tags', timeout=10)
+        response.raise_for_status()
+        names = [model.get('name') or model.get('model') for model in response.json().get('models', [])]
+
+        if preferred and preferred in names:
+            _MODEL_NAME = preferred
+        elif preferred:
+            match = next((name for name in names if name == preferred or name.startswith(preferred + ':') or name.startswith(preferred)), None)
+            _MODEL_NAME = match or _MODEL_NAME
+
+        if not _MODEL_NAME:
+            _MODEL_NAME = next((name for name in names if name.lower().startswith('gemma4')), None)
+
+        return _MODEL_NAME or preferred
+    except Exception:
+        return preferred or _MODEL_NAME or DEFAULT_MODEL
+
+
+def extract_pages(text):
+    page_numbers = [int(number) for number in re.findall(r'--- Page (\d+) ---', text)]
+    parts = re.split(r'\n\n--- Page \d+ ---\n\n', text)
+    pages = {}
+
+    for index, part in enumerate(parts):
+        part = part.strip()
+        if not part:
+            continue
+
+        page_number = page_numbers[index - 1] if index > 0 else 1
+        pages[page_number] = part
+
+    if not pages and text.strip():
+        pages[1] = text.strip()
+
+    return pages
+
+
+def get_page_text(text, page_number):
+    try:
+        page_number = int(page_number)
+    except (TypeError, ValueError):
+        raise ValueError('Invalid page number')
+
+    pages = extract_pages(text)
+
+    if page_number not in pages:
+        raise ValueError(f'Page {page_number} was not found')
+
+    return pages[page_number]
+
+
 def translate_with_ollama(text, target_language, source_language='auto'):
+    model_name = resolve_model_name(DEFAULT_MODEL)
+
     prompt = f"""Translate the following text from {source_language} to {target_language}.
 Maintain the original formatting as much as possible.
 Only provide the translation, no explanations.
@@ -121,7 +181,7 @@ Text to translate:
 {text}"""
 
     payload = {
-        "model": DEFAULT_MODEL,
+        "model": model_name,
         "prompt": prompt,
         "stream": False,
         "options": {
@@ -140,6 +200,11 @@ Text to translate:
         raise Exception("Translation timed out. Try shorter text or increase timeout.")
     except Exception as e:
         raise Exception(f"Translation failed: {str(e)}")
+
+
+def translate_page_text(text, page_number, target_language, source_language='auto'):
+    page_text = get_page_text(text, page_number)
+    return translate_with_ollama(page_text, target_language, source_language)
 
 
 def translate_full_text(text, target_language, source_language='auto'):
@@ -176,10 +241,12 @@ def upload_file():
 
     try:
         text = extract_text_from_pdf(filepath)
+        pages = extract_pages(text)
         return jsonify({
             'success': True,
             'filename': filename,
-            'text': text
+            'text': text,
+            'page_count': len(pages)
         })
     except Exception as e:
         return jsonify({'error': f'Failed to extract text from PDF: {str(e)}'}), 500
@@ -201,6 +268,33 @@ def translate_text():
             'success': True,
             'translated_text': translated
         })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/translate-page', methods=['POST'])
+def translate_page():
+    data = request.get_json()
+    text = data.get('text', '')
+    page_text = data.get('page_text', '')
+    page_number = data.get('page_number')
+    target_language = data.get('target_language', 'English')
+    source_language = data.get('source_language', 'auto')
+
+    if not text.strip() and not page_text.strip():
+        return jsonify({'error': 'No text provided'}), 400
+
+    try:
+        if not page_text.strip():
+            page_text = get_page_text(text, page_number)
+        translated = translate_with_ollama(page_text, target_language, source_language)
+        return jsonify({
+            'success': True,
+            'page_number': int(page_number),
+            'translated_text': translated
+        })
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -248,10 +342,12 @@ def get_file_text(filename):
 
     try:
         text = extract_text_from_pdf(filepath)
+        pages = extract_pages(text)
         return jsonify({
             'success': True,
             'filename': safe_name,
-            'text': text
+            'text': text,
+            'page_count': len(pages)
         })
     except Exception as e:
         return jsonify({'error': f'Failed to extract text from PDF: {str(e)}'}), 500
