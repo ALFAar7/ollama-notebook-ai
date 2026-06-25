@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemma4 PDF Translator</title>
+    <title>Gemma4 Translator</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -11,25 +11,24 @@
         <header class="hero">
             <div>
                 <p class="eyebrow">Local Ollama Translation</p>
-                <h1>Gemma4 PDF Translator</h1>
-                <p class="subtitle">Upload a PDF, view it side by side with extracted text, and translate it with your local Gemma4 model.</p>
+                <h1>Gemma4 Translator</h1>
+                <p class="subtitle">Choose text mode or attachment mode, pick languages, and translate with your local Gemma4 model.</p>
             </div>
             <div class="model-badge" id="modelBadge">Gemma4</div>
         </header>
 
-        <section class="toolbar">
-            <div class="upload-box">
-                <label for="pdfInput" class="upload-label">
-                    <span class="upload-icon">PDF</span>
-                    <span>
-                        <strong>Choose PDF</strong>
-                        <small>or drag it here</small>
-                    </span>
-                </label>
-                <input type="file" id="pdfInput" accept="application/pdf">
+        <section class="mode-switcher">
+            <button id="textModeBtn" class="mode-btn active" data-mode="text">📝 Text Mode</button>
+            <button id="attachmentModeBtn" class="mode-btn" data-mode="attachment">📎 Attachment Mode</button>
+        </section>
+
+        <section class="toolbar" id="textToolbar">
+            <div class="text-input-area">
+                <textarea id="textInput" rows="8" placeholder="Enter text here to translate..."></textarea>
+                <button id="translateTextBtn" class="primary-btn">Translate Text</button>
             </div>
 
-            <div class="translate-controls">
+            <div class="translate-controls-inline">
                 <label>
                     <span>From</span>
                     <select id="sourceLanguage">
@@ -56,6 +55,48 @@
                         <option value="Persian">Persian</option>
                     </select>
                 </label>
+            </div>
+        </section>
+
+        <section class="toolbar attachment-toolbar hidden" id="attachmentToolbar">
+            <div class="upload-box">
+                <label for="fileInput" class="upload-label">
+                    <span class="upload-icon">📎</span>
+                    <span>
+                        <strong>Choose File</strong>
+                        <small>PDF, DOCX, or TXT</small>
+                    </span>
+                </label>
+                <input type="file" id="fileInput" accept=".pdf,.docx,.txt">
+            </div>
+
+            <div class="translate-controls">
+                <label>
+                    <span>From</span>
+                    <select id="sourceLanguageFile">
+                        <option value="auto">Auto detect</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Persian">Persian</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Chinese">Chinese</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span>To</span>
+                    <select id="targetLanguageFile">
+                        <option value="English" selected>English</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Persian">Persian</option>
+                    </select>
+                </label>
 
                 <div class="page-controls">
                     <button id="prevPageBtn" class="icon-btn" type="button">‹</button>
@@ -66,33 +107,54 @@
                     <button id="nextPageBtn" class="icon-btn" type="button">›</button>
                 </div>
 
-                <button id="translateBtn" class="primary-btn">Translate page</button>
+                <button id="translatePageBtn" class="primary-btn">Translate page</button>
                 <button id="translateAllBtn" class="ghost-btn">Translate all</button>
             </div>
         </section>
 
         <section class="recent-files">
             <div class="section-title">
-                <h2>Last uploaded files</h2>
+                <h2>Recent files</h2>
                 <span id="fileCount">0 files</span>
             </div>
             <div id="fileList" class="file-list">
-                <p class="empty-state">No PDFs uploaded yet.</p>
+                <p class="empty-state">No files uploaded yet.</p>
             </div>
         </section>
 
         <section class="workspace">
-            <article class="panel">
+            <article class="panel" id="textModePanel">
                 <div class="panel-header">
                     <div>
-                        <h2>Original PDF</h2>
-                        <p id="pdfMeta">Upload a PDF to begin</p>
+                        <h2>Translation</h2>
+                        <p id="translationMetaText">Waiting for text input</p>
+                    </div>
+                    <button id="copyTranslationBtnText" class="ghost-btn">Copy text</button>
+                </div>
+                <div id="translationAreaText" class="translation-area">
+                    <div class="empty-state centered">
+                        <strong>Ready to translate</strong>
+                        <span>Enter text in the input area above and click Translate Text.</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="panel attachment-panel hidden" id="attachmentPanel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Original File</h2>
+                        <p id="pdfMeta">Upload a file to begin</p>
                         <p id="pageMeta" class="page-meta"></p>
                     </div>
                     <button id="copyOriginalBtn" class="ghost-btn">Copy text</button>
                 </div>
-                <div class="pdf-frame-wrap">
-                    <iframe id="pdfFrame" title="Uploaded PDF"></iframe>
+                <div class="pdf-frame-wrap" id="pdfFrameWrap">
+                    <div id="filePreview" class="file-preview">
+                        <div class="empty-state centered">
+                            <strong>No file loaded</strong>
+                            <span>Upload a file to preview its contents.</span>
+                        </div>
+                    </div>
                 </div>
                 <details class="text-details">
                     <summary>Extracted text</summary>
@@ -111,7 +173,7 @@
                 <div id="translationArea" class="translation-area">
                     <div class="empty-state centered">
                         <strong>Ready when you are</strong>
-                        <span>Upload a PDF, then translate it with Gemma4.</span>
+                        <span>Upload a file and translate it with Gemma4.</span>
                     </div>
                 </div>
             </article>
