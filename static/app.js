@@ -31,8 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const translationAreaText = document.getElementById('translationAreaText');
     const translationMetaText = document.getElementById('translationMetaText');
     const copyTranslationBtnText = document.getElementById('copyTranslationBtnText');
-    const sourceLanguageText = document.getElementById('sourceLanguage');
-    const targetLanguageText = document.getElementById('targetLanguage');
+
 
     let pdfText = '';
     let pages = [];
@@ -46,7 +45,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loadModels();
     switchMode('text');
 
+    sourceLanguageText.addEventListener('change', updateRTLState);
+    targetLanguageText.addEventListener('change', updateRTLState);
+    if (sourceLanguageFile) sourceLanguageFile.addEventListener('change', updateRTLState);
+    if (targetLanguageFile) targetLanguageFile.addEventListener('change', updateRTLState);
+
     textInput.addEventListener('input', () => {
+        if (textInput.value.trim()) {
+            translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Ready to translate</strong><span>Click "Translate Text" to translate your text.</span></div>';
+            translationMetaText.textContent = 'Waiting for translation';
+        }
+    });
         if (textInput.value.trim()) {
             translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Ready to translate</strong><span>Click "Translate Text" to translate your text.</span></div>';
             translationMetaText.textContent = 'Waiting for translation';
@@ -64,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         attachmentToolbar.classList.toggle('hidden', mode !== 'attachment');
         document.getElementById('textModePanel').classList.toggle('hidden', mode !== 'text');
         document.getElementById('attachmentPanel').classList.toggle('hidden', mode !== 'attachment');
+        updateRTLState();
     }
 
     fileInput.addEventListener('change', (event) => {
@@ -148,10 +158,17 @@ document.addEventListener('DOMContentLoaded', () => {
         showStatus('Uploading and extracting text...', '');
 
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 600000);
+            
             const response = await fetch('/api/upload', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                signal: controller.signal
             });
+            
+            clearTimeout(timeoutId);
+
             const data = await response.json();
 
             if (!response.ok || !data.success) {
@@ -175,7 +192,11 @@ document.addEventListener('DOMContentLoaded', () => {
             showStatus(`File uploaded. ${pages.length} page(s) detected.`, 'success');
         } catch (error) {
             console.error(error);
-            showStatus('Upload failed. Check the browser console for details.', 'error');
+            if (error.name === 'AbortError') {
+                showStatus('Upload timed out. The file may be too large or complex. Try a smaller file.', 'error');
+            } else {
+                showStatus('Upload failed. Check the browser console for details.', 'error');
+            }
         }
     }
 
@@ -213,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
             translatedText = data.translated_text;
             translationAreaText.innerHTML = formatText(translatedText);
             translationMetaText.textContent = `Translated to ${targetLanguageText.value}`;
+            updateRTLState();
             showStatus('Text translated successfully.', 'success');
         } catch (error) {
             console.error(error);
@@ -245,12 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/translate-page', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    page_text: pageText,
-                    page_number: currentPage,
-                    source_language: sourceLanguage.value,
-                    target_language: targetLanguage.value
-                })
+            body: JSON.stringify({
+                page_text: pageText,
+                page_number: currentPage,
+                source_language: sourceLanguageFile.value,
+                target_language: targetLanguageFile.value
+            })
             });
 
             const data = await response.json();
@@ -263,7 +285,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             translatedText = data.translated_text;
             translationArea.innerHTML = formatText(translatedText);
-            translationMeta.textContent = `Translated page ${currentPage} to ${targetLanguage.value}`;
+            translationMeta.textContent = `Translated page ${currentPage} to ${targetLanguageFile.value}`;
+            updateRTLState();
             showStatus(`Page ${currentPage} translated.`, 'success');
         } catch (error) {
             console.error(error);
@@ -290,11 +313,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/translate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    text: pdfText,
-                    source_language: sourceLanguage.value,
-                    target_language: targetLanguage.value
-                })
+            body: JSON.stringify({
+                text: pdfText,
+                source_language: sourceLanguageFile.value,
+                target_language: targetLanguageFile.value
+            })
             });
 
             const data = await response.json();
@@ -307,7 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             translatedText = data.translated_text;
             translationArea.innerHTML = formatText(translatedText);
-            translationMeta.textContent = `Translated full file to ${targetLanguage.value}`;
+            translationMeta.textContent = `Translated full file to ${targetLanguageFile.value}`;
+            updateRTLState();
             showStatus('Full file translation completed.', 'success');
         } catch (error) {
             console.error(error);
@@ -384,6 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentFileUrl = '';
             translatedText = '';
 
+            switchMode('attachment');
             pdfMeta.textContent = data.filename;
             renderCurrentPage();
             resetTranslation();
@@ -430,8 +455,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const pdfFrame = document.getElementById('pdfFrame');
         const filePreview = document.getElementById('filePreview');
         
-        if (fileType === 'pdf' && currentFileUrl) {
-            pdfFrame.src = `${currentFileUrl}#page=${currentPage}`;
+        if (fileType === 'pdf') {
+            const pdfSrc = currentFileUrl || `/uploads/${encodeURIComponent(currentFileName)}`;
+            pdfFrame.src = `${pdfSrc}#page=${currentPage}`;
             pdfFrame.style.display = 'block';
             filePreview.style.display = 'none';
         } else {
@@ -465,10 +491,21 @@ document.addEventListener('DOMContentLoaded', () => {
         resetTranslation();
     }
 
+    function updateRTLState() {
+        const targetLang = currentMode === 'text' ? targetLanguageText.value : targetLanguageFile.value;
+        const isRTL = targetLang === 'Persian';
+        
+        translationArea.classList.toggle('rtl', isRTL);
+        if (translationAreaText) {
+            translationAreaText.classList.toggle('rtl', isRTL);
+        }
+    }
+
     function resetTranslation() {
         translatedText = '';
         translationArea.innerHTML = '<div class="empty-state centered"><strong>Ready to translate</strong><span>Use Translate page for fast page-by-page translation.</span></div>';
         translationMeta.textContent = 'Waiting for page translation';
+        updateRTLState();
     }
 
     function updatePageButtons() {
