@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 OUTPUT_FOLDER = os.path.join(os.path.dirname(__file__), 'outputs')
-ALLOWED_EXTENSIONS = {'pdf'}
+ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt'}
 OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')
 DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma4:e2b')
 _MODEL_NAME = None
@@ -24,6 +24,10 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def get_file_extension(filename):
+    return filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
 
 
 def extract_text_from_pdf(pdf_path):
@@ -46,6 +50,30 @@ def extract_text_from_pdf(pdf_path):
                 return text
         except Exception as fallback_err:
             raise Exception(f"Primary extraction failed ({primary_err}); fallback also failed ({fallback_err})")
+
+
+def extract_text_from_docx(docx_path):
+    try:
+        import docx
+        doc = docx.Document(docx_path)
+        text = "\n\n".join([para.text for para in doc.paragraphs if para.text.strip()])
+        return text
+    except Exception as e:
+        raise Exception(f"Failed to extract text from DOCX: {str(e)}")
+
+
+def extract_text_from_txt(txt_path):
+    try:
+        with open(txt_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except UnicodeDecodeError:
+        try:
+            with open(txt_path, 'r', encoding='latin-1') as f:
+                return f.read()
+        except Exception as e:
+            raise Exception(f"Failed to read text file: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Failed to read text file: {str(e)}")
 
 
 def split_text_for_translation(text, max_chars=3000):
@@ -232,24 +260,38 @@ def upload_file():
     if file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
 
-    if not allowed_file(file.filename):
-        return jsonify({'error': 'Only PDF files are allowed'}), 400
+    ext = get_file_extension(file.filename)
+    if ext not in ALLOWED_EXTENSIONS:
+        return jsonify({'error': f'Unsupported file type. Allowed: {", ".join(sorted(ALLOWED_EXTENSIONS))}'}), 400
 
     filename = secure_filename(file.filename)
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
 
     try:
-        text = extract_text_from_pdf(filepath)
+        if ext == 'pdf':
+            text = extract_text_from_pdf(filepath)
+        elif ext == 'docx':
+            text = extract_text_from_docx(filepath)
+        elif ext == 'txt':
+            text = extract_text_from_txt(filepath)
+        else:
+            return jsonify({'error': 'Unsupported file type'}), 400
+
+        # For non-PDF files, still create page-like structure for consistency
+        if ext != 'pdf':
+            text = f"\n\n--- Page 1 ---\n\n{text}"
+        
         pages = extract_pages(text)
         return jsonify({
             'success': True,
             'filename': filename,
             'text': text,
-            'page_count': len(pages)
+            'page_count': len(pages),
+            'file_type': ext
         })
     except Exception as e:
-        return jsonify({'error': f'Failed to extract text from PDF: {str(e)}'}), 500
+        return jsonify({'error': f'Failed to extract text: {str(e)}'}), 500
 
 
 @app.route('/api/translate', methods=['POST'])
@@ -316,13 +358,15 @@ def get_models():
 @app.route('/api/files')
 def list_files():
     files = []
+    allowed_exts = tuple('.' + ext for ext in ALLOWED_EXTENSIONS)
     for filename in os.listdir(app.config['UPLOAD_FOLDER']):
         path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        if os.path.isfile(path) and filename.lower().endswith('.pdf'):
+        if os.path.isfile(path) and filename.lower().endswith(allowed_exts):
             files.append({
                 'name': filename,
                 'size': os.path.getsize(path),
-                'modified': os.path.getmtime(path)
+                'modified': os.path.getmtime(path),
+                'file_type': get_file_extension(filename)
             })
 
     files.sort(key=lambda item: item['modified'], reverse=True)
@@ -341,16 +385,28 @@ def get_file_text(filename):
         return jsonify({'error': 'File not found'}), 404
 
     try:
-        text = extract_text_from_pdf(filepath)
+        ext = get_file_extension(safe_name)
+        if ext == 'pdf':
+            text = extract_text_from_pdf(filepath)
+        elif ext == 'docx':
+            text = extract_text_from_docx(filepath)
+            text = f"\n\n--- Page 1 ---\n\n{text}"
+        elif ext == 'txt':
+            text = extract_text_from_txt(filepath)
+            text = f"\n\n--- Page 1 ---\n\n{text}"
+        else:
+            return jsonify({'error': 'Unsupported file type'}), 400
+        
         pages = extract_pages(text)
         return jsonify({
             'success': True,
             'filename': safe_name,
             'text': text,
-            'page_count': len(pages)
+            'page_count': len(pages),
+            'file_type': ext
         })
     except Exception as e:
-        return jsonify({'error': f'Failed to extract text from PDF: {str(e)}'}), 500
+        return jsonify({'error': f'Failed to extract text: {str(e)}'}), 500
 
 
 @app.route('/outputs/<filename>')

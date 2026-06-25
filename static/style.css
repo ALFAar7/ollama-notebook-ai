@@ -47,6 +47,40 @@ body {
     backdrop-filter: blur(18px);
 }
 
+.mode-switcher {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: fit-content;
+}
+
+.mode-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 16px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mode-btn.active {
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--text);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.mode-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+}
+
 .eyebrow {
     margin: 0 0 10px;
     color: var(--accent-2);
@@ -103,6 +137,60 @@ h1 {
     align-items: stretch;
     margin-top: 24px;
     padding: 18px;
+}
+
+.toolbar.hidden,
+.attachment-panel.hidden,
+#textModePanel.hidden {
+    display: none;
+}
+
+#textToolbar {
+    flex-direction: column;
+    gap: 18px;
+}
+
+.text-input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.text-input-area textarea {
+    width: 100%;
+    min-height: 140px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    font: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.text-input-area textarea:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.5);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.translate-controls-inline {
+    display: flex;
+    gap: 14px;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.attachment-toolbar {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+}
+
+.attachment-toolbar.hidden {
+    display: none;
 }
 
 .upload-box {
@@ -306,7 +394,6 @@ select {
 
 .file-item {
     display: flex;
-    justify-content: space-between;
     gap: 12px;
     align-items: center;
     min-width: 0;
@@ -325,16 +412,28 @@ select {
     border-color: rgba(139, 92, 246, 0.45);
 }
 
+.file-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 4px;
+}
+
 .file-name {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-weight: 800;
+    font-size: 0.9rem;
 }
 
 .file-size {
-    flex: 0 0 auto;
     color: var(--muted);
     font-size: 0.8rem;
 }
@@ -392,6 +491,26 @@ select {
     border: 0;
     border-radius: 20px;
     background: #f8fafc;
+}
+
+.file-preview {
+    width: 100%;
+    min-height: 520px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 20px;
+}
+
+#pdfFrame {
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    border: 0;
+    border-radius: 20px;
+    background: #f8fafc;
+    display: none;
 }
 
 .text-details {
@@ -489,8 +608,20 @@ select {
         flex-basis: auto;
     }
 
+    .attachment-toolbar {
+        grid-template-columns: 1fr;
+    }
+
     .panel {
         min-height: auto;
+    }
+
+    #textToolbar {
+        display: flex;
+    }
+
+    .translate-controls-inline {
+        width: 100%;
     }
 }
 
@@ -510,7 +641,18 @@ select {
         margin-top: 18px;
     }
 
-    .translate-controls {
+    .mode-switcher {
+        width: 100%;
+    }
+
+    .mode-btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    .toolbar,
+    .translate-controls,
+    .translate-controls-inline {
         display: grid;
     }
 
