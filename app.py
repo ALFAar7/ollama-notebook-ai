@@ -54,7 +54,14 @@ def load_extracted_text(filename):
     if not os.path.isfile(path):
         return ''
     with open(path, 'r', encoding='utf-8') as handle:
-        return handle.read()
+        text = handle.read()
+    return clean_extracted_text(text)
+
+
+def clean_extracted_text(text):
+    cleaned = re.sub(r'\(cid:\d+\)', '', text)
+    cleaned = re.sub(r'\(cid:[0-9a-fA-F]+\)', '', cleaned)
+    return cleaned
 
 
 def get_translation_cache_path(text, source_lang, target_lang):
@@ -93,7 +100,7 @@ def extract_pdf_page_text(pdf_path, page_number):
         from PyPDF2 import PdfReader
         reader = PdfReader(pdf_path)
         page = reader.pages[page_number - 1]
-        return page.extract_text() or ""
+        return clean_extracted_text(page.extract_text() or "")
     except Exception as exc:
         raise Exception(f"Failed to extract page {page_number}: {exc}")
 
@@ -104,7 +111,7 @@ def extract_text_from_pdf(pdf_path):
         reader = PdfReader(pdf_path)
         text = ""
         for i, page in enumerate(reader.pages, 1):
-            page_text = page.extract_text() or ""
+            page_text = clean_extracted_text(page.extract_text() or "")
             text += f"\n\n--- Page {i} ---\n\n{page_text}"
         return text
     except Exception as primary_err:
@@ -113,7 +120,7 @@ def extract_text_from_pdf(pdf_path):
             with pdfplumber.open(pdf_path) as pdf:
                 text = ""
                 for i, page in enumerate(pdf.pages, 1):
-                    page_text = page.extract_text() or ""
+                    page_text = clean_extracted_text(page.extract_text() or "")
                     text += f"\n\n--- Page {i} ---\n\n{page_text}"
                 return text
         except Exception as fallback_err:
@@ -127,7 +134,7 @@ def extract_pdf_pages_to_file(pdf_path, filename):
         with open(output_path, 'w', encoding='utf-8') as handle:
             reader = PdfReader(pdf_path)
             for i, page in enumerate(reader.pages, 1):
-                page_text = page.extract_text() or ""
+                page_text = clean_extracted_text(page.extract_text() or "")
                 handle.write(f"\n\n--- Page {i} ---\n\n{page_text}")
         return output_path
     except Exception as primary_err:
@@ -136,7 +143,7 @@ def extract_pdf_pages_to_file(pdf_path, filename):
             with pdfplumber.open(pdf_path) as pdf:
                 with open(output_path, 'w', encoding='utf-8') as handle:
                     for i, page in enumerate(pdf.pages, 1):
-                        page_text = page.extract_text() or ""
+                        page_text = clean_extracted_text(page.extract_text() or "")
                         handle.write(f"\n\n--- Page {i} ---\n\n{page_text}")
                 return output_path
         except Exception as fallback_err:
@@ -340,6 +347,43 @@ Text to translate:
         raise Exception("Translation timed out. Try shorter text or increase timeout.")
     except Exception as e:
         raise Exception(f"Translation failed: {str(e)}")
+
+
+def summarize_with_ollama(text, language):
+    if not text.strip():
+        return ''
+
+    model_name = resolve_model_name(DEFAULT_MODEL)
+    if len(text) > 6000:
+        text = text[:6000] + '\n\n[...truncated...]'
+
+    prompt = f"""Read the following text and write a short summary in {language}.
+Write only in {language}. Do not use any other language.
+The summary should be 2-4 sentences and capture the main topic and key points.
+
+Text to summarize:
+{text}"""
+
+    payload = {
+        "model": model_name,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": 0.5,
+            "num_ctx": 4096
+        }
+    }
+
+    try:
+        response = requests.post(f'{OLLAMA_URL}/api/generate', json=payload, timeout=300)
+        response.raise_for_status()
+        return response.json().get('response', '').strip()
+    except requests.exceptions.ConnectionError:
+        raise Exception("Could not connect to Ollama. Make sure Ollama is running on 192.168.1.3:11434")
+    except requests.exceptions.Timeout:
+        raise Exception("Summary timed out.")
+    except Exception as e:
+        raise Exception(f"Summary failed: {str(e)}")
 
 
 def translate_page_text(text, page_number, target_language, source_language='auto'):
@@ -566,6 +610,22 @@ def document_status():
         return jsonify({'success': True, 'filename': filename, 'ready': True, 'status': 'ready', 'message': 'PDF ready', 'page_count': len(extract_pages(text))})
 
     return jsonify({'success': True, 'filename': filename, 'ready': False, 'status': 'queued', 'message': 'Waiting for processing', 'page_count': 0})
+
+
+@app.route('/api/summary', methods=['POST'])
+def summarize_text():
+    data = request.get_json()
+    text = data.get('text', '')
+    language = data.get('language', 'English')
+
+    if not text.strip():
+        return jsonify({'error': 'No text provided'}), 400
+
+    try:
+        summary = summarize_with_ollama(text, language)
+        return jsonify({'success': True, 'summary': summary})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/models')
