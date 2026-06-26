@@ -137,13 +137,25 @@ textarea {
     font-weight: 800;
 }
 
+.text-input-area::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+}
+
+.text-input-area:focus {
+    outline: none;
+}
+
 .lang-select select {
+    appearance: none;
     min-height: 40px;
-    padding: 0 12px;
+    padding: 0 36px 0 12px;
     border: 1px solid var(--border);
     border-radius: 12px;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.08) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239eaecb'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat right 12px center;
+    background-size: 16px;
     color: var(--text);
+    cursor: pointer;
 }
 
 .notebook-grid {
@@ -228,6 +240,12 @@ textarea {
     transform: translateY(-1px);
 }
 
+.upload-card.dragging {
+    border-color: var(--accent);
+    background: rgba(139, 92, 246, 0.15);
+    transform: scale(1.02);
+}
+
 .upload-card strong {
     display: block;
     margin-bottom: 4px;
@@ -256,6 +274,14 @@ textarea {
     gap: 8px;
     flex-wrap: wrap;
     margin: 12px 0;
+    align-items: center;
+}
+
+.meta-pill {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .source-preview,
@@ -265,10 +291,49 @@ textarea {
     border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,255,255,0.04);
     padding: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.source-preview {
+    max-height: 280px;
+}
+
+.attachment-preview {
+    min-height: 400px;
+    height: 100%;
+}
+
+.attachment-preview .empty-state {
+    min-height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.attachment-preview .empty-state strong {
+    font-size: 1.15rem;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    word-break: break-word;
 }
 
 .compact-preview {
     min-height: 220px;
+    max-height: 280px;
+    overflow: hidden;
+}
+
+.compact-preview .preview-content {
+    min-height: auto;
+    height: 100%;
+}
+
+.compact-preview .preview-text {
+    min-height: auto;
+    max-height: 220px;
+    font-size: 0.95rem;
 }
 
 .preview-content {
@@ -276,7 +341,15 @@ textarea {
     flex-direction: column;
     gap: 12px;
     height: 100%;
-    min-height: 320px;
+}
+
+.source-preview .preview-content {
+    min-height: 200px;
+}
+
+.source-preview .preview-text {
+    min-height: auto;
+    max-height: 240px;
 }
 
 .preview-caption {
@@ -292,7 +365,7 @@ textarea {
     line-height: 1.8;
     color: var(--text);
     overflow: auto;
-    font-size: 1rem;
+    font-size: 1.05rem;
     padding-right: 6px;
     flex: 1;
 }
@@ -315,10 +388,17 @@ textarea {
     color: var(--text);
     background: rgba(255,255,255,0.06);
     line-height: 1.6;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.note-textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
 }
 
 .note-textarea:focus {
     outline: 2px solid rgba(139, 92, 246, 0.35);
+    background: rgba(255,255,255,0.08);
 }
 
 .panel {
@@ -329,10 +409,11 @@ textarea {
 
 .workspace-split {
     display: grid;
-    grid-template-columns: 1.6fr 1fr;
+    grid-template-columns: 1.4fr 1fr;
     gap: 18px;
     padding: 18px;
     align-items: start;
+    min-height: 500px;
 }
 
 .notes-summary {
@@ -372,7 +453,8 @@ textarea {
 
 .panel-header h2 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 1.05rem;
+    font-weight: 700;
 }
 
 .panel-actions {
@@ -408,7 +490,8 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    padding: 16px 18px 18px;
+    padding: 16px 18px 0;
+    min-height: 400px;
 }
 
 .attachment-actions {
