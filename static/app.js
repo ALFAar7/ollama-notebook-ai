@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let translatedText = '';
     let currentMode = 'text';
     let processingTimer = null;
+    const sidebar = document.querySelector('.sidebar');
 
     loadModels();
     restoreNote();
@@ -46,6 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sourceLanguage.addEventListener('change', updateRTLState);
     targetLanguage.addEventListener('change', updateRTLState);
+
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+    }
 
     textInput.addEventListener('input', () => {
         if (textInput.value.trim()) {
@@ -285,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const pageText = data.page_text || '';
             pages[currentPage - 1] = pageText;
-            pdfText = pageText;
             renderFilePreview();
         } catch (error) {
             console.error(error);
@@ -445,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function translateAllPages() {
-        if (!pdfText.trim()) {
+        if (!currentFileName) {
             showStatus('Upload a source file before translating.', 'error');
             return;
         }

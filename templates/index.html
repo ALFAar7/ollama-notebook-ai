@@ -85,7 +85,7 @@
                     </div>
                 </div>
 
-                <div class="sidebar-card compact-card">
+                <div class="sidebar-card compact-card sidebar-notes">
                     <div class="section-head">
                         <div>
                             <p class="eyebrow">Notes</p>
@@ -93,19 +93,21 @@
                         </div>
                         <button id="saveNoteBtn" class="ghost-btn small">Save</button>
                     </div>
-                    <div class="notes-summary compact-summary" id="notesSummary">
+                    <div class="notes-summary compact-summary" id="notesSummaryMobile">
                         <div class="empty-state centered">
                             <strong>Summary will appear here</strong>
                             <span>After translating a page, a quick summary will be generated for your notes.</span>
                         </div>
                     </div>
-                    <textarea id="noteInput" class="note-textarea compact-note" placeholder="Capture key ideas, questions, or follow-up prompts..."></textarea>
+                    <textarea id="noteInputMobile" class="note-textarea compact-note" placeholder="Capture key ideas, questions, or follow-up prompts..."></textarea>
                 </div>
             </aside>
 
+            <button id="sidebarToggle" class="ghost-btn" aria-label="Toggle sidebar">☰</button>
+
             <div class="main-pane expanded-main-pane">
                 <div id="textModePanel" class="mode-panel">
-                    <article class="panel panel-source">
+                    <article class="panel panel-source desktop-top-section">
                         <div class="panel-header">
                             <div>
                                 <p class="eyebrow">Workspace</p>
@@ -186,6 +188,25 @@
                     </div>
                     <div id="translationAreaText" class="translation-area"></div>
                 </article>
+
+                <div class="notes-section desktop-notes">
+                    <div class="sidebar-card">
+                        <div class="section-head">
+                            <div>
+                                <p class="eyebrow">Notes</p>
+                                <h2>Study notes</h2>
+                            </div>
+                            <button id="saveNoteBtn" class="ghost-btn small">Save</button>
+                        </div>
+                        <div class="notes-summary" id="notesSummaryDesktop">
+                            <div class="empty-state centered">
+                                <strong>Summary will appear here</strong>
+                                <span>After translating a page, a quick summary will be generated for your notes.</span>
+                            </div>
+                        </div>
+                        <textarea id="noteInputDesktop" class="note-textarea" placeholder="Capture key ideas, questions, or follow-up prompts..."></textarea>
+                    </div>
+                </div>
             </div>
         </section>
 
