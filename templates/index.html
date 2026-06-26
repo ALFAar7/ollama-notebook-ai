@@ -53,8 +53,8 @@
         </header>
 
         <section class="notebook-grid">
-            <aside class="sidebar">
-                <div class="sidebar-card">
+            <aside class="sidebar compact-sidebar">
+                <div class="sidebar-card compact-card">
                     <div class="section-head">
                         <div>
                             <p class="eyebrow">Sources</p>
@@ -63,7 +63,7 @@
                         <span class="section-pill" id="sourceStatus">No source loaded</span>
                     </div>
 
-                    <label for="fileInput" class="upload-card">
+                    <label for="fileInput" class="upload-card compact-upload">
                         <span class="upload-icon">⬆</span>
                         <div>
                             <strong>Drop in a PDF, DOCX, or TXT</strong>
@@ -72,12 +72,12 @@
                     </label>
                     <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
 
-                    <div class="source-meta">
+                    <div class="source-meta compact-meta">
                         <span class="meta-pill" id="sourceFileName">No file</span>
                         <span class="meta-pill" id="sourcePageCount">Pages: —</span>
                     </div>
 
-                    <div class="source-preview" id="filePreviewSidebar">
+                    <div class="source-preview compact-preview" id="filePreviewSidebar">
                         <div class="empty-state centered">
                             <strong>Start with a source</strong>
                             <span>Upload a PDF, DOCX, or TXT file to preview it here.</span>
@@ -85,7 +85,7 @@
                     </div>
                 </div>
 
-                <div class="sidebar-card">
+                <div class="sidebar-card compact-card">
                     <div class="section-head">
                         <div>
                             <p class="eyebrow">Notes</p>
@@ -93,17 +93,17 @@
                         </div>
                         <button id="saveNoteBtn" class="ghost-btn small">Save</button>
                     </div>
-                    <div class="notes-summary" id="notesSummary">
+                    <div class="notes-summary compact-summary" id="notesSummary">
                         <div class="empty-state centered">
                             <strong>Summary will appear here</strong>
                             <span>After translating a page, a quick summary will be generated for your notes.</span>
                         </div>
                     </div>
-                    <textarea id="noteInput" class="note-textarea" placeholder="Capture key ideas, questions, or follow-up prompts..."></textarea>
+                    <textarea id="noteInput" class="note-textarea compact-note" placeholder="Capture key ideas, questions, or follow-up prompts..."></textarea>
                 </div>
             </aside>
 
-            <div class="main-pane">
+            <div class="main-pane expanded-main-pane">
                 <div id="textModePanel" class="mode-panel">
                     <article class="panel panel-source">
                         <div class="panel-header">
