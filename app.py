@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
+import hashlib
 import os
 import re
 import threading
@@ -21,6 +22,8 @@ app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+CACHE_DIR = os.path.join(os.path.dirname(__file__), 'cache')
+os.makedirs(CACHE_DIR, exist_ok=True)
 
 processing_status = {}
 
@@ -52,6 +55,28 @@ def load_extracted_text(filename):
         return ''
     with open(path, 'r', encoding='utf-8') as handle:
         return handle.read()
+
+
+def get_translation_cache_path(text, source_lang, target_lang):
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    key = f"{text}\u0000{source_lang}\u0000{target_lang}"
+    filename = hashlib.sha256(key.encode('utf-8')).hexdigest() + '.txt'
+    return os.path.join(CACHE_DIR, filename)
+
+
+def save_translation_to_cache(path, translated_text):
+    with open(path, 'w', encoding='utf-8') as handle:
+        handle.write(translated_text)
+
+
+def load_translation_from_cache(path):
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, 'r', encoding='utf-8') as handle:
+            return handle.read()
+    except Exception:
+        return None
 
 
 def count_pdf_pages(pdf_path):
@@ -119,6 +144,11 @@ def extract_pdf_pages_to_file(pdf_path, filename):
 
 
 def background_extract_pdf(filepath, filename):
+    existing_text = load_extracted_text(filename)
+    if existing_text.strip():
+        processing_status[filename] = {'status': 'ready', 'message': 'PDF ready', 'page_count': count_pdf_pages(filepath)}
+        return
+
     processing_status[filename] = {'status': 'processing', 'message': 'Extracting PDF text...', 'page_count': count_pdf_pages(filepath)}
     try:
         extract_pdf_pages_to_file(filepath, filename)
@@ -274,6 +304,11 @@ def get_page_text(text, page_number):
 
 
 def translate_with_ollama(text, target_language, source_language='auto'):
+    cache_path = get_translation_cache_path(text, source_language, target_language)
+    cached = load_translation_from_cache(cache_path)
+    if cached is not None:
+        return cached
+
     model_name = resolve_model_name(DEFAULT_MODEL)
 
     prompt = f"""Translate the following text from {source_language} to {target_language}.
@@ -296,7 +331,9 @@ Text to translate:
     try:
         response = requests.post(f'{OLLAMA_URL}/api/generate', json=payload, timeout=300)
         response.raise_for_status()
-        return response.json().get('response', '')
+        translated = response.json().get('response', '')
+        save_translation_to_cache(cache_path, translated)
+        return translated
     except requests.exceptions.ConnectionError:
         raise Exception("Could not connect to Ollama. Make sure Ollama is running on 192.168.1.3:11434")
     except requests.exceptions.Timeout:
@@ -346,6 +383,21 @@ def upload_file():
     try:
         if ext == 'pdf':
             page_count = count_pdf_pages(filepath)
+            existing_text = load_extracted_text(filename)
+            if existing_text.strip():
+                pages = extract_pages(existing_text)
+                preview_text = get_page_text(existing_text, 1) if len(pages) >= 1 else existing_text[:4000]
+                return jsonify({
+                    'success': True,
+                    'filename': filename,
+                    'text': existing_text,
+                    'preview_text': preview_text,
+                    'page_count': len(pages),
+                    'file_type': ext,
+                    'storage_ready': True,
+                    'processing': False
+                })
+
             processing_status[filename] = {'status': 'queued', 'message': 'PDF queued for processing', 'page_count': page_count}
             threading.Thread(target=background_extract_pdf, args=(filepath, filename), daemon=True).start()
             return jsonify({
@@ -360,14 +412,24 @@ def upload_file():
             })
 
         if ext == 'docx':
-            text = extract_text_from_docx(filepath)
+            existing_text = load_extracted_text(filename)
+            if existing_text.strip():
+                text = existing_text
+            else:
+                text = extract_text_from_docx(filepath)
+                text = f"\n\n--- Page 1 ---\n\n{text}"
+                save_extracted_text(filename, text)
         elif ext == 'txt':
-            text = extract_text_from_txt(filepath)
+            existing_text = load_extracted_text(filename)
+            if existing_text.strip():
+                text = existing_text
+            else:
+                text = extract_text_from_txt(filepath)
+                text = f"\n\n--- Page 1 ---\n\n{text}"
+                save_extracted_text(filename, text)
         else:
             return jsonify({'error': 'Unsupported file type'}), 400
 
-        text = f"\n\n--- Page 1 ---\n\n{text}"
-        save_extracted_text(filename, text)
         pages = extract_pages(text)
         preview_text = get_page_text(text, 1) if len(pages) >= 1 else text[:4000]
         return jsonify({
@@ -555,16 +617,19 @@ def get_file_text(filename):
 
     try:
         ext = get_file_extension(safe_name)
-        if ext == 'pdf':
-            text = extract_text_from_pdf(filepath)
-        elif ext == 'docx':
-            text = extract_text_from_docx(filepath)
-            text = f"\n\n--- Page 1 ---\n\n{text}"
-        elif ext == 'txt':
-            text = extract_text_from_txt(filepath)
-            text = f"\n\n--- Page 1 ---\n\n{text}"
-        else:
-            return jsonify({'error': 'Unsupported file type'}), 400
+        text = load_extracted_text(safe_name)
+        if not text.strip():
+            if ext == 'pdf':
+                text = extract_text_from_pdf(filepath)
+            elif ext == 'docx':
+                text = extract_text_from_docx(filepath)
+                text = f"\n\n--- Page 1 ---\n\n{text}"
+            elif ext == 'txt':
+                text = extract_text_from_txt(filepath)
+                text = f"\n\n--- Page 1 ---\n\n{text}"
+            else:
+                return jsonify({'error': 'Unsupported file type'}), 400
+            save_extracted_text(safe_name, text)
         
         pages = extract_pages(text)
         return jsonify({
