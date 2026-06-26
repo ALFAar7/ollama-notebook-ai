@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const copyOriginalBtn = document.getElementById('copyOriginalBtn');
     const copyTranslationBtn = document.getElementById('copyTranslationBtn');
     const copyTranslationBtnText = document.getElementById('copyTranslationBtnText');
+    const copySourceBtn = document.getElementById('copySourceBtn');
+    const clearTextBtn = document.getElementById('clearTextBtn');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
     const modelBadge = document.getElementById('modelBadge');
     const pageNumberInput = document.getElementById('pageNumber');
     const prevPageBtn = document.getElementById('prevPageBtn');
@@ -21,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const translateTextBtn = document.getElementById('translateTextBtn');
     const translationAreaText = document.getElementById('translationAreaText');
     const filePreview = document.getElementById('filePreview');
+    const sourceFileName = document.getElementById('sourceFileName');
+    const sourcePageCount = document.getElementById('sourcePageCount');
+    const sourceStatus = document.getElementById('sourceStatus');
+    const noteInput = document.getElementById('noteInput');
 
     let pdfText = '';
     let pages = [];
@@ -30,19 +37,120 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentMode = 'text';
 
     loadModels();
+    restoreNote();
     switchMode('text');
+    updateSourceMeta();
 
     sourceLanguage.addEventListener('change', updateRTLState);
     targetLanguage.addEventListener('change', updateRTLState);
 
     textInput.addEventListener('input', () => {
         if (textInput.value.trim()) {
-            translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Ready to translate</strong><span>Click "Translate" to translate your text.</span></div>';
+            translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Ready to translate</strong><span>Click translate to turn this notebook entry into a polished translation.</span></div>';
         }
     });
 
     textModeBtn.addEventListener('click', () => switchMode('text'));
     attachmentModeBtn.addEventListener('click', () => switchMode('attachment'));
+
+    if (fileInput) {
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) uploadAndTranslateFile(file);
+        });
+    }
+
+    const uploadCard = document.querySelector('.upload-card');
+    if (uploadCard) {
+        uploadCard.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            uploadCard.classList.add('dragging');
+        });
+
+        uploadCard.addEventListener('dragleave', () => {
+            uploadCard.classList.remove('dragging');
+        });
+
+        uploadCard.addEventListener('drop', (event) => {
+            event.preventDefault();
+            uploadCard.classList.remove('dragging');
+            const file = event.dataTransfer.files[0];
+            if (file) uploadAndTranslateFile(file);
+        });
+    }
+
+    if (translateBtn) {
+        translateBtn.addEventListener('click', translateCurrentPage);
+    }
+    if (translateAllBtn) {
+        translateAllBtn.addEventListener('click', translateAllPages);
+    }
+    if (pageNumberInput) {
+        pageNumberInput.addEventListener('change', () => {
+            goToPage(Number(pageNumberInput.value));
+        });
+    }
+    if (prevPageBtn) {
+        prevPageBtn.addEventListener('click', () => goToPage(currentPage - 1));
+    }
+    if (nextPageBtn) {
+        nextPageBtn.addEventListener('click', () => goToPage(currentPage + 1));
+    }
+
+    if (copyOriginalBtn) {
+        copyOriginalBtn.addEventListener('click', async () => {
+            const pageText = pages[currentPage - 1] || '';
+            if (!pageText.trim()) {
+                showStatus('No extracted text to copy.', 'error');
+                return;
+            }
+            await copyToClipboard(pageText);
+            showStatus('Current page text copied.', 'success');
+        });
+    }
+
+    if (copyTranslationBtnText) {
+        copyTranslationBtnText.addEventListener('click', async () => {
+            const text = translationAreaText.textContent || '';
+            if (!text.trim()) {
+                showStatus('No translated text to copy.', 'error');
+                return;
+            }
+            await copyToClipboard(text);
+            showStatus('Translation copied.', 'success');
+        });
+    }
+
+    if (copySourceBtn) {
+        copySourceBtn.addEventListener('click', async () => {
+            const text = textInput.value || '';
+            if (!text.trim()) {
+                showStatus('Nothing to copy yet.', 'error');
+                return;
+            }
+            await copyToClipboard(text);
+            showStatus('Source copied.', 'success');
+        });
+    }
+
+    if (clearTextBtn) {
+        clearTextBtn.addEventListener('click', () => {
+            textInput.value = '';
+            translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Clear workspace</strong><span>Start a fresh notebook entry whenever you want.</span></div>';
+            showStatus('Notebook cleared.', 'success');
+        });
+    }
+
+    if (saveNoteBtn) {
+        saveNoteBtn.addEventListener('click', () => {
+            localStorage.setItem('notebook-note', noteInput.value || '');
+            showStatus('Note saved locally.', 'success');
+        });
+    }
+
+    if (translateTextBtn) {
+        translateTextBtn.addEventListener('click', translateTextMode);
+    }
 
     function switchMode(mode) {
         currentMode = mode;
@@ -50,80 +158,19 @@ document.addEventListener('DOMContentLoaded', () => {
         attachmentModeBtn.classList.toggle('active', mode === 'attachment');
         textModePanel.classList.toggle('hidden', mode !== 'text');
         attachmentPanel.classList.toggle('hidden', mode !== 'attachment');
+        if (translationAreaText) {
+            translationAreaText.classList.toggle('hidden', mode === 'attachment');
+        }
+        if (translationArea) {
+            translationArea.classList.toggle('hidden', mode === 'text');
+        }
         updateRTLState();
     }
-
-    fileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) uploadAndTranslateFile(file);
-    });
-
-    document.querySelector('.upload-box').addEventListener('dragover', (event) => {
-        event.preventDefault();
-        document.querySelector('.upload-box').classList.add('dragging');
-    });
-
-    document.querySelector('.upload-box').addEventListener('dragleave', () => {
-        document.querySelector('.upload-box').classList.remove('dragging');
-    });
-
-    document.querySelector('.upload-box').addEventListener('drop', (event) => {
-        event.preventDefault();
-        document.querySelector('.upload-box').classList.remove('dragging');
-        const file = event.dataTransfer.files[0];
-        if (file) uploadAndTranslateFile(file);
-    });
-
-    translateBtn.addEventListener('click', translateCurrentPage);
-    translateAllBtn.addEventListener('click', translateAllPages);
-
-    pageNumberInput.addEventListener('change', () => {
-        goToPage(Number(pageNumberInput.value));
-    });
-
-    prevPageBtn.addEventListener('click', () => {
-        goToPage(currentPage - 1);
-    });
-
-    nextPageBtn.addEventListener('click', () => {
-        goToPage(currentPage + 1);
-    });
-
-    copyOriginalBtn.addEventListener('click', async () => {
-        const pageText = pages[currentPage - 1] || '';
-        if (!pageText.trim()) {
-            showStatus('No extracted text to copy.', 'error');
-            return;
-        }
-        await copyToClipboard(pageText);
-        showStatus('Current page text copied.', 'success');
-    });
-
-    copyTranslationBtn.addEventListener('click', async () => {
-        if (!translatedText) {
-            showStatus('No translated text to copy.', 'error');
-            return;
-        }
-        await copyToClipboard(translatedText);
-        showStatus('Translated page copied.', 'success');
-    });
-
-    copyTranslationBtnText.addEventListener('click', async () => {
-        const text = translationAreaText.textContent || '';
-        if (!text.trim()) {
-            showStatus('No translated text to copy.', 'error');
-            return;
-        }
-        await copyToClipboard(text);
-        showStatus('Translation copied.', 'success');
-    });
-
-    translateTextBtn.addEventListener('click', translateTextMode);
 
     async function uploadAndTranslateFile(file) {
         const allowedTypes = ['.pdf', '.docx', '.txt'];
         const ext = '.' + file.name.split('.').pop().toLowerCase();
-        
+
         if (!allowedTypes.includes(ext)) {
             showStatus('Please choose a valid file (PDF, DOCX, or TXT).', 'error');
             return;
@@ -132,18 +179,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         formData.append('file', file);
 
-        showStatus('Processing file...', '');
+        showStatus('Processing source...', '');
 
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 600000);
-            
             const response = await fetch('/api/upload', {
                 method: 'POST',
                 body: formData,
                 signal: controller.signal
             });
-            
             clearTimeout(timeoutId);
 
             const data = await response.json();
@@ -160,9 +205,13 @@ document.addEventListener('DOMContentLoaded', () => {
             translatedText = '';
 
             renderFilePreview();
-            translationArea.innerHTML = '<div class="empty-state centered"><strong>Ready to translate</strong><span>Click "Translate page" or "Translate all".</span></div>';
-
-            showStatus(`File processed. ${pages.length} page(s) found.`, 'success');
+            updatePageButtons();
+            updateSourceMeta();
+            if (pageNumberInput) {
+                pageNumberInput.value = currentPage;
+            }
+            translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document when you are ready.</span></div>';
+            showStatus(`File processed. ${pages.length} page(s) ready.`, 'success');
         } catch (error) {
             console.error(error);
             if (error.name === 'AbortError') {
@@ -175,15 +224,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderFilePreview() {
         const fileType = currentFileName.split('.').pop().toLowerCase();
-        
         if (fileType === 'pdf') {
-            filePreview.innerHTML = '<iframe id="pdfFrame" title="PDF Preview" src="/uploads/' + encodeURIComponent(currentFileName) + '"></iframe>';
+            filePreview.innerHTML = `<iframe id="pdfFrame" title="PDF Preview" src="/uploads/${encodeURIComponent(currentFileName)}"></iframe>`;
         } else {
             const icon = fileType === 'docx' ? '📘' : fileType === 'txt' ? '📄' : '📎';
             filePreview.innerHTML = `
                 <div class="empty-state centered">
                     <strong>${icon} ${currentFileName}</strong>
-                    <span>${pages.length} page(s) • Click translate to process</span>
+                    <span>${pages.length} page(s) • Ready for translation</span>
                 </div>
             `;
         }
@@ -205,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    text: text,
+                    text,
                     source_language: sourceLanguage.value,
                     target_language: targetLanguage.value
                 })
@@ -235,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function translateCurrentPage() {
         if (!pdfText.trim()) {
-            showStatus('Upload a file before translating.', 'error');
+            showStatus('Upload a source file before translating.', 'error');
             return;
         }
 
@@ -285,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function translateAllPages() {
         if (!pdfText.trim()) {
-            showStatus('Upload a file before translating.', 'error');
+            showStatus('Upload a source file before translating.', 'error');
             return;
         }
 
@@ -330,8 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/models');
             const data = await response.json();
-
-            if (data.success && data.models.length) {
+            if (data.success && data.models.length && modelBadge) {
                 const gemmaModel = data.models.find((model) => model.toLowerCase().includes('gemma4')) || data.models[0];
                 modelBadge.textContent = gemmaModel;
             }
@@ -342,14 +389,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateRTLState() {
         const isRTL = targetLanguage.value === 'Persian';
-        
-        translationArea.classList.toggle('rtl', isRTL);
-        translationAreaText.classList.toggle('rtl', isRTL);
+        if (translationArea) {
+            translationArea.classList.toggle('rtl', isRTL);
+        }
+        if (translationAreaText) {
+            translationAreaText.classList.toggle('rtl', isRTL);
+        }
+    }
+
+    function goToPage(pageNumber) {
+        if (!pages.length) {
+            return;
+        }
+
+        const targetPage = Math.min(Math.max(1, Number(pageNumber) || 1), pages.length);
+        currentPage = targetPage;
+        if (pageNumberInput) {
+            pageNumberInput.value = currentPage;
+        }
+        updatePageButtons();
+        translationArea.innerHTML = `<div class="empty-state centered"><strong>Page ${currentPage}</strong><span>Translate this page when ready.</span></div>`;
+        translatedText = '';
     }
 
     function updatePageButtons() {
-        prevPageBtn.disabled = !pages.length || currentPage <= 1;
-        nextPageBtn.disabled = !pages.length || currentPage >= pages.length;
+        if (prevPageBtn) {
+            prevPageBtn.disabled = !pages.length || currentPage <= 1;
+        }
+        if (nextPageBtn) {
+            nextPageBtn.disabled = !pages.length || currentPage >= pages.length;
+        }
+    }
+
+    function updateSourceMeta() {
+        if (sourceFileName) {
+            sourceFileName.textContent = currentFileName || 'No file';
+        }
+        if (sourcePageCount) {
+            sourcePageCount.textContent = pages.length ? `Pages: ${pages.length}` : 'Pages: —';
+        }
+        if (sourceStatus) {
+            sourceStatus.textContent = currentFileName ? 'Source ready' : 'No source loaded';
+        }
+    }
+
+    function restoreNote() {
+        if (noteInput) {
+            noteInput.value = localStorage.getItem('notebook-note') || '';
+        }
     }
 
     function showStatus(message, type) {
@@ -377,20 +464,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         return parsed;
-    }
-
-    function formatBytes(bytes) {
-        if (!bytes) return '0 B';
-        const units = ['B', 'KB', 'MB', 'GB'];
-        let size = bytes;
-        let unitIndex = 0;
-
-        while (size >= 1024 && unitIndex < units.length - 1) {
-            size /= 1024;
-            unitIndex += 1;
-        }
-
-        return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
     }
 
     function formatText(text) {
@@ -426,3 +499,4 @@ document.addEventListener('DOMContentLoaded', () => {
         textarea.remove();
     }
 });
+

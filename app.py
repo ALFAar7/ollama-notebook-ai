@@ -352,7 +352,11 @@ def get_models():
             'models': [model.get('name', '') for model in models]
         })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({
+            'success': True,
+            'models': [],
+            'error': str(e)
+        })
 
 
 @app.route('/api/files')
