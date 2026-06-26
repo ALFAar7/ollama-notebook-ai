@@ -503,12 +503,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateRTLState() {
-        const isRTL = targetLanguage.value === 'Persian';
+        const isRTL = targetLanguage.value === 'Persian' || targetLanguage.value === 'Arabic';
         if (translationArea) {
             translationArea.classList.toggle('rtl', isRTL);
         }
         if (translationAreaText) {
             translationAreaText.classList.toggle('rtl', isRTL);
+        }
+        if (notesSummary) {
+            notesSummary.classList.toggle('rtl', isRTL);
+        }
+        if (noteInput) {
+            noteInput.classList.toggle('rtl', isRTL);
         }
     }
 
@@ -522,10 +528,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const sourcePreview = (sourceTextValue || '').replace(/\s+/g, ' ').trim().slice(0, 140);
 
         notesSummary.innerHTML = `
-            <strong>Current page summary</strong>
+            <strong>Summarizing...</strong>
             <div>${preview || 'No translation available yet.'}</div>
             <div class="summary-source">Source: ${escapeHtml(sourcePreview || 'No source text available')}</div>
         `;
+
+        fetch('/api/summary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: translatedTextValue,
+                language: targetLanguage.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.summary) {
+                notesSummary.innerHTML = `
+                    <strong>Current page summary</strong>
+                    <div>${escapeHtml(data.summary)}</div>
+                    <div class="summary-source">Source: ${escapeHtml(sourcePreview || 'No source text available')}</div>
+                `;
+            } else {
+                notesSummary.innerHTML = `
+                    <strong>Current page summary</strong>
+                    <div>${preview || 'No translation available yet.'}</div>
+                    <div class="summary-source">Source: ${escapeHtml(sourcePreview || 'No source text available')}</div>
+                `;
+            }
+        })
+        .catch(() => {
+            notesSummary.innerHTML = `
+                <strong>Current page summary</strong>
+                <div>${preview || 'No translation available yet.'}</div>
+                <div class="summary-source">Source: ${escapeHtml(sourcePreview || 'No source text available')}</div>
+            `;
+        });
     }
 
     function goToPage(pageNumber) {
