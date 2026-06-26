@@ -401,6 +401,11 @@ textarea {
     background: rgba(255,255,255,0.08);
 }
 
+.note-textarea.rtl {
+    direction: rtl;
+    text-align: right;
+}
+
 .panel {
     display: flex;
     flex-direction: column;
@@ -436,10 +441,24 @@ textarea {
     color: var(--text);
 }
 
+.notes-summary.rtl {
+    direction: rtl;
+    text-align: right;
+}
+
+.notes-summary.rtl strong {
+    text-align: right;
+}
+
 .summary-source {
     margin-top: 8px;
     color: var(--muted);
     font-size: 0.84rem;
+}
+
+.summary-source.rtl {
+    direction: rtl;
+    text-align: right;
 }
 
 .panel-header {
