@@ -3,91 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemma4 Translator</title>
+    <title>Notebook Translator</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <main class="app-shell">
         <header class="header-bar">
             <div class="header-brand">
-                <h1>Gemma4 Translator</h1>
-                <span class="model-badge" id="modelBadge">Gemma4</span>
+                <div class="brand-mark">✦</div>
+                <div>
+                    <p class="eyebrow">AI reading workspace</p>
+                    <h1>Notebook Translator</h1>
+                </div>
             </div>
-            <div class="mode-tabs">
-                <button id="textModeBtn" class="mode-tab active" data-mode="text">Text Mode</button>
-                <button id="attachmentModeBtn" class="mode-tab" data-mode="attachment">File Mode</button>
-            </div>
-            <div class="language-controls">
-                <label class="lang-select">
-                    <span>From</span>
-                    <select id="sourceLanguage">
-                        <option value="auto">Auto detect</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="English">English</option>
-                        <option value="French">French</option>
-                        <option value="German">German</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="Italian">Italian</option>
-                        <option value="Persian">Persian</option>
-                        <option value="Russian">Russian</option>
-                        <option value="Chinese">Chinese</option>
-                    </select>
-                </label>
-                <label class="lang-select">
-                    <span>To</span>
-                    <select id="targetLanguage">
-                        <option value="English" selected>English</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="Persian">Persian</option>
-                        <option value="French">French</option>
-                        <option value="German">German</option>
-                        <option value="Spanish">Spanish</option>
-                    </select>
-                </label>
+            <div class="header-actions">
+                <div class="mode-tabs">
+                    <button id="textModeBtn" class="mode-tab active" data-mode="text">Text notebook</button>
+                    <button id="attachmentModeBtn" class="mode-tab" data-mode="attachment">Source file</button>
+                </div>
+                <div class="language-controls">
+                    <label class="lang-select">
+                        <span>From</span>
+                        <select id="sourceLanguage">
+                            <option value="auto">Auto detect</option>
+                            <option value="Arabic">Arabic</option>
+                            <option value="English">English</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="Italian">Italian</option>
+                            <option value="Persian">Persian</option>
+                            <option value="Russian">Russian</option>
+                            <option value="Chinese">Chinese</option>
+                        </select>
+                    </label>
+                    <label class="lang-select">
+                        <span>To</span>
+                        <select id="targetLanguage">
+                            <option value="English" selected>English</option>
+                            <option value="Arabic">Arabic</option>
+                            <option value="Persian">Persian</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Spanish">Spanish</option>
+                        </select>
+                    </label>
+                </div>
             </div>
         </header>
 
-        <section class="workspace">
-            <article class="panel" id="textModePanel">
-                <div class="panel-header">
-                    <h2>Input Text</h2>
-                </div>
-                <textarea id="textInput" class="text-input-area" placeholder="Enter text to translate..."></textarea>
-                <button id="translateTextBtn" class="primary-btn translate-action">Translate</button>
-                <div class="panel-header translation-header">
-                    <h2>Translation</h2>
-                    <button id="copyTranslationBtnText" class="ghost-btn">Copy</button>
-                </div>
-                <div id="translationAreaText" class="translation-area"></div>
-            </article>
+        <section class="notebook-grid">
+            <aside class="sidebar">
+                <div class="sidebar-card">
+                    <div class="section-head">
+                        <div>
+                            <p class="eyebrow">Sources</p>
+                            <h2>Notebook sources</h2>
+                        </div>
+                        <span class="section-pill" id="sourceStatus">No source loaded</span>
+                    </div>
 
-            <article class="panel" id="attachmentPanel">
-                <div class="panel-header">
-                    <h2>Original</h2>
-                    <button id="copyOriginalBtn" class="ghost-btn">Copy Text</button>
-                </div>
-                <div class="file-preview-area" id="filePreview">
-                    <div class="empty-state centered">
-                        <strong>No file selected</strong>
-                        <span>Upload a PDF, DOCX, or TXT file</span>
+                    <label for="fileInput" class="upload-card">
+                        <span class="upload-icon">⬆</span>
+                        <div>
+                            <strong>Drop in a PDF, DOCX, or TXT</strong>
+                            <p>Upload a document and it becomes a source for your notebook.</p>
+                        </div>
+                    </label>
+                    <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
+
+                    <div class="source-meta">
+                        <span class="meta-pill" id="sourceFileName">No file</span>
+                        <span class="meta-pill" id="sourcePageCount">Pages: —</span>
+                    </div>
+
+                    <div class="source-preview" id="filePreview">
+                        <div class="empty-state centered">
+                            <strong>Start with a source</strong>
+                            <span>Upload a PDF, DOCX, or TXT file to preview it here.</span>
+                        </div>
                     </div>
                 </div>
-                <div class="upload-overlay" id="uploadOverlay">
-                    <div class="upload-box">
-                        <label for="fileInput" class="upload-label">
-                            <span class="upload-icon">📎</span>
-                            <strong>Choose File</strong>
-                            <small>PDF, DOCX, or TXT</small>
-                        </label>
-                        <input type="file" id="fileInput" accept=".pdf,.docx,.txt">
+
+                <div class="sidebar-card">
+                    <div class="section-head">
+                        <div>
+                            <p class="eyebrow">Notes</p>
+                            <h2>Study notes</h2>
+                        </div>
+                        <button id="saveNoteBtn" class="ghost-btn small">Save</button>
                     </div>
+                    <textarea id="noteInput" class="note-textarea" placeholder="Capture key ideas, questions, or follow-up prompts..."></textarea>
                 </div>
-                <div class="panel-header">
-                    <h2>Translation</h2>
-                    <button id="copyTranslationBtn" class="ghost-btn">Copy</button>
+            </aside>
+
+            <div class="main-pane">
+                <div id="textModePanel" class="mode-panel">
+                    <article class="panel panel-source">
+                        <div class="panel-header">
+                            <div>
+                                <p class="eyebrow">Workspace</p>
+                                <h2 id="sourceTitle">Text notebook</h2>
+                            </div>
+                            <div class="panel-actions">
+                                <button id="clearTextBtn" class="ghost-btn small">Clear</button>
+                            </div>
+                        </div>
+                        <textarea id="textInput" class="text-input-area" placeholder="Paste a passage, article section, or research note here..."></textarea>
+                        <div class="action-row">
+                            <button id="translateTextBtn" class="primary-btn">Translate</button>
+                            <button id="copySourceBtn" class="ghost-btn">Copy source</button>
+                        </div>
+                    </article>
                 </div>
-                <div id="translationArea" class="translation-area"></div>
-            </article>
+
+                <div id="attachmentPanel" class="mode-panel hidden">
+                    <article class="panel panel-source">
+                        <div class="panel-header">
+                            <div>
+                                <p class="eyebrow">Workspace</p>
+                                <h2 id="sourceTitleFile">Source document</h2>
+                            </div>
+                            <div class="panel-actions">
+                                <button id="copyOriginalBtn" class="ghost-btn small">Copy text</button>
+                            </div>
+                        </div>
+                        <div class="attachment-workspace">
+                            <div class="attachment-actions">
+                                <div class="page-controls">
+                                    <button id="prevPageBtn" class="icon-btn" type="button" aria-label="Previous page">←</button>
+                                    <label class="page-control compact">
+                                        <span>Page</span>
+                                        <input id="pageNumber" type="number" min="1" value="1">
+                                    </label>
+                                    <button id="nextPageBtn" class="icon-btn" type="button" aria-label="Next page">→</button>
+                                </div>
+                                <div class="translate-controls-inline">
+                                    <button id="translatePageBtn" class="primary-btn small">Translate page</button>
+                                    <button id="translateAllBtn" class="ghost-btn small">Translate all</button>
+                                </div>
+                            </div>
+                            <div id="attachmentPreview" class="attachment-preview">
+                                <div class="empty-state centered">
+                                    <strong>Upload a source file</strong>
+                                    <span>Once a document is uploaded, its pages appear here.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <article class="panel panel-output">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Notebook response</p>
+                            <h2>Translation & insights</h2>
+                        </div>
+                        <div class="panel-actions">
+                            <button id="copyTranslationBtnText" class="ghost-btn small">Copy</button>
+                        </div>
+                    </div>
+                    <div id="translationAreaText" class="translation-area"></div>
+                    <div id="translationArea" class="translation-area hidden"></div>
+                </article>
+            </div>
         </section>
 
         <div id="statusMessage" class="status-message hidden"></div>
