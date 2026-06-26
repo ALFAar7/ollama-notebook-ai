@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sidebarMarkup = currentFileName
             ? `
                 <div class="empty-state centered">
-                    <strong>${fileType === 'docx' ? '📘' : fileType === 'txt' ? '📄' : fileType === 'pdf' ? '📕' : '📎'} ${currentFileName}</strong>
+                    <strong>${fileType === 'docx' ? '📘' : fileType === 'txt' ? '📄' : fileType === 'pdf' ? '📕' : '📎'} ${escapeHtml(currentFileName)}</strong>
                     <span>${pages.length} page(s) • Ready for translation</span>
                 </div>
             `
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `
                     : `
                         <div class="empty-state centered">
-                            <strong>${fileType === 'docx' ? '📘' : fileType === 'txt' ? '📄' : '📎'} ${currentFileName}</strong>
+                            <strong>${fileType === 'docx' ? '📘' : fileType === 'txt' ? '📄' : '📎'} ${escapeHtml(currentFileName)}</strong>
                             <span>This page has no extractable text yet.</span>
                         </div>
                     `
