@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sourceLanguage = document.getElementById('sourceLanguage');
     const targetLanguage = document.getElementById('targetLanguage');
     const copyOriginalBtn = document.getElementById('copyOriginalBtn');
-    const copyTranslationBtn = document.getElementById('copyTranslationBtn');
+    const copyTranslationBtnAttachment = document.getElementById('copyTranslationBtnAttachment');
     const copyTranslationBtnText = document.getElementById('copyTranslationBtnText');
     const copySourceBtn = document.getElementById('copySourceBtn');
     const clearTextBtn = document.getElementById('clearTextBtn');
@@ -23,11 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const textInput = document.getElementById('textInput');
     const translateTextBtn = document.getElementById('translateTextBtn');
     const translationAreaText = document.getElementById('translationAreaText');
-    const filePreview = document.getElementById('filePreview');
+    const filePreviewSidebar = document.getElementById('filePreviewSidebar');
+    const attachmentPreview = document.getElementById('attachmentPreview');
     const sourceFileName = document.getElementById('sourceFileName');
     const sourcePageCount = document.getElementById('sourcePageCount');
     const sourceStatus = document.getElementById('sourceStatus');
     const noteInput = document.getElementById('noteInput');
+    const notesSummary = document.getElementById('notesSummary');
 
     let pdfText = '';
     let pages = [];
@@ -35,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentFileName = '';
     let translatedText = '';
     let currentMode = 'text';
+    let processingTimer = null;
 
     loadModels();
     restoreNote();
@@ -121,6 +124,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (copyTranslationBtnAttachment) {
+        copyTranslationBtnAttachment.addEventListener('click', async () => {
+            const text = translationArea.textContent || '';
+            if (!text.trim()) {
+                showStatus('No translated text to copy.', 'error');
+                return;
+            }
+            await copyToClipboard(text);
+            showStatus('Translation copied.', 'success');
+        });
+    }
+
     if (copySourceBtn) {
         copySourceBtn.addEventListener('click', async () => {
             const text = textInput.value || '';
@@ -158,11 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
         attachmentModeBtn.classList.toggle('active', mode === 'attachment');
         textModePanel.classList.toggle('hidden', mode !== 'text');
         attachmentPanel.classList.toggle('hidden', mode !== 'attachment');
-        if (translationAreaText) {
-            translationAreaText.classList.toggle('hidden', mode === 'attachment');
-        }
-        if (translationArea) {
-            translationArea.classList.toggle('hidden', mode === 'text');
+        const textOutput = document.querySelector('.text-mode-output');
+        if (textOutput) {
+            textOutput.classList.toggle('hidden', mode === 'attachment');
         }
         updateRTLState();
     }
@@ -199,8 +212,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             currentFileName = data.filename;
-            pdfText = data.text;
-            pages = parsePages(pdfText);
+            pdfText = data.text || '';
+            pages = Array(Math.max(data.page_count || 1, 1)).fill('');
+            if (pdfText.trim()) {
+                pages = parsePages(pdfText);
+            }
             currentPage = 1;
             translatedText = '';
 
@@ -210,8 +226,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pageNumberInput) {
                 pageNumberInput.value = currentPage;
             }
-            translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document when you are ready.</span></div>';
-            showStatus(`File processed. ${pages.length} page(s) ready.`, 'success');
+            if (data.processing) {
+                translationArea.innerHTML = '<div class="empty-state centered"><strong>Preparing document</strong><span>This large PDF is being processed in the background. The preview will update shortly.</span></div>';
+                showStatus('Document upload accepted. Processing in progress...', '');
+                startProcessingPolling(data.filename);
+            } else {
+                translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document when you are ready.</span></div>';
+                showStatus(`File processed. ${pages.length} page(s) ready.`, 'success');
+            }
         } catch (error) {
             console.error(error);
             if (error.name === 'AbortError') {
@@ -222,18 +244,98 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function startProcessingPolling(filename) {
+        if (processingTimer) {
+            clearInterval(processingTimer);
+        }
+        processingTimer = setInterval(async () => {
+            try {
+                const response = await fetch(`/api/document-status?filename=${encodeURIComponent(filename)}`);
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    return;
+                }
+                if (data.ready) {
+                    clearInterval(processingTimer);
+                    processingTimer = null;
+                    pages = Array(Math.max(data.page_count || 1, 1)).fill('');
+                    currentPage = 1;
+                    updateSourceMeta();
+                    renderFilePreview();
+                    loadCurrentPageText().catch(() => {});
+                    translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document when you are ready.</span></div>';
+                    showStatus(`Document ready. ${data.page_count || 0} page(s) available.`, 'success');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }, 2000);
+    }
+
+    async function loadCurrentPageText() {
+        if (!currentFileName) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/page-text?filename=${encodeURIComponent(currentFileName)}&page=${currentPage}`);
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                return;
+            }
+            const pageText = data.page_text || '';
+            pages[currentPage - 1] = pageText;
+            pdfText = pageText;
+            renderFilePreview();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     function renderFilePreview() {
         const fileType = currentFileName.split('.').pop().toLowerCase();
-        if (fileType === 'pdf') {
-            filePreview.innerHTML = `<iframe id="pdfFrame" title="PDF Preview" src="/uploads/${encodeURIComponent(currentFileName)}"></iframe>`;
-        } else {
-            const icon = fileType === 'docx' ? '📘' : fileType === 'txt' ? '📄' : '📎';
-            filePreview.innerHTML = `
+        const currentPageText = (pages[currentPage - 1] || '').trim();
+        const sidebarMarkup = currentFileName
+            ? `
                 <div class="empty-state centered">
-                    <strong>${icon} ${currentFileName}</strong>
+                    <strong>${fileType === 'docx' ? '📘' : fileType === 'txt' ? '📄' : fileType === 'pdf' ? '📕' : '📎'} ${currentFileName}</strong>
                     <span>${pages.length} page(s) • Ready for translation</span>
                 </div>
+            `
+            : `
+                <div class="empty-state centered">
+                    <strong>Start with a source</strong>
+                    <span>Upload a PDF, DOCX, or TXT file to preview it here.</span>
+                </div>
             `;
+        const mainMarkup = currentFileName
+            ? fileType === 'pdf'
+                ? `<iframe class="source-iframe" title="PDF Preview" src="/uploads/${encodeURIComponent(currentFileName)}"></iframe>`
+                : currentPageText
+                    ? `
+                        <div class="preview-content">
+                            <div class="preview-caption">Page ${currentPage} of ${pages.length}</div>
+                            <div class="preview-text">${escapeHtml(currentPageText)}</div>
+                        </div>
+                    `
+                    : `
+                        <div class="empty-state centered">
+                            <strong>${fileType === 'docx' ? '📘' : fileType === 'txt' ? '📄' : '📎'} ${currentFileName}</strong>
+                            <span>This page has no extractable text yet.</span>
+                        </div>
+                    `
+            : `
+                <div class="empty-state centered">
+                    <strong>Upload a source file</strong>
+                    <span>Once a document is uploaded, its pages appear here.</span>
+                </div>
+            `;
+
+        if (filePreviewSidebar) {
+            filePreviewSidebar.innerHTML = sidebarMarkup;
+        }
+        if (attachmentPreview) {
+            attachmentPreview.innerHTML = mainMarkup;
         }
     }
 
@@ -269,6 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             translatedText = data.translated_text;
             translationAreaText.innerHTML = formatText(translatedText);
+            updateSummary(translatedText, text);
             updateRTLState();
             showStatus('Text translated successfully.', 'success');
         } catch (error) {
@@ -282,14 +385,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function translateCurrentPage() {
-        if (!pdfText.trim()) {
-            showStatus('Upload a source file before translating.', 'error');
-            return;
+        let pageText = pages[currentPage - 1] || '';
+        if (!pageText.trim() && currentFileName) {
+            try {
+                const response = await fetch(`/api/page-text?filename=${encodeURIComponent(currentFileName)}&page=${currentPage}`);
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    pageText = data.page_text || '';
+                    pages[currentPage - 1] = pageText;
+                }
+            } catch (error) {
+                console.error(error);
+            }
         }
 
-        const pageText = pages[currentPage - 1] || '';
         if (!pageText.trim()) {
-            showStatus(`Page ${currentPage} has no extractable text.`, 'error');
+            showStatus('Upload a source file before translating.', 'error');
             return;
         }
 
@@ -304,6 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     page_text: pageText,
                     page_number: currentPage,
+                    filename: currentFileName,
                     source_language: sourceLanguage.value,
                     target_language: targetLanguage.value
                 })
@@ -319,6 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             translatedText = data.translated_text;
             translationArea.innerHTML = formatText(translatedText);
+            updateSummary(translatedText, pageText);
             updateRTLState();
             showStatus(`Page ${currentPage} translated.`, 'success');
         } catch (error) {
@@ -347,6 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: pdfText,
+                    filename: currentFileName,
                     source_language: sourceLanguage.value,
                     target_language: targetLanguage.value
                 })
@@ -362,6 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             translatedText = data.translated_text;
             translationArea.innerHTML = formatText(translatedText);
+            updateSummary(translatedText, pdfText);
             updateRTLState();
             showStatus('Full file translated.', 'success');
         } catch (error) {
@@ -397,6 +512,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function updateSummary(translatedTextValue, sourceTextValue) {
+        if (!notesSummary) {
+            return;
+        }
+
+        const cleanText = (translatedTextValue || '').replace(/<[^>]+>/g, '').trim();
+        const preview = cleanText.length > 220 ? `${cleanText.slice(0, 220)}…` : cleanText;
+        const sourcePreview = (sourceTextValue || '').replace(/\s+/g, ' ').trim().slice(0, 140);
+
+        notesSummary.innerHTML = `
+            <strong>Current page summary</strong>
+            <div>${preview || 'No translation available yet.'}</div>
+            <div class="summary-source">Source: ${escapeHtml(sourcePreview || 'No source text available')}</div>
+        `;
+    }
+
     function goToPage(pageNumber) {
         if (!pages.length) {
             return;
@@ -408,6 +539,10 @@ document.addEventListener('DOMContentLoaded', () => {
             pageNumberInput.value = currentPage;
         }
         updatePageButtons();
+        renderFilePreview();
+        if (currentFileName) {
+            loadCurrentPageText().catch(() => {});
+        }
         translationArea.innerHTML = `<div class="empty-state centered"><strong>Page ${currentPage}</strong><span>Translate this page when ready.</span></div>`;
         translatedText = '';
     }

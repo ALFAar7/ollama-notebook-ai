@@ -77,7 +77,7 @@
                         <span class="meta-pill" id="sourcePageCount">Pages: —</span>
                     </div>
 
-                    <div class="source-preview" id="filePreview">
+                    <div class="source-preview" id="filePreviewSidebar">
                         <div class="empty-state centered">
                             <strong>Start with a source</strong>
                             <span>Upload a PDF, DOCX, or TXT file to preview it here.</span>
@@ -92,6 +92,12 @@
                             <h2>Study notes</h2>
                         </div>
                         <button id="saveNoteBtn" class="ghost-btn small">Save</button>
+                    </div>
+                    <div class="notes-summary" id="notesSummary">
+                        <div class="empty-state centered">
+                            <strong>Summary will appear here</strong>
+                            <span>After translating a page, a quick summary will be generated for your notes.</span>
+                        </div>
                     </div>
                     <textarea id="noteInput" class="note-textarea" placeholder="Capture key ideas, questions, or follow-up prompts..."></textarea>
                 </div>
@@ -118,42 +124,57 @@
                 </div>
 
                 <div id="attachmentPanel" class="mode-panel hidden">
-                    <article class="panel panel-source">
-                        <div class="panel-header">
-                            <div>
-                                <p class="eyebrow">Workspace</p>
-                                <h2 id="sourceTitleFile">Source document</h2>
-                            </div>
-                            <div class="panel-actions">
-                                <button id="copyOriginalBtn" class="ghost-btn small">Copy text</button>
-                            </div>
-                        </div>
-                        <div class="attachment-workspace">
-                            <div class="attachment-actions">
-                                <div class="page-controls">
-                                    <button id="prevPageBtn" class="icon-btn" type="button" aria-label="Previous page">←</button>
-                                    <label class="page-control compact">
-                                        <span>Page</span>
-                                        <input id="pageNumber" type="number" min="1" value="1">
-                                    </label>
-                                    <button id="nextPageBtn" class="icon-btn" type="button" aria-label="Next page">→</button>
+                    <div class="workspace-split">
+                        <article class="panel panel-source">
+                            <div class="panel-header">
+                                <div>
+                                    <p class="eyebrow">Workspace</p>
+                                    <h2 id="sourceTitleFile">Source document</h2>
                                 </div>
-                                <div class="translate-controls-inline">
-                                    <button id="translatePageBtn" class="primary-btn small">Translate page</button>
-                                    <button id="translateAllBtn" class="ghost-btn small">Translate all</button>
+                                <div class="panel-actions">
+                                    <button id="copyOriginalBtn" class="ghost-btn small">Copy text</button>
                                 </div>
                             </div>
-                            <div id="attachmentPreview" class="attachment-preview">
-                                <div class="empty-state centered">
-                                    <strong>Upload a source file</strong>
-                                    <span>Once a document is uploaded, its pages appear here.</span>
+                            <div class="attachment-workspace">
+                                <div class="attachment-actions">
+                                    <div class="page-controls">
+                                        <button id="prevPageBtn" class="icon-btn" type="button" aria-label="Previous page">←</button>
+                                        <label class="page-control compact">
+                                            <span>Page</span>
+                                            <input id="pageNumber" type="number" min="1" value="1">
+                                        </label>
+                                        <button id="nextPageBtn" class="icon-btn" type="button" aria-label="Next page">→</button>
+                                    </div>
+                                    <div class="translate-controls-inline">
+                                        <button id="translatePageBtn" class="primary-btn small">Translate page</button>
+                                        <button id="translateAllBtn" class="ghost-btn small">Translate all</button>
+                                    </div>
+                                </div>
+                                <div id="attachmentPreview" class="attachment-preview">
+                                    <div class="empty-state centered">
+                                        <strong>Upload a source file</strong>
+                                        <span>Once a document is uploaded, its pages appear here.</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </article>
+                        </article>
+
+                        <article class="panel panel-output">
+                            <div class="panel-header">
+                                <div>
+                                    <p class="eyebrow">Notebook response</p>
+                                    <h2>Translation & insights</h2>
+                                </div>
+                                <div class="panel-actions">
+                                    <button id="copyTranslationBtnAttachment" class="ghost-btn small">Copy</button>
+                                </div>
+                            </div>
+                            <div id="translationArea" class="translation-area"></div>
+                        </article>
+                    </div>
                 </div>
 
-                <article class="panel panel-output">
+                <article class="panel panel-output text-mode-output">
                     <div class="panel-header">
                         <div>
                             <p class="eyebrow">Notebook response</p>
@@ -164,7 +185,6 @@
                         </div>
                     </div>
                     <div id="translationAreaText" class="translation-area"></div>
-                    <div id="translationArea" class="translation-area hidden"></div>
                 </article>
             </div>
         </section>
