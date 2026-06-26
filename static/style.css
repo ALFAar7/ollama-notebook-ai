@@ -686,6 +686,10 @@ button,
     .workspace-split {
         grid-template-columns: 1fr;
     }
+
+    .desktop-notes {
+        display: none;
+    }
 }
 
 @media (min-width: 1080px) {
@@ -717,10 +721,6 @@ button,
         display: block;
     }
 
-    .desktop-notes {
-        display: block;
-    }
-
     .desktop-top-section {
         min-height: 280px;
     }
@@ -736,12 +736,6 @@ button,
 
     .notes-section .note-textarea {
         min-height: 180px;
-    }
-}
-
-@media (max-width: 1080px) {
-    .desktop-notes {
-        display: none;
     }
 }
 
