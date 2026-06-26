@@ -148,9 +148,10 @@ textarea {
 
 .notebook-grid {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 280px minmax(0, 1fr);
     gap: 20px;
     margin-top: 20px;
+    align-items: start;
 }
 
 .sidebar,
@@ -158,6 +159,18 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 18px;
+}
+
+.compact-sidebar {
+    gap: 12px;
+}
+
+.compact-card {
+    padding: 12px;
+}
+
+.expanded-main-pane {
+    gap: 16px;
 }
 
 .sidebar-card,
@@ -247,18 +260,23 @@ textarea {
 
 .source-preview,
 .attachment-preview {
-    min-height: 180px;
+    min-height: 360px;
     border-radius: 18px;
     border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,255,255,0.04);
-    padding: 12px;
+    padding: 16px;
+}
+
+.compact-preview {
+    min-height: 220px;
 }
 
 .preview-content {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     height: 100%;
+    min-height: 320px;
 }
 
 .preview-caption {
@@ -271,16 +289,17 @@ textarea {
 
 .preview-text {
     white-space: pre-wrap;
-    line-height: 1.7;
+    line-height: 1.8;
     color: var(--text);
     overflow: auto;
-    font-size: 0.95rem;
-    padding-right: 4px;
+    font-size: 1rem;
+    padding-right: 6px;
+    flex: 1;
 }
 
 .source-iframe {
     width: 100%;
-    min-height: 420px;
+    min-height: 720px;
     border: 0;
     border-radius: 12px;
     background: white;
@@ -310,19 +329,24 @@ textarea {
 
 .workspace-split {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 16px;
-    padding: 16px;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 18px;
+    padding: 18px;
+    align-items: start;
 }
 
 .notes-summary {
-    margin-bottom: 12px;
-    padding: 12px;
+    margin-bottom: 10px;
+    padding: 10px;
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,255,255,0.04);
     color: var(--muted);
     line-height: 1.6;
+}
+
+.compact-summary {
+    min-height: 120px;
 }
 
 .notes-summary strong {
@@ -342,7 +366,7 @@ textarea {
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    padding: 16px 18px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -383,7 +407,7 @@ textarea {
 .attachment-workspace {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     padding: 16px 18px 18px;
 }
 
@@ -472,7 +496,7 @@ button,
 
 .translation-area {
     padding: 18px;
-    min-height: 280px;
+    min-height: 380px;
     overflow: auto;
     color: #f8fafc;
     font-size: 1rem;
