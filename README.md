@@ -8,7 +8,7 @@ A local AI-powered reading workspace that translates documents (PDF, DOCX, TXT) 
 - Page-by-page or full-document translation
 - Auto-generated summaries in the target language
 - Persistence: saves notes and extracted document text
-- RTL support for Persian and Arabic
+- RTL support for Persian, Arabic, and Kurdish
 - Local translation caching for faster repeated requests
 
 ## Prerequisites
@@ -97,3 +97,16 @@ python app.py
 ```
 
 Open `http://localhost:5000` in your browser.
+
+## زاراوەکانی تر
+
+ئەم ئەپلیکەیشنە پشتگیری لە زمانی کوردی دەکات. بۆ وەرگێڕانی دەق یان پەڕەکانی پەڕتووک، زمانی کوردی دیاری بکە و کلیلی Translate بکە.
+
+**تایبەتیەکان:**
+- پشتگیری لە زمانی کوردی (سورانی)
+- ڕێنوێنی خوارەوەی ڕاست بۆ دەقی کوردی
+- وەرگێڕانی پەڕە بە پەڕە یان سەرجەم پەڕتووک
+
+---
+
+*A notebook translator built with Flask, Ollama, and Gemma4 for local, private document translation.*

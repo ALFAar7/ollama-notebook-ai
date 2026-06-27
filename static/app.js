@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateRTLState() {
-        const isRTL = targetLanguage.value === 'Persian' || targetLanguage.value === 'Arabic';
+        const isRTL = targetLanguage.value === 'Persian' || targetLanguage.value === 'Arabic' || targetLanguage.value === 'Kurdish';
         if (translationArea) {
             translationArea.classList.toggle('rtl', isRTL);
         }
