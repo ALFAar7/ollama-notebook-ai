@@ -1,5 +1,5 @@
 # Notebook Translator
-
+![alt text](image.png)
 A local AI-powered reading workspace that translates documents (PDF, DOCX, TXT) and text using Ollama and Gemma4. Supports multiple languages, page-by-page translation, summarization, and RTL layouts.
 
 ## Features
