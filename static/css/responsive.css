@@ -1,0 +1,84 @@
+@media (max-width: 1080px) {
+    .notebook-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .workspace-split {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 1080px) {
+    .notebook-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        bottom: 16px;
+        width: 320px;
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+        z-index: 100;
+        margin-top: 0;
+        max-height: none;
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    #sidebarToggle {
+        display: block;
+    }
+
+    .desktop-top-section {
+        min-height: 280px;
+    }
+
+    .notes-section {
+        margin-top: 18px;
+    }
+
+    .notes-section .notes-summary {
+        min-height: 120px;
+    }
+
+    .notes-section .note-textarea {
+        min-height: 180px;
+    }
+}
+
+@media (max-width: 720px) {
+    .app-shell {
+        width: min(100% - 20px, 1480px);
+        padding-top: 12px;
+    }
+
+    .header-bar {
+        align-items: flex-start;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .language-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .attachment-actions {
+        align-items: stretch;
+    }
+
+    .page-controls {
+        width: 100%;
+    }
+}

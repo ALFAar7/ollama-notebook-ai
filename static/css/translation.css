@@ -1,0 +1,21 @@
+.translation-area {
+    padding: 18px;
+    min-height: 380px;
+    overflow: auto;
+    color: #f8fafc;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+.translation-area.rtl {
+    direction: rtl;
+    text-align: right;
+}
+
+.translation-area p {
+    margin: 0 0 1rem;
+}
+
+.translation-area.rtl p {
+    text-align: right;
+}
