@@ -1,0 +1,32 @@
+<aside class="sidebar compact-sidebar">
+    <div class="sidebar-card compact-card">
+        <div class="section-head">
+            <div>
+                <p class="eyebrow">Sources</p>
+                <h2>Notebook sources</h2>
+            </div>
+            <span class="section-pill" id="sourceStatus">No source loaded</span>
+        </div>
+
+        <label for="fileInput" class="upload-card compact-upload">
+            <span class="upload-icon">&#11015;</span>
+            <div>
+                <strong>Drop in a PDF, DOCX, or TXT</strong>
+                <p>Upload a document and it becomes a source for your notebook.</p>
+            </div>
+        </label>
+        <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
+
+        <div class="source-meta compact-meta">
+            <span class="meta-pill" id="sourceFileName">No file</span>
+            <span class="meta-pill" id="sourcePageCount">Pages: &mdash;</span>
+        </div>
+
+        <div class="source-preview compact-preview" id="filePreviewSidebar">
+            <div class="empty-state centered">
+                <strong>Start with a source</strong>
+                <span>Upload a PDF, DOCX, or TXT file to preview it here.</span>
+            </div>
+        </div>
+    </div>
+</aside>

@@ -1,0 +1,32 @@
+.app-shell {
+    width: min(1480px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 24px 0 40px;
+}
+
+.notebook-grid {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+    align-items: start;
+}
+
+.sidebar,
+.main-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.compact-sidebar {
+    gap: 12px;
+}
+
+.compact-card {
+    padding: 12px;
+}
+
+.expanded-main-pane {
+    gap: 16px;
+}

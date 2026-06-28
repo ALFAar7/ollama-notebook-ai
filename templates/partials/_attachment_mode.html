@@ -1,0 +1,49 @@
+<div id="attachmentPanel" class="mode-panel hidden">
+    <div class="workspace-split">
+        <article class="panel panel-source">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Workspace</p>
+                    <h2 id="sourceTitleFile">Source document</h2>
+                </div>
+                <div class="panel-actions">
+                    <button id="copyOriginalBtn" class="ghost-btn small">Copy text</button>
+                </div>
+            </div>
+            <div class="attachment-workspace">
+                <div class="attachment-actions">
+                    <div class="page-controls">
+                        <button id="prevPageBtn" class="icon-btn" type="button" aria-label="Previous page">&#8592;</button>
+                        <label class="page-control compact">
+                            <span>Page</span>
+                            <input id="pageNumber" type="number" min="1" value="1">
+                        </label>
+                        <button id="nextPageBtn" class="icon-btn" type="button" aria-label="Next page">&#8594;</button>
+                    </div>
+                    <div class="translate-controls-inline">
+                        <button id="translatePageBtn" class="primary-btn small">Translate page</button>
+                        <button id="translateAllBtn" class="ghost-btn small">Translate all</button>
+                    </div>
+                </div>
+                <div id="attachmentPreview" class="attachment-preview">
+                    <div class="empty-state centered">
+                        <strong>Upload a source file</strong>
+                        <span>Once a document is uploaded, its pages appear here.</span>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article class="panel panel-output">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Notebook response</p>
+                    <h2>Translation & insights</h2>
+                </div>
+                <div class="panel-actions">
+                    <button id="copyTranslationBtnAttachment" class="ghost-btn small">Copy</button>
+                </div>
+            </div>
+            <div id="translationArea" class="translation-area"></div>
+        </article>
+    </div>
+</div>
