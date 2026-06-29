@@ -25,6 +25,14 @@ button,
     box-shadow: 0 16px 30px rgba(6, 182, 212, 0.18);
 }
 
+.primary-btn:focus-visible,
+.ghost-btn:focus-visible,
+.icon-btn:focus-visible,
+.mode-tab:focus-visible {
+    outline: 2px solid rgba(139, 92, 246, 0.5);
+    outline-offset: 2px;
+}
+
 .primary-btn:hover,
 .ghost-btn:hover,
 .icon-btn:hover,
