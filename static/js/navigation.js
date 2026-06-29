@@ -2,9 +2,11 @@ function switchMode(mode) {
     App.currentMode = mode;
     if (App.els.textModeBtn) {
         App.els.textModeBtn.classList.toggle('active', mode === 'text');
+        App.els.textModeBtn.setAttribute('aria-pressed', mode === 'text');
     }
     if (App.els.attachmentModeBtn) {
         App.els.attachmentModeBtn.classList.toggle('active', mode === 'attachment');
+        App.els.attachmentModeBtn.setAttribute('aria-pressed', mode === 'attachment');
     }
     if (App.els.textModePanel) {
         App.els.textModePanel.classList.toggle('hidden', mode !== 'text');

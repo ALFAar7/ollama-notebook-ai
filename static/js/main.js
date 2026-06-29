@@ -43,6 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (App.els.statusMessage) {
+        App.els.statusMessage.setAttribute('aria-live', 'polite');
+    }
+
     if (App.els.textInput) {
         App.els.textInput.addEventListener('input', () => {
             if (App.els.textInput.value.trim()) {

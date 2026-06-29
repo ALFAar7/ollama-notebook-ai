@@ -27,10 +27,17 @@
         max-height: none;
         height: auto;
         overflow-y: auto;
+        overscroll-behavior: contain;
     }
 
     .sidebar.open {
         transform: translateX(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .sidebar {
+            transition: none;
+        }
     }
 
     #sidebarToggle {

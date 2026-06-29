@@ -8,7 +8,7 @@ function updateSummary(translatedTextValue, sourceTextValue) {
     const sourcePreview = (sourceTextValue || '').replace(/\s+/g, ' ').trim().slice(0, 140);
 
     App.els.notesSummary.innerHTML = `
-        <strong>Summarizing...</strong>
+        <strong>Summarizing…</strong>
         <div>${preview || 'No translation available yet.'}</div>
         <div class="summary-source">Source: ${escapeHtml(sourcePreview || 'No source text available')}</div>
     `;
