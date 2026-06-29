@@ -8,6 +8,7 @@
                 </div>
                 <div class="panel-actions">
                     <button id="copyOriginalBtn" class="ghost-btn small" aria-label="Copy original text">Copy text</button>
+                    <span id="attachmentLoading" class="loading-text hidden" aria-live="polite">Translating…</span>
                 </div>
             </div>
             <div class="attachment-workspace">
@@ -21,14 +22,14 @@
                         <button id="nextPageBtn" class="icon-btn" type="button" aria-label="Next page">&#8594;</button>
                     </div>
                     <div class="translate-controls-inline">
-                        <button id="translatePageBtn" class="primary-btn small">Translate page</button>
+                        <button id="translatePageBtn" class="primary-btn small" title="Ctrl + Enter">Translate page</button>
                         <button id="translateAllBtn" class="ghost-btn small">Translate all</button>
                     </div>
                 </div>
                 <div id="attachmentPreview" class="attachment-preview" aria-live="polite">
                     <div class="empty-state centered">
-                        <strong>Upload a source file</strong>
-                        <span>Once a document is uploaded, its pages appear here.</span>
+                        <strong>Load a document to translate</strong>
+                        <span>Upload a PDF, DOCX, or TXT and its pages will appear here.</span>
                     </div>
                 </div>
             </div>
@@ -41,6 +42,7 @@
                 </div>
                 <div class="panel-actions">
                     <button id="copyTranslationBtnAttachment" class="ghost-btn small" aria-label="Copy translation">Copy</button>
+                    <span id="attachmentOutputLoading" class="loading-text hidden" aria-live="polite">Translating…</span>
                 </div>
             </div>
             <div id="translationArea" class="translation-area" aria-live="polite"></div>

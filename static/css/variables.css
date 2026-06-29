@@ -11,4 +11,13 @@
     --success: #22c55e;
     --danger: #ef4444;
     --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    --radius-xs: 8px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+    --radius-12: 12px;
+    --radius-16: 16px;
+    --radius-18: 18px;
+    --radius-pill: 999px;
 }

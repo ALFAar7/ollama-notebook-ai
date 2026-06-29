@@ -37,22 +37,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const sidebarToggle = document.getElementById('sidebarToggle');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
     if (sidebarToggle && App.els.sidebar) {
         sidebarToggle.addEventListener('click', () => {
             const isOpen = App.els.sidebar.classList.toggle('open');
             sidebarToggle.setAttribute('aria-expanded', isOpen);
+            if (isOpen && closeSidebarBtn) {
+                setTimeout(() => closeSidebarBtn.focus(), 50);
+            }
         });
     }
 
-    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
     if (closeSidebarBtn && App.els.sidebar) {
         closeSidebarBtn.addEventListener('click', () => {
             App.els.sidebar.classList.remove('open');
-            const sidebarToggle = document.getElementById('sidebarToggle');
             if (sidebarToggle) {
                 sidebarToggle.setAttribute('aria-expanded', 'false');
+                sidebarToggle.focus();
             }
         });
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && App.els.sidebar && App.els.sidebar.classList.contains('open')) {
+            App.els.sidebar.classList.remove('open');
+            if (sidebarToggle) {
+                sidebarToggle.setAttribute('aria-expanded', 'false');
+                sidebarToggle.focus();
+            }
+        }
+    });
+
+    const langDetails = document.querySelector('.lang-details');
+    if (langDetails) {
+        const updateLangDetails = () => {
+            if (window.innerWidth >= 1080) {
+                langDetails.setAttribute('open', '');
+            } else {
+                langDetails.removeAttribute('open');
+            }
+        };
+        updateLangDetails();
+        window.addEventListener('resize', updateLangDetails);
     }
 
     if (App.els.statusMessage) {
@@ -62,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (App.els.textInput) {
         App.els.textInput.addEventListener('input', () => {
             if (App.els.textInput.value.trim()) {
-                App.els.translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Ready to translate</strong><span>Click translate to turn this notebook entry into a polished translation.</span></div>';
+                App.els.translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Paste text into the notebook</strong><span>Click Translate to turn this into a polished translation.</span></div>';
             }
         });
     }
@@ -182,6 +208,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (App.els.translateTextBtn) {
         App.els.translateTextBtn.addEventListener('click', translateTextMode);
     }
+
+    document.addEventListener('keydown', (event) => {
+        const isModifier = event.ctrlKey || event.metaKey;
+        if (isModifier && event.key === 'Enter') {
+            event.preventDefault();
+            if (App.currentMode === 'attachment' && App.els.translatePageBtn) {
+                App.els.translatePageBtn.click();
+            } else if (App.els.translateTextBtn) {
+                App.els.translateTextBtn.click();
+            }
+        }
+    });
 
     loadModels();
     restoreNote();

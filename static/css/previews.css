@@ -1,6 +1,6 @@
 .source-preview {
     min-height: 360px;
-    border-radius: 18px;
+    border-radius: var(--radius-18);
     border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,255,255,0.04);
     padding: 16px;
@@ -76,7 +76,7 @@
     width: 100%;
     min-height: 720px;
     border: 0;
-    border-radius: 12px;
+    border-radius: var(--radius-12);
     background: white;
 }
 
