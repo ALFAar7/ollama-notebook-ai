@@ -18,7 +18,8 @@ function cacheElements() {
         'pageNumberInput', 'prevPageBtn', 'nextPageBtn', 'textModeBtn',
         'attachmentModeBtn', 'textModePanel', 'attachmentPanel', 'textInput',
         'translateTextBtn', 'filePreviewSidebar', 'attachmentPreview',
-        'sourceFileName', 'sourcePageCount', 'sourceStatus', 'noteInput', 'notesSummary'
+        'sourceFileName', 'sourcePageCount', 'sourceStatus', 'noteInput', 'notesSummary',
+        'ollamaStatus', 'ollamaDot', 'ollamaLabel'
     ];
     ids.forEach(id => {
         App.els[id] = document.getElementById(id);
@@ -225,4 +226,25 @@ document.addEventListener('DOMContentLoaded', () => {
     restoreNote();
     switchMode('text');
     updateSourceMeta();
+    checkOllamaStatus();
+    setInterval(checkOllamaStatus, 30000);
 });
+
+function checkOllamaStatus() {
+    if (!App.els.ollamaStatus || !App.els.ollamaDot || !App.els.ollamaLabel) {
+        return;
+    }
+    fetch('/api/ollama-status')
+        .then(response => response.json())
+        .then(data => {
+            const isOnline = data.ollama_online === true;
+            App.els.ollamaStatus.classList.toggle('online', isOnline);
+            App.els.ollamaStatus.classList.toggle('offline', !isOnline);
+            App.els.ollamaLabel.textContent = isOnline ? 'Ollama running' : 'Ollama unreachable';
+        })
+        .catch(() => {
+            App.els.ollamaStatus.classList.add('offline');
+            App.els.ollamaStatus.classList.remove('online');
+            App.els.ollamaLabel.textContent = 'Ollama unreachable';
+        });
+}
