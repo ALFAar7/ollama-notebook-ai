@@ -1,19 +1,19 @@
-<div class="notes-section">
+<section class="notes-section" aria-labelledby="notesTitle">
     <div class="sidebar-card">
         <div class="section-head">
             <div>
                 <p class="eyebrow">Notes</p>
-                <h2>Study notes</h2>
+                <h2 id="notesTitle">Study notes</h2>
             </div>
-            <button id="saveNoteBtn" class="ghost-btn small">Save</button>
+            <button id="saveNoteBtn" class="ghost-btn small" aria-label="Save notes">Save</button>
         </div>
-        <div class="notes-summary" id="notesSummary">
+        <div class="notes-summary" id="notesSummary" aria-live="polite">
             <div class="empty-state centered">
                 <strong>Summary will appear here</strong>
                 <span>After translating a page, a quick summary will be generated for your notes.</span>
             </div>
         </div>
         <label for="noteInput" class="sr-only">Study notes</label>
-        <textarea id="noteInput" class="note-textarea" placeholder="Capture key ideas, questions, or follow-up prompts…"></textarea>
+        <textarea id="noteInput" class="note-textarea" placeholder="Capture key ideas, questions, or follow-up prompts…" aria-describedby="notesTitle"></textarea>
     </div>
-</div>
+</section>

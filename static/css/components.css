@@ -15,8 +15,8 @@ input[type="submit"] {
     height: 40px;
     padding: 0;
     border: 1px solid var(--border);
-    border-radius: 12px;
-    background: transparent;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.05);
     color: var(--text);
     font-size: 1rem;
     transition: all 0.15s ease;
@@ -24,6 +24,7 @@ input[type="submit"] {
 
 .icon-btn:hover {
     background: rgba(255,255,255,0.08);
+    border-color: rgba(6, 182, 212, 0.7);
     transform: translateY(-1px);
 }
 
@@ -35,10 +36,10 @@ input[type="submit"] {
 /* Ghost buttons - secondary/outline style */
 .ghost-btn {
     min-height: 40px;
-    padding: 0 16px;
+    padding: 0 18px;
     border: 1px solid var(--border);
-    border-radius: 12px;
-    background: transparent;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.05);
     color: var(--text);
     font-weight: 600;
     transition: all 0.15s ease;
@@ -46,7 +47,7 @@ input[type="submit"] {
 
 .ghost-btn:hover {
     background: rgba(255,255,255,0.08);
-    border-color: var(--accent-2);
+    border-color: rgba(6, 182, 212, 0.7);
 }
 
 .ghost-btn:active {
@@ -55,7 +56,7 @@ input[type="submit"] {
 
 .ghost-btn.small {
     min-height: 34px;
-    padding: 0 12px;
+    padding: 0 14px;
     font-size: 0.875rem;
 }
 
@@ -65,7 +66,7 @@ input[type="submit"] {
     min-width: 120px;
     padding: 0 20px;
     border: 0;
-    border-radius: 12px;
+    border-radius: 16px;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: white;
     font-weight: 600;

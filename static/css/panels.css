@@ -38,7 +38,6 @@
     gap: 18px;
     padding: 18px;
     align-items: start;
-    min-height: 500px;
 }
 
 .attachment-workspace {
@@ -46,7 +45,6 @@
     flex-direction: column;
     gap: 14px;
     padding: 16px 18px 0;
-    min-height: 400px;
 }
 
 .attachment-actions {
@@ -69,7 +67,7 @@
     gap: 4px;
     color: var(--muted);
     font-size: 0.76rem;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .page-control input {
@@ -81,6 +79,10 @@
     background: rgba(255,255,255,0.08);
     color: var(--text);
     text-align: center;
+}
+
+.page-control input:hover {
+    border-color: var(--accent-2);
 }
 
 .action-row {
@@ -104,5 +106,19 @@
 }
 
 .text-input-area:focus-visible {
-    outline: 2px solid rgba(139, 92, 246, 0.35);
+    outline: 2px solid rgba(139, 92, 246, 0.5);
+    outline-offset: -2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1079px) {
+    .workspace-split {
+        grid-template-columns: 1fr;
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .action-row {
+        padding: 0 12px 12px;
+    }
 }

@@ -1,8 +1,8 @@
 .translation-area {
     padding: 18px;
-    min-height: 380px;
+    min-height: 300px;
     overflow: auto;
-    color: #f8fafc;
+    color: var(--text);
     font-size: 1rem;
     line-height: 1.75;
 }
@@ -18,4 +18,17 @@
 
 .translation-area.rtl p {
     text-align: right;
+}
+
+/* Translation panel layout */
+@media (min-width: 1080px) {
+    .desktop-top-section {
+        min-height: 320px;
+    }
+}
+
+@media (max-width: 1079px) {
+    .translation-area {
+        min-height: 240px;
+    }
 }
