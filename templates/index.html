@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<main class="app-shell">
+<main id="main" class="app-shell" tabindex="-1">
     {% include "partials/_header.html" %}
     {% include "partials/_sidebar.html" %}
-    <button id="sidebarToggle" class="icon-btn" aria-label="Toggle sidebar">&#9776;</button>
     <div class="main-pane expanded-main-pane">
         {% include "partials/_text_mode.html" %}
         {% include "partials/_attachment_mode.html" %}
@@ -11,5 +10,5 @@
         {% include "partials/_notes.html" %}
     </div>
 </main>
-<div id="statusMessage" class="status-message hidden"></div>
+<div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
 {% endblock %}
