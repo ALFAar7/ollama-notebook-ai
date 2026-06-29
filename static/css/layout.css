@@ -19,14 +19,56 @@
     gap: 18px;
 }
 
-.compact-sidebar {
-    gap: 12px;
+.main-pane {
+    min-width: 0;
 }
 
-.compact-card {
-    padding: 12px;
+.sidebar {
+    position: relative;
 }
 
-.expanded-main-pane {
-    gap: 16px;
+/* Mobile sidebar hidden by default */
+@media (max-width: 1079px) {
+    .sidebar {
+        display: none;
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        bottom: 16px;
+        width: 320px;
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+        z-index: 100;
+        margin-top: 0;
+        max-height: none;
+        height: auto;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .sidebar.open {
+        display: flex;
+        transform: translateX(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .sidebar {
+            transition: none;
+        }
+    }
+}
+
+/* Sidebar toggle button - positioned on mobile */
+#sidebarToggle {
+    display: none;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 90;
+}
+
+@media (max-width: 1079px) {
+    #sidebarToggle {
+        display: block;
+    }
 }
