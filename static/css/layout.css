@@ -6,8 +6,8 @@
 
 .notebook-grid {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
-    gap: 20px;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 16px;
     margin-top: 20px;
     align-items: start;
 }
@@ -29,25 +29,32 @@
 
 /* Mobile sidebar hidden by default */
 @media (max-width: 1079px) {
+    .notebook-grid {
+        grid-template-columns: 1fr;
+    }
+
     .sidebar {
-        display: none;
         position: fixed;
-        top: 16px;
-        right: 16px;
-        bottom: 16px;
-        width: 320px;
-        transform: translateX(100%);
-        transition: transform 0.25s ease;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 480px;
+        transform: translateX(120%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 100;
         margin-top: 0;
         max-height: none;
         height: auto;
         overflow-y: auto;
         overscroll-behavior: contain;
+        display: flex;
+        background: var(--bg);
+        border-left: 1px solid var(--border);
+        box-shadow: -8px 0 30px rgba(0, 0, 0, 0.35);
     }
 
     .sidebar.open {
-        display: flex;
         transform: translateX(0);
     }
 
