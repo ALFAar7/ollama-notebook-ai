@@ -39,7 +39,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebarToggle && App.els.sidebar) {
         sidebarToggle.addEventListener('click', () => {
-            App.els.sidebar.classList.toggle('open');
+            const isOpen = App.els.sidebar.classList.toggle('open');
+            sidebarToggle.setAttribute('aria-expanded', isOpen);
+        });
+    }
+
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    if (closeSidebarBtn && App.els.sidebar) {
+        closeSidebarBtn.addEventListener('click', () => {
+            App.els.sidebar.classList.remove('open');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            if (sidebarToggle) {
+                sidebarToggle.setAttribute('aria-expanded', 'false');
+            }
         });
     }
 
