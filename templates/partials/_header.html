@@ -1,4 +1,4 @@
-<div class="header-bar">
+<header class="header-bar" role="banner">
     <div class="header-brand">
         <div class="brand-mark" aria-hidden="true">&#10022;</div>
         <div>
@@ -7,37 +7,37 @@
         </div>
     </div>
     <div class="header-actions">
-        <div class="mode-tabs">
-            <button id="textModeBtn" class="mode-tab active" data-mode="text" aria-pressed="true">Text notebook</button>
-            <button id="attachmentModeBtn" class="mode-tab" data-mode="attachment" aria-pressed="false">Source file</button>
+        <div class="mode-tabs" role="tablist">
+            <button id="textModeBtn" class="mode-tab active" data-mode="text" aria-pressed="true" role="tab">Text notebook</button>
+            <button id="attachmentModeBtn" class="mode-tab" data-mode="attachment" aria-pressed="false" role="tab">Source file</button>
         </div>
         <div class="language-controls">
-                <label class="lang-select">
-                    <span>From</span>
-                    <select id="sourceLanguage">
-                        <option value="auto">Auto detect</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="English" selected>English</option>
-                        <option value="French">French</option>
-                        <option value="German">German</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="Italian">Italian</option>
-                        <option value="Persian">Persian</option>
-                        <option value="Russian">Russian</option>
-                        <option value="Chinese">Chinese</option>
-                    </select>
-                </label>
-                <label class="lang-select">
-                    <span>To</span>
-                    <select id="targetLanguage">
-                        <option value="English">English</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="Persian" selected>Persian</option>
-                        <option value="French">French</option>
-                        <option value="German">German</option>
-                        <option value="Spanish">Spanish</option>
-                    </select>
-                </label>
+            <label class="lang-select">
+                <span>From</span>
+                <select id="sourceLanguage" aria-label="Source language">
+                    <option value="auto">Auto detect</option>
+                    <option value="Arabic">Arabic</option>
+                    <option value="English" selected>English</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Persian">Persian</option>
+                    <option value="Russian">Russian</option>
+                    <option value="Chinese">Chinese</option>
+                </select>
+            </label>
+            <label class="lang-select">
+                <span>To</span>
+                <select id="targetLanguage" aria-label="Target language">
+                    <option value="English">English</option>
+                    <option value="Arabic">Arabic</option>
+                    <option value="Persian" selected>Persian</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Spanish">Spanish</option>
+                </select>
+            </label>
         </div>
     </div>
-</div>
+</header>

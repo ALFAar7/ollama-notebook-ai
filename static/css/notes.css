@@ -1,14 +1,15 @@
 .note-textarea {
     width: 100%;
     min-height: 180px;
-    border: 0;
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 14px;
     resize: vertical;
     color: var(--text);
     background: rgba(255,255,255,0.06);
     line-height: 1.6;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    font-family: inherit;
 }
 
 .note-textarea.rtl {
@@ -16,9 +17,14 @@
     text-align: right;
 }
 
+.note-textarea:focus-visible {
+    outline: 2px solid rgba(139, 92, 246, 0.5);
+    outline-offset: 2px;
+}
+
 .notes-summary {
     margin-bottom: 10px;
-    padding: 10px;
+    padding: 12px;
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,255,255,0.04);
@@ -30,6 +36,7 @@
     display: block;
     margin-bottom: 6px;
     color: var(--text);
+    font-weight: 600;
 }
 
 .notes-summary.rtl {
@@ -50,4 +57,41 @@
 .summary-source.rtl {
     direction: rtl;
     text-align: right;
+}
+
+.notes-section .section-head {
+    margin-bottom: 12px;
+}
+
+/* Ensure notes textarea has proper placeholder styling */
+.note-textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+}
+
+/* Better empty state styling */
+.empty-state.centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    padding: 20px;
+}
+
+.empty-state.centered strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.empty-state.centered span {
+    color: var(--muted);
+    max-width: 280px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .note-textarea {
+        transition: none;
+    }
 }

@@ -60,14 +60,15 @@
 }
 
 .mode-tab {
-    padding: 10px 16px;
+    min-height: 36px;
+    padding: 0 14px;
     border: 0;
-    border-radius: 12px;
+    border-radius: 10px;
     background: transparent;
     color: var(--muted);
-    font-weight: 800;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .mode-tab.active {
@@ -78,6 +79,10 @@
 .mode-tab:hover:not(.active) {
     background: rgba(255,255,255,0.08);
     color: var(--text);
+}
+
+.mode-tab:active {
+    background: rgba(255,255,255,0.12);
 }
 
 .language-controls {
@@ -91,7 +96,7 @@
     gap: 4px;
     color: var(--muted);
     font-size: 0.8rem;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .lang-select select {
@@ -104,4 +109,14 @@
     background-size: 16px;
     color: var(--text);
     cursor: pointer;
+}
+
+.lang-select select:hover {
+    border-color: var(--accent-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mode-tab {
+        transition: none;
+    }
 }

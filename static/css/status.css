@@ -9,6 +9,7 @@
     background: var(--bg-soft);
     box-shadow: var(--shadow);
     line-height: 1.5;
+    z-index: 1000;
 }
 
 .status-message.error {
@@ -22,38 +23,33 @@
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
+/* Empty state - reused across components */
 .empty-state {
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     min-height: 180px;
     padding: 24px;
     color: var(--muted);
     text-align: center;
     line-height: 1.6;
+    gap: 8px;
 }
 
 .empty-state strong {
-    display: block;
     margin-bottom: 8px;
     color: var(--text);
     font-size: 1.05rem;
+    font-weight: 600;
 }
 
-.centered {
-    text-align: center;
-}
-
-#sidebarToggle {
-    display: none;
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 101;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    font-size: 1.1rem;
+/* Sidebar toggle button for mobile */
+@media (max-width: 1079px) {
+    #sidebarToggle {
+        display: block;
+    }
 }

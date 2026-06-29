@@ -1,56 +1,150 @@
-.icon-btn,
-select,
+/* Base button reset */
 button,
-.ghost-btn {
-    min-height: 40px;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: rgba(255,255,255,0.08);
-    color: var(--text);
+select,
+input[type="button"],
+input[type="submit"] {
+    font: inherit;
     cursor: pointer;
-    font-weight: 800;
 }
 
-.ghost-btn {
-    padding: 0 14px;
+/* Icon buttons - for icon-only buttons */
+.icon-btn {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.15s ease;
 }
 
-.primary-btn {
-    min-width: 160px;
-    padding: 0 16px;
-    border: 0;
-    border-radius: 14px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: white;
-    box-shadow: 0 16px 30px rgba(6, 182, 212, 0.18);
-}
-
-.primary-btn:focus-visible,
-.ghost-btn:focus-visible,
-.icon-btn:focus-visible,
-.mode-tab:focus-visible {
-    outline: 2px solid rgba(139, 92, 246, 0.5);
-    outline-offset: 2px;
-}
-
-.primary-btn:hover,
-.ghost-btn:hover,
-.icon-btn:hover,
-.mode-tab:hover {
+.icon-btn:hover {
+    background: rgba(255,255,255,0.08);
     transform: translateY(-1px);
 }
 
-.primary-btn:disabled,
-.ghost-btn:disabled,
-.icon-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
+.icon-btn:active {
+    transform: translateY(0);
+    background: rgba(255,255,255,0.12);
 }
 
-.primary-btn.small,
+/* Ghost buttons - secondary/outline style */
+.ghost-btn {
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text);
+    font-weight: 600;
+    transition: all 0.15s ease;
+}
+
+.ghost-btn:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: var(--accent-2);
+}
+
+.ghost-btn:active {
+    background: rgba(255,255,255,0.12);
+}
+
 .ghost-btn.small {
     min-height: 34px;
     padding: 0 12px;
-    font-size: 0.84rem;
+    font-size: 0.875rem;
+}
+
+/* Primary buttons - main action style */
+.primary-btn {
+    min-height: 40px;
+    min-width: 120px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+    transition: all 0.15s ease;
+}
+
+.primary-btn:hover {
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+    transform: translateY(-1px);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+}
+
+.primary-btn.small {
+    min-height: 34px;
+    min-width: auto;
+    padding: 0 14px;
+    font-size: 0.875rem;
+}
+
+/* Focus states - accessible focus indicator */
+button:focus-visible,
+select:focus-visible {
+    outline: 2px solid rgba(139, 92, 246, 0.6);
+    outline-offset: 2px;
+}
+
+/* Mode tabs */
+.mode-tab {
+    min-height: 36px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.mode-tab.active {
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--text);
+}
+
+.mode-tab:hover:not(.active) {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+}
+
+.mode-tab:active {
+    background: rgba(255,255,255,0.12);
+}
+
+/* Disabled state */
+button:disabled,
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Prefers reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    button,
+    .ghost-btn,
+    .primary-btn,
+    .icon-btn,
+    .mode-tab {
+        transition: none;
+    }
+    
+    .primary-btn:hover,
+    .ghost-btn:hover,
+    .icon-btn:hover,
+    .mode-tab:hover {
+        transform: none;
+    }
 }

@@ -1,4 +1,4 @@
-<div id="attachmentPanel" class="mode-panel hidden">
+<section id="attachmentPanel" class="mode-panel hidden" aria-labelledby="sourceTitleFile">
     <div class="workspace-split">
         <article class="panel panel-source">
             <div class="panel-header">
@@ -7,17 +7,17 @@
                     <h2 id="sourceTitleFile">Source document</h2>
                 </div>
                 <div class="panel-actions">
-                    <button id="copyOriginalBtn" class="ghost-btn small">Copy text</button>
+                    <button id="copyOriginalBtn" class="ghost-btn small" aria-label="Copy original text">Copy text</button>
                 </div>
             </div>
             <div class="attachment-workspace">
                 <div class="attachment-actions">
                     <div class="page-controls">
                         <button id="prevPageBtn" class="icon-btn" type="button" aria-label="Previous page">&#8592;</button>
-                            <label class="page-control compact">
-                                <span>Page</span>
-                                <input id="pageNumber" type="number" min="1" value="1" name="page_number" autocomplete="off">
-                            </label>
+                        <label class="page-control compact">
+                            <span>Page</span>
+                            <input id="pageNumber" type="number" min="1" value="1" name="page_number" autocomplete="off" aria-label="Current page number">
+                        </label>
                         <button id="nextPageBtn" class="icon-btn" type="button" aria-label="Next page">&#8594;</button>
                     </div>
                     <div class="translate-controls-inline">
@@ -25,7 +25,7 @@
                         <button id="translateAllBtn" class="ghost-btn small">Translate all</button>
                     </div>
                 </div>
-                <div id="attachmentPreview" class="attachment-preview">
+                <div id="attachmentPreview" class="attachment-preview" aria-live="polite">
                     <div class="empty-state centered">
                         <strong>Upload a source file</strong>
                         <span>Once a document is uploaded, its pages appear here.</span>
@@ -40,10 +40,10 @@
                     <h2>Translation & insights</h2>
                 </div>
                 <div class="panel-actions">
-                    <button id="copyTranslationBtnAttachment" class="ghost-btn small">Copy</button>
+                    <button id="copyTranslationBtnAttachment" class="ghost-btn small" aria-label="Copy translation">Copy</button>
                 </div>
             </div>
-            <div id="translationArea" class="translation-area"></div>
+            <div id="translationArea" class="translation-area" aria-live="polite"></div>
         </article>
     </div>
-</div>
+</section>

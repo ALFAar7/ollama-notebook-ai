@@ -8,6 +8,9 @@
 
 .sidebar-card {
     padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .section-head {
@@ -15,7 +18,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    margin-bottom: 14px;
+    margin-bottom: 4px;
 }
 
 .section-head h2 {
@@ -32,7 +35,7 @@
     background: rgba(255,255,255,0.08);
     color: var(--muted);
     font-size: 0.76rem;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .upload-card {
@@ -44,18 +47,22 @@
     border-radius: 16px;
     background: rgba(255,255,255,0.05);
     cursor: pointer;
-    transition: border-color 0.2s ease, transform 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .upload-card:hover {
     border-color: rgba(6, 182, 212, 0.7);
-    transform: translateY(-1px);
+    background: rgba(255,255,255,0.08);
+}
+
+.upload-card:focus-visible {
+    outline: 2px solid rgba(139, 92, 246, 0.5);
+    outline-offset: 2px;
 }
 
 .upload-card.dragging {
     border-color: var(--accent);
     background: rgba(139, 92, 246, 0.15);
-    transform: scale(1.02);
 }
 
 .upload-card strong {
@@ -96,6 +103,24 @@
     white-space: nowrap;
 }
 
+/* Compact sidebar styles */
+.compact-sidebar {
+    gap: 12px;
+}
+
+.compact-card {
+    padding: 12px;
+}
+
+.compact-upload {
+    padding: 10px;
+    gap: 8px;
+}
+
+.compact-meta {
+    margin: 8px 0;
+}
+
 .compact-preview {
     min-height: 220px;
     max-height: 280px;
@@ -111,4 +136,17 @@
     min-height: auto;
     max-height: 220px;
     font-size: 0.95rem;
+}
+
+/* Close sidebar button positioning */
+.sidebar .icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .upload-card {
+        transition: none;
+    }
 }

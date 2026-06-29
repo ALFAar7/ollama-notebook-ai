@@ -21,8 +21,12 @@
 .attachment-preview .empty-state {
     min-height: 360px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    text-align: center;
 }
 
 .attachment-preview .empty-state strong {
@@ -37,6 +41,7 @@
     flex-direction: column;
     gap: 12px;
     height: 100%;
+    min-height: 0;
 }
 
 .source-preview .preview-content {
@@ -59,6 +64,7 @@
     font-size: 1.05rem;
     padding-right: 6px;
     flex: 1;
+    min-width: 0;
 }
 
 .source-preview .preview-text {
@@ -72,4 +78,16 @@
     border: 0;
     border-radius: 12px;
     background: white;
+}
+
+/* Compact preview for sidebar */
+.sidebar .source-preview {
+    min-height: 140px;
+    max-height: 200px;
+}
+
+.sidebar .preview-text {
+    min-height: 100px;
+    font-size: 0.9rem;
+    max-height: 150px;
 }
