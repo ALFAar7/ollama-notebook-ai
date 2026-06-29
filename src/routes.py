@@ -261,6 +261,17 @@ def summarize_text():
         return jsonify({'error': str(e)}), 500
 
 
+@bp.route('/api/ollama-status')
+def ollama_status():
+    try:
+        import requests
+        response = requests.get(f'{os.environ.get("OLLAMA_URL", "http://192.168.1.3:11434")}/api/tags', timeout=5)
+        response.raise_for_status()
+        return jsonify({'ollama_online': True})
+    except Exception:
+        return jsonify({'ollama_online': False})
+
+
 @bp.route('/api/models')
 def get_models():
     try:

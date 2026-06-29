@@ -145,6 +145,51 @@
     font-size: 1.1rem;
 }
 
+/* Ollama health indicator */
+.ollama-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.05);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-pill);
+    background: var(--muted);
+    transition: background 0.3s ease;
+}
+
+.ollama-status.online .status-dot {
+    background: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.ollama-status.online .status-label {
+    color: #60a5fa;
+}
+
+.ollama-status.offline .status-dot {
+    background: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.ollama-status.offline .status-label {
+    color: #fca5a5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .status-dot {
+        transition: none;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .upload-card {
         transition: none;
