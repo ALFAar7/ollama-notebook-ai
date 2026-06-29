@@ -15,7 +15,7 @@ input[type="submit"] {
     height: 40px;
     padding: 0;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-16);
     background: rgba(255,255,255,0.05);
     color: var(--text);
     font-size: 1rem;
@@ -38,7 +38,7 @@ input[type="submit"] {
     min-height: 40px;
     padding: 0 18px;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-16);
     background: rgba(255,255,255,0.05);
     color: var(--text);
     font-weight: 600;
@@ -48,10 +48,14 @@ input[type="submit"] {
 .ghost-btn:hover {
     background: rgba(255,255,255,0.08);
     border-color: rgba(6, 182, 212, 0.7);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
 }
 
 .ghost-btn:active {
     background: rgba(255,255,255,0.12);
+    transform: translateY(0);
+    box-shadow: none;
 }
 
 .ghost-btn.small {
@@ -66,7 +70,7 @@ input[type="submit"] {
     min-width: 120px;
     padding: 0 20px;
     border: 0;
-    border-radius: 16px;
+    border-radius: var(--radius-16);
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: white;
     font-weight: 600;
@@ -91,6 +95,20 @@ input[type="submit"] {
     font-size: 0.875rem;
 }
 
+/* Loading text indicator */
+.loading-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent-2);
+    letter-spacing: 0.04em;
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
 /* Focus states - accessible focus indicator */
 button:focus-visible,
 select:focus-visible {
@@ -103,7 +121,7 @@ select:focus-visible {
     min-height: 36px;
     padding: 0 14px;
     border: 0;
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     background: transparent;
     color: var(--muted);
     font-weight: 600;
@@ -138,10 +156,12 @@ select:disabled {
     .ghost-btn,
     .primary-btn,
     .icon-btn,
-    .mode-tab {
+    .mode-tab,
+    .loading-text {
         transition: none;
+        animation: none;
     }
-    
+
     .primary-btn:hover,
     .ghost-btn:hover,
     .icon-btn:hover,

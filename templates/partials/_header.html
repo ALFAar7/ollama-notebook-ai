@@ -12,32 +12,35 @@
             <button id="attachmentModeBtn" class="mode-tab" data-mode="attachment" aria-pressed="false" role="tab">Source file</button>
         </div>
         <div class="language-controls">
-            <label class="lang-select">
-                <span>From</span>
-                <select id="sourceLanguage" aria-label="Source language">
-                    <option value="auto">Auto detect</option>
-                    <option value="Arabic">Arabic</option>
-                    <option value="English" selected>English</option>
-                    <option value="French">French</option>
-                    <option value="German">German</option>
-                    <option value="Spanish">Spanish</option>
-                    <option value="Italian">Italian</option>
-                    <option value="Persian">Persian</option>
-                    <option value="Russian">Russian</option>
-                    <option value="Chinese">Chinese</option>
-                </select>
-            </label>
-            <label class="lang-select">
-                <span>To</span>
-                <select id="targetLanguage" aria-label="Target language">
-                    <option value="English">English</option>
-                    <option value="Arabic">Arabic</option>
-                    <option value="Persian" selected>Persian</option>
-                    <option value="French">French</option>
-                    <option value="German">German</option>
-                    <option value="Spanish">Spanish</option>
-                </select>
-            </label>
+            <details class="lang-details">
+                <summary class="lang-summary">Languages</summary>
+                <label class="lang-select">
+                    <span>From</span>
+                    <select id="sourceLanguage" aria-label="Source language">
+                        <option value="auto">Auto detect</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="English" selected>English</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Persian">Persian</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Chinese">Chinese</option>
+                    </select>
+                </label>
+                <label class="lang-select">
+                    <span>To</span>
+                    <select id="targetLanguage" aria-label="Target language">
+                        <option value="English">English</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="Persian" selected>Persian</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
+                    </select>
+                </label>
+            </details>
         </div>
     </div>
 </header>

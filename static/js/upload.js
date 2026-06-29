@@ -12,6 +12,9 @@ async function uploadAndTranslateFile(file) {
 
     showStatus('Processing source...', '');
 
+    const attachmentLoading = document.getElementById('attachmentLoading');
+    if (attachmentLoading) attachmentLoading.classList.remove('hidden');
+
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 600000);
@@ -52,6 +55,7 @@ async function uploadAndTranslateFile(file) {
             App.els.translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document when you are ready.</span></div>';
             showStatus(`File processed. ${App.pages.length} page(s) ready.`, 'success');
         }
+        switchMode('attachment');
     } catch (error) {
         console.error(error);
         if (error.name === 'AbortError') {
@@ -59,6 +63,8 @@ async function uploadAndTranslateFile(file) {
         } else {
             showStatus('Upload failed. Check the browser console.', 'error');
         }
+    } finally {
+        if (attachmentLoading) attachmentLoading.classList.add('hidden');
     }
 }
 
@@ -81,7 +87,7 @@ function startProcessingPolling(filename) {
                 updateSourceMeta();
                 renderFilePreview();
                 loadCurrentPageText().catch(() => {});
-                App.els.translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document when you are ready.</span></div>';
+                App.els.translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document.</span></div>';
                 showStatus(`Document ready. ${data.page_count || 0} page(s) available.`, 'success');
             }
         } catch (error) {

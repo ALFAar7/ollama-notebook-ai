@@ -5,6 +5,9 @@ async function translateTextMode() {
         return;
     }
 
+    const textModeLoading = document.getElementById('textModeLoading');
+    if (textModeLoading) textModeLoading.classList.remove('hidden');
+
     App.els.translateTextBtn.disabled = true;
     App.els.translateTextBtn.textContent = 'Translating...';
     App.els.translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Translating...</strong><span>This may take a moment.</span></div>';
@@ -38,6 +41,7 @@ async function translateTextMode() {
         App.els.translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Translation failed</strong><span>Could not connect to the translation server.</span></div>';
         showStatus('Translation request failed.', 'error');
     } finally {
+        if (textModeLoading) textModeLoading.classList.add('hidden');
         App.els.translateTextBtn.disabled = false;
         App.els.translateTextBtn.textContent = 'Translate';
     }
@@ -62,6 +66,9 @@ async function translateCurrentPage() {
         showStatus('Upload a source file before translating.', 'error');
         return;
     }
+
+    const attachmentLoading = document.getElementById('attachmentLoading');
+    if (attachmentLoading) attachmentLoading.classList.remove('hidden');
 
     App.els.translatePageBtn.disabled = true;
     App.els.translatePageBtn.textContent = 'Translating...';
@@ -98,6 +105,7 @@ async function translateCurrentPage() {
         App.els.translationArea.innerHTML = '<div class="empty-state centered"><strong>Translation failed</strong><span>Could not connect to the translation server.</span></div>';
         showStatus('Translation request failed.', 'error');
     } finally {
+        if (attachmentLoading) attachmentLoading.classList.add('hidden');
         App.els.translatePageBtn.disabled = false;
         App.els.translatePageBtn.textContent = 'Translate page';
     }
@@ -108,6 +116,9 @@ async function translateAllPages() {
         showStatus('Upload a source file before translating.', 'error');
         return;
     }
+
+    const attachmentLoading = document.getElementById('attachmentLoading');
+    if (attachmentLoading) attachmentLoading.classList.remove('hidden');
 
     App.els.translateAllBtn.disabled = true;
     App.els.translateAllBtn.textContent = 'Translating...';
@@ -143,6 +154,7 @@ async function translateAllPages() {
         App.els.translationArea.innerHTML = '<div class="empty-state centered"><strong>Translation failed</strong><span>Could not connect to the translation server.</span></div>';
         showStatus('Translation request failed.', 'error');
     } finally {
+        if (attachmentLoading) attachmentLoading.classList.add('hidden');
         App.els.translateAllBtn.disabled = false;
         App.els.translateAllBtn.textContent = 'Translate all';
     }

@@ -1,6 +1,6 @@
 .panel {
     border: 1px solid var(--border);
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
     box-shadow: var(--shadow);
     backdrop-filter: blur(18px);
@@ -9,7 +9,7 @@
 .panel {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .panel-header {
@@ -75,7 +75,7 @@
     width: 100%;
     padding: 0 12px;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-12);
     background: rgba(255,255,255,0.08);
     color: var(--text);
     text-align: center;
@@ -88,8 +88,13 @@
 .action-row {
     display: flex;
     gap: 10px;
-    padding: 0 18px 18px;
+    padding: 14px 18px 18px;
     flex-wrap: wrap;
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+    border-top: 1px solid var(--border);
+    z-index: 1;
 }
 
 .text-input-area {
@@ -97,12 +102,14 @@
     flex: 1;
     min-height: 250px;
     padding: 18px;
-    border: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
     resize: vertical;
-    background: transparent;
+    background: rgba(255,255,255,0.06);
     color: var(--text);
     font-size: 1rem;
     line-height: 1.7;
+    transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .text-input-area:focus-visible {

@@ -5,7 +5,7 @@
     gap: 16px;
     padding: 18px 24px;
     border: 1px solid var(--border);
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
     box-shadow: var(--shadow);
     backdrop-filter: blur(18px);
@@ -23,7 +23,7 @@
     place-items: center;
     width: 48px;
     height: 48px;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     font-size: 1.2rem;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     box-shadow: 0 16px 30px rgba(6, 182, 212, 0.2);
@@ -55,7 +55,7 @@
     display: flex;
     gap: 8px;
     padding: 6px;
-    border-radius: 16px;
+    border-radius: var(--radius-16);
     background: rgba(255,255,255,0.06);
 }
 
@@ -63,7 +63,7 @@
     min-height: 36px;
     padding: 0 14px;
     border: 0;
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     background: transparent;
     color: var(--muted);
     font-weight: 600;
@@ -91,6 +91,64 @@
     align-items: flex-end;
 }
 
+.lang-details {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.lang-summary {
+    display: none;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    align-items: center;
+}
+
+.lang-summary::-webkit-details-marker {
+    display: none;
+}
+
+.lang-summary:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+}
+
+@media (max-width: 1079px) {
+    .lang-summary {
+        display: flex;
+    }
+
+    .lang-details .lang-select {
+        display: none;
+    }
+
+    .lang-details[open] .lang-select {
+        display: grid;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 12px;
+        box-shadow: var(--shadow);
+        z-index: 50;
+        gap: 10px;
+    }
+
+    .lang-details[open] .lang-summary {
+        border-color: var(--accent-2);
+        color: var(--text);
+    }
+}
+
 .lang-select {
     display: grid;
     gap: 4px;
@@ -104,7 +162,7 @@
     min-height: 40px;
     padding: 0 36px 0 12px;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-12);
     background: rgba(255,255,255,0.08) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239eaecb'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat right 12px center;
     background-size: 16px;
     color: var(--text);
