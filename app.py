@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import hashlib
@@ -713,6 +714,14 @@ def serve_upload(filename):
     safe_name = os.path.basename(filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'], safe_name)
 
+=======
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from src.app import app
+>>>>>>> feature/ui
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

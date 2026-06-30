@@ -1,0 +1,131 @@
+.panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.panel-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.workspace-split {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 18px;
+    padding: 18px;
+    align-items: start;
+}
+
+.attachment-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 18px 0;
+}
+
+.attachment-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.page-controls {
+    display: grid;
+    grid-template-columns: 42px minmax(72px, 1fr) 42px;
+    gap: 8px;
+    align-items: end;
+}
+
+.page-control {
+    display: grid;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.page-control input {
+    min-height: 40px;
+    width: 100%;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-12);
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    text-align: center;
+}
+
+.page-control input:hover {
+    border-color: var(--accent-2);
+}
+
+.action-row {
+    display: flex;
+    gap: 10px;
+    padding: 14px 18px 18px;
+    flex-wrap: wrap;
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+    border-top: 1px solid var(--border);
+    z-index: 1;
+}
+
+.text-input-area {
+    width: 100%;
+    flex: 1;
+    min-height: 250px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    resize: vertical;
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.7;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.text-input-area:focus-visible {
+    outline: 2px solid rgba(139, 92, 246, 0.5);
+    outline-offset: -2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1079px) {
+    .workspace-split {
+        grid-template-columns: 1fr;
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .action-row {
+        padding: 0 12px 12px;
+    }
+}

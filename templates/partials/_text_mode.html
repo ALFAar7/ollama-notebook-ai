@@ -1,0 +1,20 @@
+<section id="textModePanel" class="mode-panel" aria-labelledby="sourceTitle">
+    <article class="panel panel-source desktop-top-section">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">Workspace</p>
+                <h2 id="sourceTitle">Text notebook</h2>
+            </div>
+            <div class="panel-actions">
+                <button id="clearTextBtn" class="ghost-btn small" aria-label="Clear text">Clear</button>
+                <span id="textModeLoading" class="loading-text hidden" aria-live="polite">Translating…</span>
+            </div>
+        </div>
+        <label for="textInput" class="sr-only">Source text</label>
+        <textarea id="textInput" class="text-input-area" placeholder="Paste a passage, article section, or research note here…" aria-describedby="sourceTitle"></textarea>
+        <div class="action-row">
+            <button id="translateTextBtn" class="primary-btn" title="Ctrl + Enter">Translate</button>
+            <button id="copySourceBtn" class="ghost-btn">Copy source</button>
+        </div>
+    </article>
+</section>

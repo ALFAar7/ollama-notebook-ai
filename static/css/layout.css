@@ -1,0 +1,81 @@
+.app-shell {
+    width: min(1480px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 24px 0 40px;
+}
+
+.notebook-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 16px;
+    margin-top: 20px;
+    align-items: start;
+}
+
+.sidebar,
+.main-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.main-pane {
+    min-width: 0;
+}
+
+.sidebar {
+    position: relative;
+}
+
+/* Mobile sidebar hidden by default */
+@media (max-width: 1079px) {
+    .notebook-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 480px;
+        transform: translateX(120%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 100;
+        margin-top: 0;
+        max-height: none;
+        height: auto;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        display: flex;
+        background: var(--bg);
+        border-left: 1px solid var(--border);
+        box-shadow: -8px 0 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .sidebar {
+            transition: none;
+        }
+    }
+}
+
+/* Sidebar toggle button - positioned on mobile */
+#sidebarToggle {
+    display: none;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 90;
+}
+
+@media (max-width: 1079px) {
+    #sidebarToggle {
+        display: block;
+    }
+}

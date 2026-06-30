@@ -5,4 +5,11 @@ cache/*
 *.pyc
 __pycache__/
 __pycache__/*
+<<<<<<< HEAD
 .fuse*
+=======
+.conntinue
+.kilo
+*.fuse*
+.fuse_hidden*
+>>>>>>> feature/ui

@@ -1,0 +1,197 @@
+.sidebar-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+}
+
+.sidebar-card {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.section-head h2 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.section-pill,
+.meta-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: var(--radius-pill);
+    background: rgba(255,255,255,0.08);
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.upload-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px dashed rgba(255,255,255,0.2);
+    border-radius: var(--radius-16);
+    background: rgba(255,255,255,0.05);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.upload-card:hover {
+    border-color: rgba(6, 182, 212, 0.7);
+    background: rgba(255,255,255,0.08);
+}
+
+.upload-card:focus-visible {
+    outline: 2px solid rgba(139, 92, 246, 0.5);
+    outline-offset: 2px;
+}
+
+.upload-card.dragging {
+    border-color: var(--accent);
+    background: rgba(139, 92, 246, 0.15);
+}
+
+.upload-card strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.upload-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.upload-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-12);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: white;
+    font-size: 1rem;
+    box-shadow: 0 12px 24px rgba(6, 182, 212, 0.22);
+}
+
+.source-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+    align-items: center;
+}
+
+.meta-pill {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Compact sidebar styles */
+.compact-sidebar {
+    gap: 12px;
+}
+
+.compact-card {
+    padding: 12px;
+}
+
+.compact-upload {
+    padding: 10px;
+    gap: 8px;
+}
+
+.compact-meta {
+    margin: 8px 0;
+}
+
+.compact-preview {
+    min-height: 220px;
+    max-height: 280px;
+    overflow: hidden;
+}
+
+.compact-preview .preview-content {
+    min-height: auto;
+    height: 100%;
+}
+
+.compact-preview .preview-text {
+    min-height: auto;
+    max-height: 220px;
+    font-size: 0.95rem;
+}
+
+/* Close sidebar button positioning */
+.sidebar .icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+}
+
+/* Ollama health indicator */
+.ollama-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.05);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-pill);
+    background: var(--muted);
+    transition: background 0.3s ease;
+}
+
+.ollama-status.online .status-dot {
+    background: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.ollama-status.online .status-label {
+    color: #60a5fa;
+}
+
+.ollama-status.offline .status-dot {
+    background: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.ollama-status.offline .status-label {
+    color: #fca5a5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .status-dot {
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .upload-card {
+        transition: none;
+    }
+}
