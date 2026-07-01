@@ -254,7 +254,7 @@ const History = {
     
     init() {
         // Set up event listeners
-        const searchInput = document.getElementById('historySearch');
+        const searchInput = document.getElementById('historySearchInput');
         if (searchInput) {
             let searchTimeout;
             searchInput.addEventListener('input', (e) => {
@@ -262,6 +262,27 @@ const History = {
                 searchTimeout = setTimeout(() => {
                     this.searchHistory(e.target.value);
                 }, 300);
+            });
+        }
+        
+        const viewToggle = document.getElementById('historyViewToggle');
+        if (viewToggle) {
+            viewToggle.addEventListener('click', () => {
+                const newView = this.currentView === 'list' ? 'stats' : 'list';
+                this.switchView(newView);
+                
+                // Update button text
+                const icon = document.getElementById('historyViewIcon');
+                const label = document.getElementById('historyViewLabel');
+                if (icon && label) {
+                    if (newView === 'stats') {
+                        icon.textContent = '📋';
+                        label.textContent = 'List';
+                    } else {
+                        icon.textContent = '📊';
+                        label.textContent = 'Stats';
+                    }
+                }
             });
         }
         
