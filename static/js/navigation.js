@@ -8,15 +8,27 @@ function switchMode(mode) {
         App.els.attachmentModeBtn.classList.toggle('active', mode === 'attachment');
         App.els.attachmentModeBtn.setAttribute('aria-pressed', mode === 'attachment');
     }
+    if (App.els.historyModeBtn) {
+        App.els.historyModeBtn.classList.toggle('active', mode === 'history');
+        App.els.historyModeBtn.setAttribute('aria-pressed', mode === 'history');
+    }
     if (App.els.textModePanel) {
         App.els.textModePanel.classList.toggle('hidden', mode !== 'text');
     }
     if (App.els.attachmentPanel) {
         App.els.attachmentPanel.classList.toggle('hidden', mode !== 'attachment');
     }
+    if (App.els.historyPanel) {
+        App.els.historyPanel.classList.toggle('hidden', mode !== 'history');
+        // Load history when switching to history mode
+        if (mode === 'history' && typeof History !== 'undefined') {
+            History.loadHistory();
+            History.loadStats();
+        }
+    }
     const textOutput = document.querySelector('.text-mode-output');
     if (textOutput) {
-        textOutput.classList.toggle('hidden', mode === 'attachment');
+        textOutput.classList.toggle('hidden', mode === 'attachment' || mode === 'history');
     }
     updateRTLState();
 }
