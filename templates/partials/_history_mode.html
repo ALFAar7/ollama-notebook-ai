@@ -1,0 +1,45 @@
+<div class="panel history-panel" id="historyPanel">
+    <div class="panel-header">
+        <div class="header-row">
+            <h2 class="panel-title">Translation History</h2>
+            <div class="history-actions">
+                <button id="historyViewToggle" class="secondary-btn" aria-label="Toggle between list and stats view">
+                    <span id="historyViewIcon">📊</span>
+                    <span id="historyViewLabel">Stats</span>
+                </button>
+                <button id="clearHistoryBtn" class="secondary-btn danger-btn" aria-label="Clear all history">
+                    <span>🗑️</span>
+                    Clear All
+                </button>
+            </div>
+        </div>
+        <div class="history-search">
+            <input type="search" 
+                   id="historySearchInput" 
+                   class="search-input" 
+                   placeholder="Search translations..." 
+                   aria-label="Search translation history">
+        </div>
+    </div>
+
+    <!-- List View -->
+    <div id="historyListView" class="history-view">
+        <div id="historyList" class="history-list" role="list">
+            <!-- History entries will be rendered here by history.js -->
+            <div class="empty-state centered">
+                <strong>No translation history yet</strong>
+                <span>Your translations will appear here automatically.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats View -->
+    <div id="historyStatsView" class="history-view" style="display: none;">
+        <div id="historyStats" class="history-stats">
+            <!-- Stats cards will be rendered here by history.js -->
+            <div class="empty-state centered">
+                <strong>Loading statistics...</strong>
+            </div>
+        </div>
+    </div>
+</div>

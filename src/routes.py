@@ -139,9 +139,25 @@ def translate_text():
             translated = translate_with_ollama(chunk, target_language, source_language)
             translated_chunks.append(translated.strip())
 
+        translated_text = '\n\n'.join(translated_chunks)
+        
+        # Save to history
+        try:
+            history_manager = app.config['HISTORY_MANAGER']
+            history_manager.add_entry(
+                source_text=text,
+                translated_text=translated_text,
+                source_language=source_language,
+                target_language=target_language,
+                mode='text' if not filename else 'document',
+                filename=filename
+            )
+        except Exception:
+            pass  # Don't fail translation if history fails
+
         return jsonify({
             'success': True,
-            'translated_text': '\n\n'.join(translated_chunks)
+            'translated_text': translated_text
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -175,6 +191,22 @@ def translate_page():
             else:
                 page_text = get_page_text(text, page_number)
         translated = translate_with_ollama(page_text, target_language, source_language)
+        
+        # Save to history
+        try:
+            history_manager = app.config['HISTORY_MANAGER']
+            history_manager.add_entry(
+                source_text=page_text,
+                translated_text=translated,
+                source_language=source_language,
+                target_language=target_language,
+                mode='page',
+                filename=filename,
+                page_number=int(page_number)
+            )
+        except Exception:
+            pass  # Don't fail translation if history fails
+        
         return jsonify({
             'success': True,
             'page_number': int(page_number),
@@ -359,3 +391,121 @@ def serve_upload(filename):
     import werkzeug.utils
     safe_name = werkzeug.utils.secure_filename(filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'], safe_name)
+
+
+# History API routes
+@bp.route('/api/history', methods=['GET'])
+def get_history():
+    """Get translation history with optional pagination and search."""
+    try:
+        history_manager = app.config['HISTORY_MANAGER']
+        
+        # Get query parameters
+        limit = int(request.args.get('limit', 50))
+        skip = int(request.args.get('skip', 0))
+        search_query = request.args.get('q', '').strip()
+        
+        if search_query:
+            entries = history_manager.search_history(search_query, limit)
+        else:
+            entries = history_manager.get_history(limit, skip)
+        
+        return jsonify({
+            'success': True,
+            'entries': entries,
+            'count': len(entries)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/history', methods=['POST'])
+def add_history_entry():
+    """Add a new translation to history."""
+    try:
+        history_manager = app.config['HISTORY_MANAGER']
+        data = request.get_json()
+        
+        entry = history_manager.add_entry(
+            source_text=data.get('source_text', ''),
+            translated_text=data.get('translated_text', ''),
+            source_language=data.get('source_language', 'auto'),
+            target_language=data.get('target_language', 'English'),
+            mode=data.get('mode', 'text'),
+            filename=data.get('filename'),
+            page_number=data.get('page_number'),
+            summary=data.get('summary')
+        )
+        
+        return jsonify({
+            'success': True,
+            'entry': entry
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/history/<entry_id>', methods=['GET'])
+def get_history_entry(entry_id):
+    """Get a specific history entry."""
+    try:
+        history_manager = app.config['HISTORY_MANAGER']
+        entry = history_manager.get_entry(entry_id)
+        
+        if entry:
+            return jsonify({
+                'success': True,
+                'entry': entry
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Entry not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/history/<entry_id>', methods=['DELETE'])
+def delete_history_entry(entry_id):
+    """Delete a specific history entry."""
+    try:
+        history_manager = app.config['HISTORY_MANAGER']
+        success = history_manager.delete_entry(entry_id)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Entry deleted'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Entry not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/history/clear', methods=['POST'])
+def clear_history():
+    """Clear all history entries."""
+    try:
+        history_manager = app.config['HISTORY_MANAGER']
+        success = history_manager.clear_history()
+        
+        return jsonify({
+            'success': success,
+            'message': 'History cleared' if success else 'Failed to clear history'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/history/stats', methods=['GET'])
+def get_history_stats():
+    """Get history statistics."""
+    try:
+        history_manager = app.config['HISTORY_MANAGER']
+        stats = history_manager.get_stats()
+        
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

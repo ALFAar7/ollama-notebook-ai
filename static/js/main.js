@@ -16,10 +16,10 @@ function cacheElements() {
         'copyOriginalBtn', 'copyTranslationBtnAttachment', 'copyTranslationBtnText',
         'copySourceBtn', 'clearTextBtn', 'saveNoteBtn', 'modelBadge',
         'pageNumberInput', 'prevPageBtn', 'nextPageBtn', 'textModeBtn',
-        'attachmentModeBtn', 'textModePanel', 'attachmentPanel', 'textInput',
-        'translateTextBtn', 'filePreviewSidebar', 'attachmentPreview',
-        'sourceFileName', 'sourcePageCount', 'sourceStatus', 'noteInput', 'notesSummary',
-        'ollamaStatus', 'ollamaDot', 'ollamaLabel'
+        'attachmentModeBtn', 'historyModeBtn', 'textModePanel', 'attachmentPanel', 
+        'historyPanel', 'textInput', 'translateTextBtn', 'filePreviewSidebar', 
+        'attachmentPreview', 'sourceFileName', 'sourcePageCount', 'sourceStatus', 
+        'noteInput', 'notesSummary', 'ollamaStatus', 'ollamaDot', 'ollamaLabel'
     ];
     ids.forEach(id => {
         App.els[id] = document.getElementById(id);
@@ -99,6 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (App.els.attachmentModeBtn) {
         App.els.attachmentModeBtn.addEventListener('click', () => switchMode('attachment'));
+    }
+    if (App.els.historyModeBtn) {
+        App.els.historyModeBtn.addEventListener('click', () => switchMode('history'));
     }
 
     if (App.els.fileInput) {

@@ -14,7 +14,7 @@ A local AI-powered reading workspace that translates documents (PDF, DOCX, TXT) 
 ## Prerequisites
 
 - Python 3.8+
-- [Ollama](https://ollama.com/)
+- [Ollama](https://ollama.com/)4.5
 
 ## Installation
 
