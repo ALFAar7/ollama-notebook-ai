@@ -109,26 +109,15 @@
     gap: var(--space-xs);
 }
 
-.history-entry-actions button {
-    padding: 4px 8px;
+.history-entry-actions .icon-btn {
+    min-width: auto;
+    width: 32px;
+    height: 32px;
     font-size: 0.85rem;
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-.history-entry-actions button:hover {
-    background: var(--surface-primary);
-    border-color: var(--accent-primary);
-    color: var(--accent-primary);
-}
-
-.history-entry-actions .delete-btn:hover {
-    border-color: var(--error);
-    color: var(--error);
+.history-entry-actions .ghost-btn.small {
+    min-height: 32px;
 }
 
 .history-entry-content {
