@@ -6,43 +6,60 @@
             <h1>Notebook Translator</h1>
         </div>
     </div>
+
     <div class="header-actions">
-        <div class="mode-tabs" role="tablist">
-            <button id="textModeBtn" class="mode-tab active" data-mode="text" aria-pressed="true" role="tab">Text notebook</button>
-            <button id="attachmentModeBtn" class="mode-tab" data-mode="attachment" aria-pressed="false" role="tab">Source file</button>
+        <!-- Workspace tabs: Text / Document / Notes -->
+        <nav class="workspace-tabs-nav" role="tablist" aria-label="Workspace">
+            <button class="workspace-tab-btn active" data-tab="text" role="tab" aria-selected="true" aria-controls="panelText">
+                <span class="tab-icon" aria-hidden="true">&#9998;</span>
+                <span class="tab-label">Text</span>
+            </button>
+            <button class="workspace-tab-btn" data-tab="document" role="tab" aria-selected="false" aria-controls="panelDocument">
+                <span class="tab-icon" aria-hidden="true">&#128196;</span>
+                <span class="tab-label">Document</span>
+            </button>
+            <button class="workspace-tab-btn" data-tab="notes" role="tab" aria-selected="false" aria-controls="panelNotes">
+                <span class="tab-icon" aria-hidden="true">&#128221;</span>
+                <span class="tab-label">Notes</span>
+            </button>
+        </nav>
+
+        <!-- Language controls -->
+        <div class="language-bar">
+            <div class="lang-select-inline">
+                <span>From</span>
+                <select id="sourceLanguage" aria-label="Source language">
+                    <option value="auto">Auto detect</option>
+                    <option value="Arabic">Arabic</option>
+                    <option value="English" selected>English</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Kurdish">Kurdish</option>
+                    <option value="Persian">Persian</option>
+                    <option value="Russian">Russian</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="Chinese">Chinese</option>
+                </select>
+            </div>
+            <span class="lang-arrow" aria-hidden="true">&#8594;</span>
+            <div class="lang-select-inline">
+                <span>To</span>
+                <select id="targetLanguage" aria-label="Target language">
+                    <option value="English">English</option>
+                    <option value="Arabic">Arabic</option>
+                    <option value="Kurdish">Kurdish</option>
+                    <option value="Persian" selected>Persian</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Spanish">Spanish</option>
+                </select>
+            </div>
         </div>
-        <div class="language-controls">
-            <details class="lang-details">
-                <summary class="lang-summary">Languages</summary>
-                <label class="lang-select">
-                    <span>From</span>
-                    <select id="sourceLanguage" aria-label="Source language">
-                        <option value="auto">Auto detect</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="English" selected>English</option>
-                        <option value="French">French</option>
-                        <option value="German">German</option>
-                        <option value="Italian">Italian</option>
-                        <option value="Kurdish">Kurdish</option>
-                        <option value="Persian">Persian</option>
-                        <option value="Russian">Russian</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="Chinese">Chinese</option>
-                    </select>
-                </label>
-                <label class="lang-select">
-                    <span>To</span>
-                    <select id="targetLanguage" aria-label="Target language">
-                        <option value="English">English</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="Kurdish">Kurdish</option>
-                        <option value="Persian" selected>Persian</option>
-                        <option value="French">French</option>
-                        <option value="German">German</option>
-                        <option value="Spanish">Spanish</option>
-                    </select>
-                </label>
-            </details>
-        </div>
+
+        <!-- Sidebar toggle -->
+        <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle sidebar" aria-expanded="false">
+            &#9776;
+        </button>
     </div>
 </header>

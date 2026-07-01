@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 <main id="main" class="app-shell" tabindex="-1">
-    <button id="sidebarToggle" class="icon-btn" aria-label="Open sidebar" aria-expanded="false">&#9776;</button>
     {% include "partials/_header.html" %}
-    <div class="notebook-grid">
-        <div class="main-pane expanded-main-pane">
+    <div class="workspace-layout">
+        <!-- Main content area with tab panels -->
+        <div class="workspace-content">
             {% include "partials/_text_mode.html" %}
             {% include "partials/_attachment_mode.html" %}
-            {% include "partials/_output.html" %}
             {% include "partials/_notes.html" %}
         </div>
+        <!-- Sidebar: file upload & settings -->
         {% include "partials/_sidebar.html" %}
     </div>
 </main>
