@@ -1,14 +1,18 @@
-<aside class="sidebar compact-sidebar">
-    <div class="sidebar-card compact-card">
+<!-- Sidebar: file upload & source settings -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-card">
         <div class="section-head">
             <div>
                 <p class="eyebrow">Sources</p>
-                <h2>Notebook sources</h2>
+                <h2>Upload & settings</h2>
             </div>
-            <button id="closeSidebarBtn" class="icon-btn" aria-label="Close sidebar">&#215;</button>
+            <button id="closeSidebarBtn" class="icon-btn" aria-label="Close sidebar">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
         </div>
 
-        <label for="fileInput" class="upload-card compact-upload">
+        <!-- Upload card -->
+        <label for="fileInput" class="upload-card">
             <span class="upload-icon" aria-hidden="true">&#11015;</span>
             <div>
                 <strong>Drop in a PDF, DOCX, or TXT</strong>
@@ -17,17 +21,20 @@
         </label>
         <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
 
-        <div class="source-meta compact-meta">
+        <!-- File metadata pills -->
+        <div class="source-meta">
             <span class="meta-pill" id="sourceFileName">No file</span>
             <span class="meta-pill" id="sourcePageCount">Pages: &mdash;</span>
         </div>
 
+        <!-- Ollama status -->
         <div class="ollama-status" id="ollamaStatus" aria-live="polite">
             <span class="status-dot" id="ollamaDot"></span>
-            <span class="status-label" id="ollamaLabel">Checking Ollama…</span>
+            <span class="status-label" id="ollamaLabel">Checking Ollama...</span>
         </div>
 
-        <div class="source-preview compact-preview" id="filePreviewSidebar">
+        <!-- File preview in sidebar -->
+        <div class="source-preview" id="filePreviewSidebar">
             <div class="empty-state centered">
                 <strong>Add a source document</strong>
                 <span>Upload a PDF, DOCX, or TXT file to get started.</span>
@@ -35,3 +42,5 @@
         </div>
     </div>
 </aside>
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

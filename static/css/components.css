@@ -1,4 +1,8 @@
-/* Base button reset */
+/* ============================================
+   COMPONENTS — Glassmorphism UI Elements
+   ============================================ */
+
+/* ── Base button reset ── */
 button,
 select,
 input[type="button"],
@@ -7,156 +11,297 @@ input[type="submit"] {
     cursor: pointer;
 }
 
-/* Icon buttons - for icon-only buttons */
+/* ── Icon buttons ── */
 .icon-btn {
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     padding: 0;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-16);
-    background: rgba(255,255,255,0.05);
-    color: var(--text);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    background: var(--glass);
+    color: var(--text-secondary);
     font-size: 1rem;
-    transition: all 0.15s ease;
+    transition: all var(--transition-smooth);
 }
 
 .icon-btn:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(6, 182, 212, 0.7);
+    background: var(--glass-hover);
+    border-color: var(--glass-border-hover);
+    color: var(--text);
     transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .icon-btn:active {
     transform: translateY(0);
-    background: rgba(255,255,255,0.12);
+    background: var(--glass-active);
 }
 
-/* Ghost buttons - secondary/outline style */
+/* ── Ghost buttons ── */
 .ghost-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     min-height: 40px;
     padding: 0 18px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-16);
-    background: rgba(255,255,255,0.05);
-    color: var(--text);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-pill);
+    background: var(--glass);
+    color: var(--text-secondary);
     font-weight: 600;
-    transition: all 0.15s ease;
+    font-size: 0.88rem;
+    transition: all var(--transition-smooth);
 }
 
 .ghost-btn:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(6, 182, 212, 0.7);
+    background: var(--glass-hover);
+    border-color: var(--glass-border-hover);
+    color: var(--text);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .ghost-btn:active {
-    background: rgba(255,255,255,0.12);
+    background: var(--glass-active);
     transform: translateY(0);
     box-shadow: none;
 }
 
 .ghost-btn.small {
-    min-height: 34px;
+    min-height: 32px;
     padding: 0 14px;
-    font-size: 0.875rem;
+    font-size: 0.82rem;
 }
 
-/* Primary buttons - main action style */
+/* ── Primary buttons ── */
 .primary-btn {
-    min-height: 40px;
-    min-width: 120px;
-    padding: 0 20px;
-    border: 0;
-    border-radius: var(--radius-16);
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    min-width: 140px;
+    padding: 0 24px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-primary);
     color: white;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
-    transition: all 0.15s ease;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 20px rgba(124, 106, 239, 0.3);
+    transition: all var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.primary-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-base);
 }
 
 .primary-btn:hover {
-    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
-    transform: translateY(-1px);
+    box-shadow: 0 6px 28px rgba(124, 106, 239, 0.45);
+    transform: translateY(-2px);
+}
+
+.primary-btn:hover::before {
+    opacity: 1;
 }
 
 .primary-btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+    box-shadow: 0 2px 12px rgba(124, 106, 239, 0.3);
 }
 
 .primary-btn.small {
-    min-height: 34px;
+    min-height: 36px;
     min-width: auto;
-    padding: 0 14px;
-    font-size: 0.875rem;
+    padding: 0 18px;
+    font-size: 0.85rem;
 }
 
-/* Loading text indicator */
+/* Primary button loading state */
+.primary-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.primary-btn.loading .btn-text {
+    opacity: 0;
+}
+
+.primary-btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* ── Secondary action button ── */
+.secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 18px;
+    border: 1px solid var(--accent-subtle);
+    border-radius: var(--radius-pill);
+    background: var(--accent-subtle);
+    color: var(--accent-light);
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all var(--transition-smooth);
+}
+
+.secondary-btn:hover {
+    background: rgba(124, 106, 239, 0.18);
+    border-color: rgba(124, 106, 239, 0.3);
+    transform: translateY(-1px);
+}
+
+.secondary-btn:active {
+    transform: translateY(0);
+}
+
+.secondary-btn.small {
+    min-height: 34px;
+    padding: 0 14px;
+    font-size: 0.82rem;
+}
+
+/* ── Loading text indicator ── */
 .loading-text {
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--accent-2);
+    color: var(--accent-light);
     letter-spacing: 0.04em;
-    animation: pulse 1.4s ease-in-out infinite;
+    animation: pulse-glow 1.6s ease-in-out infinite;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.loading-text::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.2s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
+    0%, 100% { opacity: 0.4; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
 }
 
-/* Focus states - accessible focus indicator */
+/* ── Eyebrow labels ── */
+.eyebrow {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ── Focus states ── */
 button:focus-visible,
 select:focus-visible {
-    outline: 2px solid rgba(139, 92, 246, 0.6);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
-/* Mode tabs */
-.mode-tab {
-    min-height: 36px;
-    padding: 0 14px;
-    border: 0;
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: var(--muted);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.mode-tab.active {
-    background: rgba(139, 92, 246, 0.2);
-    color: var(--text);
-}
-
-.mode-tab:hover:not(.active) {
-    background: rgba(255,255,255,0.08);
-    color: var(--text);
-}
-
-.mode-tab:active {
-    background: rgba(255,255,255,0.12);
-}
-
-/* Disabled state */
+/* ── Disabled state ── */
 button:disabled,
 select:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-/* Prefers reduced motion support */
+/* ── Meta pills ── */
+.meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-pill);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* ── Section headings ── */
+.section-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.section-head > div:first-child {
+    flex: 1;
+}
+
+.section-head h2 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+}
+
+/* ── Empty states ── */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-2xl);
+    text-align: center;
+}
+
+.empty-state.centered {
+    justify-content: center;
+    flex: 1;
+}
+
+.empty-state strong {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.empty-state span {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    max-width: 280px;
+    line-height: 1.5;
+}
+
+/* ── Prefers reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
     button,
     .ghost-btn,
     .primary-btn,
     .icon-btn,
-    .mode-tab,
+    .secondary-btn,
+    .workspace-tab-btn,
     .loading-text {
         transition: none;
         animation: none;
@@ -165,7 +310,8 @@ select:disabled {
     .primary-btn:hover,
     .ghost-btn:hover,
     .icon-btn:hover,
-    .mode-tab:hover {
+    .secondary-btn:hover,
+    .workspace-tab-btn:hover {
         transform: none;
     }
 }

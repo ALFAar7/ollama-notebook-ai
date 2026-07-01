@@ -1,81 +1,112 @@
+/* ============================================
+   LAYOUT — Tab-based Workspace
+   ============================================ */
+
+/* ── App shell ── */
 .app-shell {
-    width: min(1480px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 24px 0 40px;
-}
-
-.notebook-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 260px;
-    gap: 16px;
-    margin-top: 20px;
-    align-items: start;
-}
-
-.sidebar,
-.main-pane {
+    position: relative;
+    z-index: var(--z-base);
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    min-height: 100vh;
 }
 
-.main-pane {
+/* ── Main content area ── */
+.app-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+/* ── Workspace area (right of sidebar) ── */
+.workspace-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     min-width: 0;
+    padding: var(--space-lg);
+    gap: var(--space-lg);
+    overflow-y: auto;
 }
 
-.sidebar {
+/* ── Workspace tabs content ── */
+.workspace-tabs {
     position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Mobile sidebar hidden by default */
-@media (max-width: 1079px) {
-    .notebook-grid {
+.workspace-tab-panel {
+    display: none;
+    flex-direction: column;
+    gap: var(--space-lg);
+    flex: 1;
+    animation: fadeInUp 0.3s ease;
+}
+
+.workspace-tab-panel.active {
+    display: flex;
+}
+
+/* ── Source → Output layout for text mode ── */
+.translation-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    flex: 1;
+}
+
+.translation-split {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    flex: 1;
+}
+
+.translation-split .source-panel,
+.translation-split .output-panel {
+    flex: 1;
+    min-height: 250px;
+}
+
+/* ── Document mode layout ── */
+.document-workspace {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    flex: 1;
+    min-height: 0;
+}
+
+.document-workspace .source-panel,
+.document-workspace .output-panel {
+    min-height: 400px;
+}
+
+/* ── Notes workspace ── */
+.notes-workspace {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    flex: 1;
+    min-height: 400px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+    .workspace-area {
+        padding: var(--space-md);
+    }
+
+    .document-workspace,
+    .notes-workspace {
         grid-template-columns: 1fr;
     }
-
-    .sidebar {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        max-width: 480px;
-        transform: translateX(120%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 100;
-        margin-top: 0;
-        max-height: none;
-        height: auto;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        display: flex;
-        background: var(--bg);
-        border-left: 1px solid var(--border);
-        box-shadow: -8px 0 30px rgba(0, 0, 0, 0.35);
-    }
-
-    .sidebar.open {
-        transform: translateX(0);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .sidebar {
-            transition: none;
-        }
-    }
 }
 
-/* Sidebar toggle button - positioned on mobile */
-#sidebarToggle {
-    display: none;
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 90;
-}
-
-@media (max-width: 1079px) {
-    #sidebarToggle {
-        display: block;
+@media (max-width: 768px) {
+    .workspace-area {
+        padding: var(--space-sm);
     }
 }

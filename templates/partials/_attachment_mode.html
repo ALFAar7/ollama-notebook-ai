@@ -1,51 +1,77 @@
-<section id="attachmentPanel" class="mode-panel hidden" aria-labelledby="sourceTitleFile">
-    <div class="workspace-split">
+<!-- Tab panel: Document workspace -->
+<section id="panelDocument" class="tab-panel" role="tabpanel" aria-labelledby="tabDocument">
+    <div class="translation-workspace">
+        <!-- Source: document preview + controls -->
         <article class="panel panel-source">
             <div class="panel-header">
                 <div>
-                    <p class="eyebrow">Workspace</p>
-                    <h2 id="sourceTitleFile">Source document</h2>
+                    <p class="eyebrow">Source</p>
+                    <h2 id="sourceTitleFile">Document</h2>
                 </div>
                 <div class="panel-actions">
-                    <button id="copyOriginalBtn" class="ghost-btn small" aria-label="Copy original text">Copy text</button>
-                    <span id="attachmentLoading" class="loading-text hidden" aria-live="polite">Translating…</span>
+                    <span id="attachmentLoading" class="loading-pill hidden" aria-live="polite">
+                        <span class="spinner" aria-hidden="true"></span>Translating...
+                    </span>
+                    <button id="copyOriginalBtn" class="ghost-btn small" title="Copy original text">Copy text</button>
                 </div>
             </div>
-            <div class="attachment-workspace">
-                <div class="attachment-actions">
-                    <div class="page-controls">
-                        <button id="prevPageBtn" class="icon-btn" type="button" aria-label="Previous page">&#8592;</button>
-                        <label class="page-control compact">
-                            <span>Page</span>
-                            <input id="pageNumber" type="number" min="1" value="1" name="page_number" autocomplete="off" aria-label="Current page number">
-                        </label>
-                        <button id="nextPageBtn" class="icon-btn" type="button" aria-label="Next page">&#8594;</button>
-                    </div>
-                    <div class="translate-controls-inline">
-                        <button id="translatePageBtn" class="primary-btn small" title="Ctrl + Enter">Translate page</button>
-                        <button id="translateAllBtn" class="ghost-btn small">Translate all</button>
-                    </div>
-                </div>
-                <div id="attachmentPreview" class="attachment-preview" aria-live="polite">
-                    <div class="empty-state centered">
-                        <strong>Load a document to translate</strong>
-                        <span>Upload a PDF, DOCX, or TXT and its pages will appear here.</span>
-                    </div>
+
+            <!-- Page controls -->
+            <div class="page-controls">
+                <button id="prevPageBtn" class="icon-btn" type="button" aria-label="Previous page">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <label class="page-control compact">
+                    <span>Page</span>
+                    <input id="pageNumber" type="number" min="1" value="1" name="page_number" autocomplete="off" aria-label="Current page number">
+                </label>
+                <button id="nextPageBtn" class="icon-btn" type="button" aria-label="Next page">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="page-controls-spacer"></div>
+                <button id="translatePageBtn" class="primary-btn small" title="Translate current page (Ctrl + Enter)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4h8M4 2v2M2 6c1 2 2.5 3.5 5 4m-3-2c1 2 2 3.5 4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 8l2 6 2-6M10 14h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Translate page
+                </button>
+                <button id="translateAllBtn" class="ghost-btn small">Translate all</button>
+            </div>
+
+            <!-- Document preview area -->
+            <div id="attachmentPreview" class="attachment-preview" aria-live="polite">
+                <div class="empty-state centered">
+                    <div class="empty-icon" aria-hidden="true">&#128196;</div>
+                    <strong>Load a document to translate</strong>
+                    <span>Upload a PDF, DOCX, or TXT from the sidebar to begin</span>
                 </div>
             </div>
         </article>
+
+        <!-- Divider -->
+        <div class="workspace-divider" aria-hidden="true">
+            <div class="divider-line"></div>
+        </div>
+
+        <!-- Output column -->
         <article class="panel panel-output">
             <div class="panel-header">
                 <div>
-                    <p class="eyebrow">Notebook response</p>
-                    <h2>Translation & insights</h2>
+                    <p class="eyebrow">Translation</p>
+                    <h2>Translated output</h2>
                 </div>
                 <div class="panel-actions">
-                    <button id="copyTranslationBtnAttachment" class="ghost-btn small" aria-label="Copy translation">Copy</button>
-                    <span id="attachmentOutputLoading" class="loading-text hidden" aria-live="polite">Translating…</span>
+                    <button id="copyTranslationBtnAttachment" class="ghost-btn small" title="Copy translation">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M9 5V3a1.5 1.5 0 00-1.5-1.5h-4A1.5 1.5 0 002 3v4A1.5 1.5 0 003.5 8.5H5" stroke="currentColor" stroke-width="1.2"/></svg>
+                        Copy
+                    </button>
                 </div>
             </div>
-            <div id="translationArea" class="translation-area" aria-live="polite"></div>
+            <div id="translationArea" class="translation-area" aria-live="polite">
+                <div class="empty-state centered">
+                    <div class="empty-icon" aria-hidden="true">&#128196;</div>
+                    <strong>Your translation will appear here</strong>
+                    <span>Translate a page or the full document to begin</span>
+                </div>
+            </div>
         </article>
     </div>
 </section>

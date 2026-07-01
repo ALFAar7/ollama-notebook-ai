@@ -1,131 +1,142 @@
-.panel {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(18px);
-}
+/* ============================================
+   PANELS — Glass Panel Components
+   ============================================ */
 
+/* ── Base panel ── */
 .panel {
+    position: relative;
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    background: var(--glass);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
+.panel:hover {
+    border-color: var(--glass-border-hover);
+}
+
+/* ── Panel glow effect on focus-within ── */
+.panel:focus-within {
+    border-color: rgba(124, 106, 239, 0.25);
+    box-shadow: var(--shadow-glow);
+}
+
+/* ── Panel header ── */
 .panel-header {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+    gap: var(--space-md);
 }
 
 .panel-header h2 {
-    margin: 0;
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 700;
+    margin: 0;
+    color: var(--text);
 }
 
+.panel-header .eyebrow {
+    margin-bottom: 2px;
+}
+
+/* ── Panel actions ── */
 .panel-actions {
     display: flex;
-    gap: 8px;
-}
-
-.workspace-split {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 18px;
-    padding: 18px;
-    align-items: start;
-}
-
-.attachment-workspace {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding: 16px 18px 0;
-}
-
-.attachment-actions {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: var(--space-sm);
+    flex-shrink: 0;
 }
 
-.page-controls {
-    display: grid;
-    grid-template-columns: 42px minmax(72px, 1fr) 42px;
-    gap: 8px;
-    align-items: end;
-}
-
-.page-control {
-    display: grid;
-    gap: 4px;
-    color: var(--muted);
-    font-size: 0.76rem;
-    font-weight: 600;
-}
-
-.page-control input {
-    min-height: 40px;
-    width: 100%;
-    padding: 0 12px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-12);
-    background: rgba(255,255,255,0.08);
-    color: var(--text);
-    text-align: center;
-}
-
-.page-control input:hover {
-    border-color: var(--accent-2);
-}
-
-.action-row {
-    display: flex;
-    gap: 10px;
-    padding: 14px 18px 18px;
-    flex-wrap: wrap;
-    position: sticky;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
-    border-top: 1px solid var(--border);
-    z-index: 1;
-}
-
-.text-input-area {
-    width: 100%;
+/* ── Panel body ── */
+.panel-body {
     flex: 1;
-    min-height: 250px;
-    padding: 18px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    resize: vertical;
-    background: rgba(255,255,255,0.06);
-    color: var(--text);
-    font-size: 1rem;
-    line-height: 1.7;
-    transition: border-color 0.15s ease, background 0.15s ease;
+    padding: 0 var(--space-lg) var(--space-lg);
+    min-height: 0;
 }
 
-.text-input-area:focus-visible {
-    outline: 2px solid rgba(139, 92, 246, 0.5);
-    outline-offset: -2px;
+/* ── Source panel (input) ── */
+.panel-source {
+    border-color: rgba(255, 255, 255, 0.06);
 }
 
-/* Responsive adjustments */
-@media (max-width: 1079px) {
-    .workspace-split {
-        grid-template-columns: 1fr;
-        padding: 12px;
-        gap: 12px;
+.panel-source:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Output panel ── */
+.panel-output {
+    border-color: rgba(124, 106, 239, 0.08);
+}
+
+.panel-output:hover {
+    border-color: rgba(124, 106, 239, 0.16);
+}
+
+/* ── Panel with gradient accent top border ── */
+.panel-accent-top {
+    border-top: 2px solid transparent;
+    background-image: linear-gradient(var(--glass), var(--glass)),
+                      var(--gradient-primary);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+/* ── Shimmer loading state ── */
+.panel.loading .panel-body {
+    position: relative;
+    overflow: hidden;
+}
+
+.panel.loading .panel-body::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.04) 50%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Panel as a glass card ── */
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    transition: all var(--transition-smooth);
+}
+
+.glass-card:hover {
+    background: var(--glass-hover);
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .panel {
+        border-radius: var(--radius-lg);
     }
-    
-    .action-row {
-        padding: 0 12px 12px;
+
+    .panel-header {
+        padding: var(--space-md) var(--space-md) var(--space-sm);
+    }
+
+    .panel-header h2 {
+        font-size: 0.9rem;
     }
 }

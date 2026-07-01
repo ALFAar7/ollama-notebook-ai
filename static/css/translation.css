@@ -1,34 +1,299 @@
-.translation-area {
-    padding: 18px;
-    min-height: 300px;
-    overflow: auto;
-    color: var(--text);
-    font-size: 1rem;
-    line-height: 1.75;
+/* ============================================
+   TRANSLATION — Source & Output Styling
+   ============================================ */
+
+/* ── Translation workspace ── */
+.translation-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    flex: 1;
 }
 
-.translation-area.rtl {
-    direction: rtl;
-    text-align: right;
+/* ── Source text input area ── */
+.text-input-area {
+    width: 100%;
+    min-height: 280px;
+    padding: var(--space-lg);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.7;
+    resize: vertical;
+    transition: all var(--transition-smooth);
+}
+
+.text-input-area:hover {
+    border-color: var(--glass-border-hover);
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.text-input-area:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow), inset 0 0 20px rgba(124, 106, 239, 0.05);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* ── Translation action row ── */
+.action-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+}
+
+/* ── Translate button (large CTA) ── */
+.translate-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 16px 32px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-primary);
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(124, 106, 239, 0.35);
+    transition: all var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.translate-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.translate-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(124, 106, 239, 0.5);
+}
+
+.translate-cta:hover::before {
+    opacity: 1;
+}
+
+.translate-cta:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(124, 106, 239, 0.3);
+}
+
+/* Translate button loading state */
+.translate-cta.loading {
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+.translate-cta.loading .cta-text {
+    opacity: 0;
+}
+
+.translate-cta.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+/* ── Arrow between source and output ── */
+.translation-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: var(--accent);
+    font-size: 1.2rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* ── Translation output area ── */
+.translation-area {
+    min-height: 280px;
+    padding: var(--space-lg);
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(124, 106, 239, 0.08);
+    border-radius: var(--radius-lg);
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.7;
+    overflow-y: auto;
+    transition: all var(--transition-smooth);
+    animation: fadeInUp 0.3s ease;
+}
+
+.translation-area:hover {
+    border-color: rgba(124, 106, 239, 0.16);
+}
+
+/* ── Empty translation state ── */
+.translation-area:empty::before {
+    content: 'Translation will appear here...';
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ── Translation content styling ── */
+.translation-area h1,
+.translation-area h2,
+.translation-area h3 {
+    color: var(--text);
+    margin-top: 1.2em;
+    margin-bottom: 0.5em;
 }
 
 .translation-area p {
-    margin: 0 0 1rem;
+    margin: 0.8em 0;
 }
 
-.translation-area.rtl p {
+.translation-area code {
+    background: var(--glass);
+    padding: 2px 6px;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+.translation-area pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+}
+
+.translation-area blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: var(--space-md);
+    margin-left: 0;
+    color: var(--text-secondary);
+}
+
+.translation-area ul,
+.translation-area ol {
+    padding-left: 1.5em;
+}
+
+.translation-area li {
+    margin: 0.3em 0;
+}
+
+/* ── Word count indicator ── */
+.word-count {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-dim);
     text-align: right;
+    padding-top: var(--space-sm);
 }
 
-/* Translation panel layout */
-@media (min-width: 1080px) {
-    .desktop-top-section {
-        min-height: 320px;
+/* ── Copy/Download actions for output ── */
+.output-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) 0 0;
+    justify-content: flex-end;
+}
+
+/* ── Document mode split ── */
+.workspace-split {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--space-lg);
+    flex: 1;
+    min-height: 0;
+}
+
+/* ── Page controls ── */
+.page-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0 var(--space-md);
+}
+
+.page-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.page-control input {
+    width: 50px;
+    padding: 6px 8px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.page-control input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* ── Attachment actions row ── */
+.attachment-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) 0;
+}
+
+.translate-controls-inline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+    .workspace-split {
+        grid-template-columns: 1fr;
     }
 }
 
-@media (max-width: 1079px) {
+@media (max-width: 768px) {
+    .text-input-area {
+        min-height: 200px;
+        padding: var(--space-md);
+        font-size: 0.95rem;
+    }
+
     .translation-area {
-        min-height: 240px;
+        min-height: 200px;
+        padding: var(--space-md);
+    }
+
+    .translate-cta {
+        padding: 14px 24px;
+        font-size: 0.95rem;
     }
 }
