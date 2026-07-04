@@ -14,17 +14,25 @@ function cacheElements() {
         'fileInput', 'translationArea', 'translationAreaText', 'translatePageBtn',
         'translateAllBtn', 'statusMessage', 'sourceLanguage', 'targetLanguage',
         'copyOriginalBtn', 'copyTranslationBtnAttachment', 'copyTranslationBtnText',
-        'copySourceBtn', 'clearTextBtn', 'saveNoteBtn', 'modelBadge',
-        'pageNumberInput', 'prevPageBtn', 'nextPageBtn', 'textModeBtn',
-        'attachmentModeBtn', 'textModePanel', 'attachmentPanel', 'textInput',
+        'copySourceBtn', 'clearTextBtn', 'clearNotesBtn', 'saveNotesBtn', 'modelBadge',
+        'pageNumber', 'prevPageBtn', 'nextPageBtn', 'textInput', 'notesArea',
         'translateTextBtn', 'filePreviewSidebar', 'attachmentPreview',
-        'sourceFileName', 'sourcePageCount', 'sourceStatus', 'noteInput', 'notesSummary',
-        'ollamaStatus', 'ollamaDot', 'ollamaLabel'
+        'sourceFileName', 'sourcePageCount', 'ollamaStatus', 'ollamaDot', 'ollamaLabel',
+        'toastContainer', 'sidebar', 'sidebarOverlay'
     ];
     ids.forEach(id => {
         App.els[id] = document.getElementById(id);
     });
-    App.els.sidebar = document.querySelector('.sidebar');
+
+    // Cache workspace tab buttons
+    App.els.tabText = document.querySelector('[data-tab="text"]');
+    App.els.tabDocument = document.querySelector('[data-tab="document"]');
+    App.els.tabNotes = document.querySelector('[data-tab="notes"]');
+
+    // Cache tab panels
+    App.els.panelText = document.getElementById('panelText');
+    App.els.panelDocument = document.getElementById('panelDocument');
+    App.els.panelNotes = document.getElementById('panelNotes');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -91,14 +99,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (App.els.textInput.value.trim()) {
                 App.els.translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Paste text into the notebook</strong><span>Click Translate to turn this into a polished translation.</span></div>';
             }
+            updateCharCount();
         });
     }
 
-    if (App.els.textModeBtn) {
-        App.els.textModeBtn.addEventListener('click', () => switchMode('text'));
+    // Set up workspace tab navigation
+    if (App.els.tabText) {
+        App.els.tabText.addEventListener('click', () => switchWorkspaceTab('text'));
     }
-    if (App.els.attachmentModeBtn) {
-        App.els.attachmentModeBtn.addEventListener('click', () => switchMode('attachment'));
+    if (App.els.tabDocument) {
+        App.els.tabDocument.addEventListener('click', () => switchWorkspaceTab('document'));
+    }
+    if (App.els.tabNotes) {
+        App.els.tabNotes.addEventListener('click', () => switchWorkspaceTab('notes'));
     }
 
     if (App.els.fileInput) {
@@ -199,6 +212,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (App.els.clearNotesBtn) {
+        App.els.clearNotesBtn.addEventListener('click', () => {
+            App.els.notesArea.value = '';
+            showStatus('Notes cleared.', 'success');
+        });
+    }
+
     if (App.els.saveNoteBtn) {
         App.els.saveNoteBtn.addEventListener('click', () => {
             localStorage.setItem('notebook-note', App.els.noteInput.value || '');
@@ -224,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadModels();
     restoreNote();
-    switchMode('text');
+    switchWorkspaceTab('text');
     updateSourceMeta();
     checkOllamaStatus();
     setInterval(checkOllamaStatus, 30000);

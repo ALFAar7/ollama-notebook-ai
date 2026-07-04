@@ -19,10 +19,13 @@
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
     color: var(--text);
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1.7;
     resize: vertical;
     transition: all var(--transition-smooth);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .text-input-area:hover {
@@ -138,11 +141,22 @@
     border: 1px solid rgba(124, 106, 239, 0.08);
     border-radius: var(--radius-lg);
     color: var(--text);
-    font-size: 1rem;
-    line-height: 1.7;
+    font-size: 0.95rem;
+    line-height: 1.75;
     overflow-y: auto;
     transition: all var(--transition-smooth);
     animation: fadeInUp 0.3s ease;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.translation-area p {
+    margin: 0 0 1em 0;
+}
+
+.translation-area p:last-child {
+    margin-bottom: 0;
 }
 
 .translation-area:hover {
