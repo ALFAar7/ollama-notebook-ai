@@ -1,26 +1,62 @@
-function switchMode(mode) {
-    App.currentMode = mode;
-    if (App.els.textModeBtn) {
-        App.els.textModeBtn.classList.toggle('active', mode === 'text');
-        App.els.textModeBtn.setAttribute('aria-pressed', mode === 'text');
+/**
+ * Switch between workspace tabs (Text, Document, Notes)
+ * @param {string} tab - The tab to switch to: 'text', 'document', or 'notes'
+ */
+function switchWorkspaceTab(tab) {
+    // Update current mode
+    App.currentMode = tab;
+
+    // Update tab buttons
+    if (App.els.tabText) {
+        const isText = tab === 'text';
+        App.els.tabText.classList.toggle('active', isText);
+        App.els.tabText.setAttribute('aria-selected', isText);
     }
-    if (App.els.attachmentModeBtn) {
-        App.els.attachmentModeBtn.classList.toggle('active', mode === 'attachment');
-        App.els.attachmentModeBtn.setAttribute('aria-pressed', mode === 'attachment');
+    if (App.els.tabDocument) {
+        const isDocument = tab === 'document';
+        App.els.tabDocument.classList.toggle('active', isDocument);
+        App.els.tabDocument.setAttribute('aria-selected', isDocument);
     }
-    if (App.els.textModePanel) {
-        App.els.textModePanel.classList.toggle('hidden', mode !== 'text');
+    if (App.els.tabNotes) {
+        const isNotes = tab === 'notes';
+        App.els.tabNotes.classList.toggle('active', isNotes);
+        App.els.tabNotes.setAttribute('aria-selected', isNotes);
     }
-    if (App.els.attachmentPanel) {
-        App.els.attachmentPanel.classList.toggle('hidden', mode !== 'attachment');
+
+    // Update tab panels
+    if (App.els.panelText) {
+        App.els.panelText.classList.toggle('active', tab === 'text');
     }
-    const textOutput = document.querySelector('.text-mode-output');
-    if (textOutput) {
-        textOutput.classList.toggle('hidden', mode === 'attachment');
+    if (App.els.panelDocument) {
+        App.els.panelDocument.classList.toggle('active', tab === 'document');
     }
+    if (App.els.panelNotes) {
+        App.els.panelNotes.classList.toggle('active', tab === 'notes');
+    }
+
+    // Update character count for text mode
+    if (tab === 'text' && App.els.textInput) {
+        updateCharCount();
+    }
+
+    // Update RTL state for language settings
     updateRTLState();
 }
 
+/**
+ * Update character count display for text input
+ */
+function updateCharCount() {
+    if (App.els.charCount && App.els.textInput) {
+        const count = App.els.textInput.value.length;
+        App.els.charCount.textContent = `${count} character${count !== 1 ? 's' : ''}`;
+    }
+}
+
+/**
+ * Go to a specific page in the document
+ * @param {number} pageNumber - The page number to navigate to
+ */
 function goToPage(pageNumber) {
     if (!App.pages.length) {
         return;
@@ -28,8 +64,8 @@ function goToPage(pageNumber) {
 
     const targetPage = Math.min(Math.max(1, Number(pageNumber) || 1), App.pages.length);
     App.currentPage = targetPage;
-    if (App.els.pageNumberInput) {
-        App.els.pageNumberInput.value = App.currentPage;
+    if (App.els.pageNumber) {
+        App.els.pageNumber.value = App.currentPage;
     }
     updatePageButtons();
     renderFilePreview();
@@ -40,6 +76,9 @@ function goToPage(pageNumber) {
     App.translatedText = '';
 }
 
+/**
+ * Update page navigation button states
+ */
 function updatePageButtons() {
     if (App.els.prevPageBtn) {
         App.els.prevPageBtn.disabled = !App.pages.length || App.currentPage <= 1;
