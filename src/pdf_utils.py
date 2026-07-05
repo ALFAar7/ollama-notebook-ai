@@ -76,7 +76,8 @@ def background_extract_pdf(filepath, filename):
         return
     processing_status[filename] = {'status': 'processing', 'message': 'Extracting PDF text...', 'page_count': count_pdf_pages(filepath)}
     try:
-        extract_text_from_pdf(filepath)
+        text = extract_text_from_pdf(filepath)
+        save_extracted_text(filename, text)
         processing_status[filename] = {'status': 'ready', 'message': 'PDF ready', 'page_count': count_pdf_pages(filepath)}
     except Exception as exc:
         processing_status[filename] = {'status': 'error', 'message': str(exc), 'page_count': count_pdf_pages(filepath)}

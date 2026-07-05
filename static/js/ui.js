@@ -46,7 +46,11 @@ function renderFilePreview() {
 }
 
 function updateRTLState() {
-    const isRTL = App.els.targetLanguage && (App.els.targetLanguage.value === 'Persian' || App.els.targetLanguage.value === 'Arabic');
+    const isRTL = App.els.targetLanguage && (
+        App.els.targetLanguage.value === 'Persian' ||
+        App.els.targetLanguage.value === 'Arabic' ||
+        App.els.targetLanguage.value === 'Kurdish'
+    );
     if (App.els.translationArea) {
         App.els.translationArea.classList.toggle('rtl', isRTL);
     }
