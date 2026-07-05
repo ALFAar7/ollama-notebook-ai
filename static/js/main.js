@@ -223,8 +223,10 @@ function updatePDFViewerPage() {
             const iframe = document.querySelector('.source-iframe');
             if (iframe) {
                 try {
-                    // Use PDF.js or direct URL parameter to navigate to specific page
-                    iframe.src = `/uploads/${encodeURIComponent(App.currentFileName)}#page=${App.currentPage}`;
+                    // Use direct URL parameter to navigate to specific page
+                    // Add timestamp to prevent caching issues and ensure navigation
+                    const timestamp = new Date().getTime();
+                    iframe.src = `/uploads/${encodeURIComponent(App.currentFileName)}#page=${App.currentPage}&t=${timestamp}`;
                 } catch (e) {
                     console.error('Error updating PDF viewer page:', e);
                 }

@@ -58,6 +58,28 @@ function goToPage(pageNumber) {
 }
 
 function cacheAttachmentElements() {
+    // Remove existing event listeners to prevent duplicates
+    if (App.els.pageNumberInput) {
+        const newPageNumberInput = App.els.pageNumberInput.cloneNode(true);
+        App.els.pageNumberInput.replaceWith(newPageNumberInput);
+        App.els.pageNumberInput = newPageNumberInput;
+    }
+    if (App.els.prevPageBtn) {
+        const newPrevPageBtn = App.els.prevPageBtn.cloneNode(true);
+        App.els.prevPageBtn.replaceWith(newPrevPageBtn);
+        App.els.prevPageBtn = newPrevPageBtn;
+    }
+    if (App.els.nextPageBtn) {
+        const newNextPageBtn = App.els.nextPageBtn.cloneNode(true);
+        App.els.nextPageBtn.replaceWith(newNextPageBtn);
+        App.els.nextPageBtn = newNextPageBtn;
+    }
+    if (App.els.copyOriginalBtn) {
+        const newCopyOriginalBtn = App.els.copyOriginalBtn.cloneNode(true);
+        App.els.copyOriginalBtn.replaceWith(newCopyOriginalBtn);
+        App.els.copyOriginalBtn = newCopyOriginalBtn;
+    }
+
     // Cache elements that are loaded dynamically in attachment mode
     App.els.pageNumberInput = document.getElementById('pageNumber');
     App.els.prevPageBtn = document.getElementById('prevPageBtn');
@@ -76,17 +98,25 @@ function cacheAttachmentElements() {
         App.els.pageNumberInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 goToPage(Number(App.els.pageNumberInput.value));
+                e.preventDefault(); // Prevent form submission
             }
         });
     }
     if (App.els.prevPageBtn) {
-        App.els.prevPageBtn.addEventListener('click', () => goToPage(App.currentPage - 1));
+        App.els.prevPageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            goToPage(App.currentPage - 1);
+        });
     }
     if (App.els.nextPageBtn) {
-        App.els.nextPageBtn.addEventListener('click', () => goToPage(App.currentPage + 1));
+        App.els.nextPageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            goToPage(App.currentPage + 1);
+        });
     }
     if (App.els.copyOriginalBtn) {
-        App.els.copyOriginalBtn.addEventListener('click', async () => {
+        App.els.copyOriginalBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
             const pageText = App.pages[App.currentPage - 1] || '';
             if (!pageText.trim()) {
                 showStatus('No extracted text to copy.', 'error');
