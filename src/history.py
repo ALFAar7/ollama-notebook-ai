@@ -31,6 +31,11 @@ class HistoryManager:
         summary: Optional[str] = None
     ) -> Dict:
         """Add a new translation entry to history."""
+        # Store full text in separate file for complete translations
+        full_text_id = None
+        if mode == 'page' and filename and page_number:
+            full_text_id = self._save_full_translation(filename, page_number, target_language, translated_text)
+
         entry = {
             'id': self._generate_id(),
             'timestamp': datetime.now().isoformat(),
@@ -43,7 +48,8 @@ class HistoryManager:
             'page_number': page_number,
             'summary': summary,
             'source_length': len(source_text),
-            'translated_length': len(translated_text)
+            'translated_length': len(translated_text),
+            'full_text_id': full_text_id
         }
         
         # Load existing history
@@ -161,5 +167,43 @@ class HistoryManager:
     def _generate_id(self) -> str:
         """Generate a unique ID for history entry."""
         import hashlib
-        timestamp = datetime.now().isoformat()
-        return hashlib.md5(timestamp.encode()).hexdigest()[:12]
+        import uuid
+        return str(uuid.uuid4())
+
+    def _save_full_translation(self, filename: str, page_number: int, target_language: str, translated_text: str) -> str:
+        """Save full translation text to a separate file."""
+        # Create a unique ID for the full translation
+        full_text_id = self._generate_id()
+        full_text_dir = os.path.join(self.history_dir, 'full_texts')
+        os.makedirs(full_text_dir, exist_ok=True)
+
+        # Create a storage key based on filename, page, and language
+        storage_key = f"{filename}_page{page_number}_{target_language}"
+        storage_key = storage_key.replace('/', '_').replace('\\', '_').replace(':', '_')
+
+        full_text_file = os.path.join(full_text_dir, f"{storage_key}.txt")
+
+        # Save the full translation text
+        with open(full_text_file, 'w', encoding='utf-8') as f:
+            f.write(translated_text)
+
+        return full_text_id
+
+    def get_full_translation(self, full_text_id: str, filename: str, page_number: int, target_language: str) -> Optional[str]:
+        """Retrieve full translation text by ID."""
+        if not full_text_id:
+            return None
+
+        full_text_dir = os.path.join(self.history_dir, 'full_texts')
+
+        # Create the expected storage key
+        storage_key = f"{filename}_page{page_number}_{target_language}"
+        storage_key = storage_key.replace('/', '_').replace('\\', '_').replace(':', '_')
+
+        full_text_file = os.path.join(full_text_dir, f"{storage_key}.txt")
+
+        try:
+            with open(full_text_file, 'r', encoding='utf-8') as f:
+                return f.read()
+        except (FileNotFoundError, IOError):
+            return None

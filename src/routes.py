@@ -530,10 +530,26 @@ def get_translation_cache():
                 entry.get('page_number') == page and
                 entry.get('target_language') == target_language and
                 entry.get('mode') == 'page'):
-                return jsonify({
-                    'success': True,
-                    'translated_text': entry.get('translated_text', '')
-                })
+
+                # Get the full translation text
+                full_translation = history_manager.get_full_translation(
+                    entry.get('full_text_id'),
+                    filename,
+                    page,
+                    target_language
+                )
+
+                if full_translation:
+                    return jsonify({
+                        'success': True,
+                        'translated_text': full_translation
+                    })
+                else:
+                    # Fallback to preview text if full text not found
+                    return jsonify({
+                        'success': True,
+                        'translated_text': entry.get('translated_text', '')
+                    })
 
         return jsonify({'success': False, 'error': 'Translation not found in cache'})
     except Exception as e:
