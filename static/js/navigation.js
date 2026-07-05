@@ -17,6 +17,10 @@ function switchMode(mode) {
     }
     if (App.els.attachmentPanel) {
         App.els.attachmentPanel.classList.toggle('hidden', mode !== 'attachment');
+        // Re-cache elements when entering attachment mode since they're loaded dynamically
+        if (mode === 'attachment') {
+            cacheAttachmentElements();
+        }
     }
     if (App.els.historyPanel) {
         App.els.historyPanel.classList.toggle('hidden', mode !== 'history');
@@ -45,11 +49,53 @@ function goToPage(pageNumber) {
     }
     updatePageButtons();
     renderFilePreview();
+    updatePDFViewerPage();
     if (App.currentFileName) {
         loadCurrentPageText().catch(() => {});
     }
     App.els.translationArea.innerHTML = `<div class="empty-state centered"><strong>Page ${App.currentPage}</strong><span>Translate this page when ready.</span></div>`;
     App.translatedText = '';
+}
+
+function cacheAttachmentElements() {
+    // Cache elements that are loaded dynamically in attachment mode
+    App.els.pageNumberInput = document.getElementById('pageNumber');
+    App.els.prevPageBtn = document.getElementById('prevPageBtn');
+    App.els.nextPageBtn = document.getElementById('nextPageBtn');
+    App.els.translatePageBtn = document.getElementById('translatePageBtn');
+    App.els.translateAllBtn = document.getElementById('translateAllBtn');
+    App.els.copyOriginalBtn = document.getElementById('copyOriginalBtn');
+    App.els.attachmentPreview = document.getElementById('attachmentPreview');
+    App.els.translationArea = document.getElementById('translationArea');
+
+    // Reattach event listeners for navigation elements
+    if (App.els.pageNumberInput) {
+        App.els.pageNumberInput.addEventListener('blur', () => {
+            goToPage(Number(App.els.pageNumberInput.value));
+        });
+        App.els.pageNumberInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                goToPage(Number(App.els.pageNumberInput.value));
+            }
+        });
+    }
+    if (App.els.prevPageBtn) {
+        App.els.prevPageBtn.addEventListener('click', () => goToPage(App.currentPage - 1));
+    }
+    if (App.els.nextPageBtn) {
+        App.els.nextPageBtn.addEventListener('click', () => goToPage(App.currentPage + 1));
+    }
+    if (App.els.copyOriginalBtn) {
+        App.els.copyOriginalBtn.addEventListener('click', async () => {
+            const pageText = App.pages[App.currentPage - 1] || '';
+            if (!pageText.trim()) {
+                showStatus('No extracted text to copy.', 'error');
+                return;
+            }
+            await copyToClipboard(pageText);
+            showStatus('Current page text copied.', 'success');
+        });
+    }
 }
 
 function updatePageButtons() {

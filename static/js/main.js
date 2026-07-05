@@ -134,29 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (App.els.translateAllBtn) {
         App.els.translateAllBtn.addEventListener('click', translateAllPages);
     }
-    if (App.els.pageNumberInput) {
-        App.els.pageNumberInput.addEventListener('change', () => {
-            goToPage(Number(App.els.pageNumberInput.value));
-        });
-    }
-    if (App.els.prevPageBtn) {
-        App.els.prevPageBtn.addEventListener('click', () => goToPage(App.currentPage - 1));
-    }
-    if (App.els.nextPageBtn) {
-        App.els.nextPageBtn.addEventListener('click', () => goToPage(App.currentPage + 1));
-    }
+    // Note: Navigation event listeners are now handled in cacheAttachmentElements()
+    // when switching to attachment mode, since those elements are loaded dynamically
 
-    if (App.els.copyOriginalBtn) {
-        App.els.copyOriginalBtn.addEventListener('click', async () => {
-            const pageText = App.pages[App.currentPage - 1] || '';
-            if (!pageText.trim()) {
-                showStatus('No extracted text to copy.', 'error');
-                return;
-            }
-            await copyToClipboard(pageText);
-            showStatus('Current page text copied.', 'success');
-        });
-    }
+    // Note: copyOriginalBtn event listener is now handled in cacheAttachmentElements()
+    // when switching to attachment mode, since the element is loaded dynamically
 
     if (App.els.copyTranslationBtnText) {
         App.els.copyTranslationBtnText.addEventListener('click', async () => {
@@ -232,6 +214,24 @@ document.addEventListener('DOMContentLoaded', () => {
     checkOllamaStatus();
     setInterval(checkOllamaStatus, 30000);
 });
+
+function updatePDFViewerPage() {
+    // For PDF files, update the iframe viewer to show the correct page
+    if (App.currentFileName) {
+        const fileType = (App.currentFileName || '').split('.').pop().toLowerCase();
+        if (fileType === 'pdf') {
+            const iframe = document.querySelector('.source-iframe');
+            if (iframe) {
+                try {
+                    // Use PDF.js or direct URL parameter to navigate to specific page
+                    iframe.src = `/uploads/${encodeURIComponent(App.currentFileName)}#page=${App.currentPage}`;
+                } catch (e) {
+                    console.error('Error updating PDF viewer page:', e);
+                }
+            }
+        }
+    }
+}
 
 function checkOllamaStatus() {
     if (!App.els.ollamaStatus || !App.els.ollamaDot || !App.els.ollamaLabel) {

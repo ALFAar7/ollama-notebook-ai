@@ -44,6 +44,7 @@ async function uploadAndTranslateFile(file) {
         renderFilePreview();
         updatePageButtons();
         updateSourceMeta();
+        updatePDFViewerPage();
         if (App.els.pageNumberInput) {
             App.els.pageNumberInput.value = App.currentPage;
         }
@@ -86,6 +87,7 @@ function startProcessingPolling(filename) {
                 App.currentPage = 1;
                 updateSourceMeta();
                 renderFilePreview();
+                updatePDFViewerPage();
                 loadCurrentPageText().catch(() => {});
                 App.els.translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document.</span></div>';
                 showStatus(`Document ready. ${data.page_count || 0} page(s) available.`, 'success');
