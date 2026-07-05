@@ -502,10 +502,39 @@ def get_history_stats():
     try:
         history_manager = app.config['HISTORY_MANAGER']
         stats = history_manager.get_stats()
-        
+
         return jsonify({
             'success': True,
             'stats': stats
         })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route('/api/translation-cache', methods=['GET'])
+def get_translation_cache():
+    """Check if a translation exists in cache for a specific page and language."""
+    filename = request.args.get('filename', '')
+    page = int(request.args.get('page', 1))
+    target_language = request.args.get('target_language', 'English')
+
+    if not filename:
+        return jsonify({'error': 'Filename is required'}), 400
+
+    try:
+        history_manager = app.config['HISTORY_MANAGER']
+        history = history_manager.get_history()
+
+        # Search for matching translation in history
+        for entry in history:
+            if (entry.get('filename') == filename and
+                entry.get('page_number') == page and
+                entry.get('target_language') == target_language and
+                entry.get('mode') == 'page'):
+                return jsonify({
+                    'success': True,
+                    'translated_text': entry.get('translated_text', '')
+                })
+
+        return jsonify({'success': False, 'error': 'Translation not found in cache'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

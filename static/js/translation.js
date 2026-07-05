@@ -47,6 +47,17 @@ async function translateTextMode() {
     }
 }
 
+async function checkTranslationCache(filename, pageNumber, targetLanguage) {
+    try {
+        const response = await fetch(`/api/translation-cache?filename=${encodeURIComponent(filename)}&page=${pageNumber}&target_language=${encodeURIComponent(targetLanguage)}`);
+        const data = await response.json();
+        return response.ok && data.success ? data.translated_text : null;
+    } catch (error) {
+        console.error('Error checking translation cache:', error);
+        return null;
+    }
+}
+
 async function translateCurrentPage() {
     let pageText = App.pages[App.currentPage - 1] || '';
     if (!pageText.trim() && App.currentFileName) {
@@ -64,6 +75,19 @@ async function translateCurrentPage() {
 
     if (!pageText.trim()) {
         showStatus('Upload a source file before translating.', 'error');
+        return;
+    }
+
+    // Check translation cache first
+    const targetLanguage = App.els.targetLanguage.value;
+    const cachedTranslation = await checkTranslationCache(App.currentFileName, App.currentPage, targetLanguage);
+
+    if (cachedTranslation) {
+        App.translatedText = cachedTranslation;
+        App.els.translationArea.innerHTML = formatText(App.translatedText);
+        updateSummary(App.translatedText, pageText);
+        updateRTLState();
+        showStatus(`Page ${App.currentPage} loaded from cache.`, 'success');
         return;
     }
 
