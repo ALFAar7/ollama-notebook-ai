@@ -1,81 +1,270 @@
+/* ============================================
+   LAYOUT — Tab-based Workspace
+   ============================================ */
+
+/* ── App shell ── */
 .app-shell {
-    width: min(1480px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 24px 0 40px;
-}
-
-.notebook-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 260px;
-    gap: 16px;
-    margin-top: 20px;
-    align-items: start;
-}
-
-.sidebar,
-.main-pane {
+    position: relative;
+    z-index: var(--z-base);
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    min-height: 100vh;
 }
 
-.main-pane {
+/* ── Main workspace layout ── */
+.workspace-layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+/* ── Workspace content area (tabs) ── */
+.workspace-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     min-width: 0;
+    padding: var(--space-lg);
+    gap: var(--space-lg);
+    overflow-y: auto;
 }
 
-.sidebar {
-    position: relative;
+/* ── Tab panels ── */
+.tab-panel {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    animation: fadeIn 0.2s ease;
 }
 
-/* Mobile sidebar hidden by default */
-@media (max-width: 1079px) {
-    .notebook-grid {
-        grid-template-columns: 1fr;
+.tab-panel.active {
+    display: flex;
+}
+
+/* ── Translation workspace layout (source + output) ── */
+.translation-workspace {
+    display: flex;
+    gap: var(--space-lg);
+    flex: 1;
+    min-height: 0;
+}
+
+.panel {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+}
+
+/* ── Workspace divider (visual separator) ── */
+.workspace-divider {
+    width: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 var(--space-md);
+}
+
+.divider-line {
+    width: 1px;
+    height: 80%;
+    background: var(--glass-border);
+}
+
+/* ── Panel header & footer ── */
+.panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+    border-bottom: 1px solid var(--glass-border);
+    min-height: 56px;
+}
+
+.panel-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text);
+    line-height: 1.3;
+}
+
+.panel-header .eyebrow {
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0 0 4px 0;
+}
+
+.panel-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+}
+
+.panel-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-lg);
+    border-top: 1px solid var(--glass-border);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    min-height: 44px;
+}
+
+/* ── Page controls for document mode ── */
+.page-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    border-bottom: 1px solid var(--glass-border);
+    min-height: 52px;
+}
+
+.page-controls-spacer {
+    flex: 1;
+}
+
+.page-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.page-control input {
+    width: 50px;
+    text-align: center;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 6px 8px;
+    font-size: 0.85rem;
+}
+
+/* ── Action row (buttons) ── */
+.action-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    width: 100%;
+}
+
+/* ── Responsive layout ── */
+@media (max-width: 1024px) {
+    .workspace-layout {
+        flex-direction: column;
     }
 
+    .workspace-content {
+        width: 100%;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid var(--glass-border);
+        position: relative;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .sidebar.collapsed {
+        display: none;
+    }
+}
+
+@media (max-width: 900px) {
     .sidebar {
         position: fixed;
         top: 0;
         right: 0;
         bottom: 0;
-        width: 100%;
-        max-width: 480px;
-        transform: translateX(120%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 100;
-        margin-top: 0;
-        max-height: none;
-        height: auto;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        display: flex;
-        background: var(--bg);
-        border-left: 1px solid var(--border);
-        box-shadow: -8px 0 30px rgba(0, 0, 0, 0.35);
+        z-index: var(--z-overlay);
+        width: 320px;
+        transform: translateX(100%);
+        box-shadow: -8px 0 40px rgba(0, 0, 0, 0.5);
     }
 
     .sidebar.open {
         transform: translateX(0);
     }
 
-    @media (prefers-reduced-motion: reduce) {
-        .sidebar {
-            transition: none;
-        }
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: calc(var(--z-overlay) - 1);
+        animation: fadeIn 0.2s ease;
+    }
+
+    .sidebar-overlay.visible {
+        display: block;
     }
 }
 
-/* Sidebar toggle button - positioned on mobile */
-#sidebarToggle {
-    display: none;
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 90;
+@media (max-width: 768px) {
+    .workspace-content {
+        padding: var(--space-sm);
+    }
+
+    .translation-workspace {
+        flex-direction: column;
+    }
+
+    .panel {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .workspace-divider {
+        display: none;
+    }
 }
 
-@media (max-width: 1079px) {
-    #sidebarToggle {
-        display: block;
+@media (max-width: 480px) {
+    .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .panel-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .action-row {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .action-row .primary-btn {
+        width: 100%;
+    }
+
+    .page-controls {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+
+    .page-controls-spacer {
+        flex-basis: 100%;
+        height: 0;
+    }
+
+    .translate-controls-inline {
+        width: 100%;
     }
 }

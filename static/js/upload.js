@@ -44,9 +44,8 @@ async function uploadAndTranslateFile(file) {
         renderFilePreview();
         updatePageButtons();
         updateSourceMeta();
-        updatePDFViewerPage();
-        if (App.els.pageNumberInput) {
-            App.els.pageNumberInput.value = App.currentPage;
+        if (App.els.pageNumber) {
+            App.els.pageNumber.value = App.currentPage;
         }
         if (data.processing) {
             App.els.translationArea.innerHTML = '<div class="empty-state centered"><strong>Preparing document</strong><span>This large PDF is being processed in the background. The preview will update shortly.</span></div>';
@@ -56,7 +55,7 @@ async function uploadAndTranslateFile(file) {
             App.els.translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document when you are ready.</span></div>';
             showStatus(`File processed. ${App.pages.length} page(s) ready.`, 'success');
         }
-        switchMode('attachment');
+        switchWorkspaceTab('document');
     } catch (error) {
         console.error(error);
         if (error.name === 'AbortError') {
@@ -87,7 +86,6 @@ function startProcessingPolling(filename) {
                 App.currentPage = 1;
                 updateSourceMeta();
                 renderFilePreview();
-                updatePDFViewerPage();
                 loadCurrentPageText().catch(() => {});
                 App.els.translationArea.innerHTML = '<div class="empty-state centered"><strong>Source ready</strong><span>Translate the current page or the full document.</span></div>';
                 showStatus(`Document ready. ${data.page_count || 0} page(s) available.`, 'success');

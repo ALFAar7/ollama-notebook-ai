@@ -14,17 +14,23 @@ function cacheElements() {
         'fileInput', 'translationArea', 'translationAreaText', 'translatePageBtn',
         'translateAllBtn', 'statusMessage', 'sourceLanguage', 'targetLanguage',
         'copyOriginalBtn', 'copyTranslationBtnAttachment', 'copyTranslationBtnText',
-        'copySourceBtn', 'clearTextBtn', 'saveNoteBtn', 'modelBadge',
-        'pageNumberInput', 'prevPageBtn', 'nextPageBtn', 'textModeBtn',
-        'attachmentModeBtn', 'historyModeBtn', 'textModePanel', 'attachmentPanel', 
-        'historyPanel', 'textInput', 'translateTextBtn', 'filePreviewSidebar', 
-        'attachmentPreview', 'sourceFileName', 'sourcePageCount', 'sourceStatus', 
-        'noteInput', 'notesSummary', 'ollamaStatus', 'ollamaDot', 'ollamaLabel'
+        'copySourceBtn', 'clearTextBtn', 'clearNotesBtn', 'saveNotesBtn', 'modelBadge',
+        'pageNumber', 'prevPageBtn', 'nextPageBtn', 'textInput', 'notesArea',
+        'translateTextBtn', 'filePreviewSidebar', 'attachmentPreview',
+        'sourceFileName', 'sourcePageCount', 'ollamaStatus', 'ollamaDot', 'ollamaLabel',
+        'toastContainer', 'sidebar', 'sidebarOverlay'
     ];
     ids.forEach(id => {
         App.els[id] = document.getElementById(id);
     });
-    App.els.sidebar = document.querySelector('.sidebar');
+
+    App.els.tabText = document.querySelector('[data-tab="text"]');
+    App.els.tabDocument = document.querySelector('[data-tab="document"]');
+    App.els.tabNotes = document.querySelector('[data-tab="notes"]');
+
+    App.els.panelText = document.getElementById('panelText');
+    App.els.panelDocument = document.getElementById('panelDocument');
+    App.els.panelNotes = document.getElementById('panelNotes');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -91,17 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (App.els.textInput.value.trim()) {
                 App.els.translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Paste text into the notebook</strong><span>Click Translate to turn this into a polished translation.</span></div>';
             }
+            updateCharCount();
         });
     }
 
-    if (App.els.textModeBtn) {
-        App.els.textModeBtn.addEventListener('click', () => switchMode('text'));
+    if (App.els.tabText) {
+        App.els.tabText.addEventListener('click', () => switchWorkspaceTab('text'));
     }
-    if (App.els.attachmentModeBtn) {
-        App.els.attachmentModeBtn.addEventListener('click', () => switchMode('attachment'));
+    if (App.els.tabDocument) {
+        App.els.tabDocument.addEventListener('click', () => switchWorkspaceTab('document'));
     }
-    if (App.els.historyModeBtn) {
-        App.els.historyModeBtn.addEventListener('click', () => switchMode('history'));
+    if (App.els.tabNotes) {
+        App.els.tabNotes.addEventListener('click', () => switchWorkspaceTab('notes'));
     }
 
     if (App.els.fileInput) {
@@ -134,11 +141,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (App.els.translateAllBtn) {
         App.els.translateAllBtn.addEventListener('click', translateAllPages);
     }
-    // Note: Navigation event listeners are now handled in cacheAttachmentElements()
-    // when switching to attachment mode, since those elements are loaded dynamically
+    if (App.els.pageNumber) {
+        App.els.pageNumber.addEventListener('change', () => {
+            goToPage(Number(App.els.pageNumber.value));
+        });
+    }
+    if (App.els.prevPageBtn) {
+        App.els.prevPageBtn.addEventListener('click', () => goToPage(App.currentPage - 1));
+    }
+    if (App.els.nextPageBtn) {
+        App.els.nextPageBtn.addEventListener('click', () => goToPage(App.currentPage + 1));
+    }
 
-    // Note: copyOriginalBtn event listener is now handled in cacheAttachmentElements()
-    // when switching to attachment mode, since the element is loaded dynamically
+    if (App.els.copyOriginalBtn) {
+        App.els.copyOriginalBtn.addEventListener('click', async () => {
+            const pageText = App.pages[App.currentPage - 1] || '';
+            if (!pageText.trim()) {
+                showStatus('No extracted text to copy.', 'error');
+                return;
+            }
+            await copyToClipboard(pageText);
+            showStatus('Current page text copied.', 'success');
+        });
+    }
 
     if (App.els.copyTranslationBtnText) {
         App.els.copyTranslationBtnText.addEventListener('click', async () => {
@@ -184,9 +209,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (App.els.saveNoteBtn) {
-        App.els.saveNoteBtn.addEventListener('click', () => {
-            localStorage.setItem('notebook-note', App.els.noteInput.value || '');
+    if (App.els.clearNotesBtn) {
+        App.els.clearNotesBtn.addEventListener('click', () => {
+            App.els.notesArea.value = '';
+            showStatus('Notes cleared.', 'success');
+        });
+    }
+
+    if (App.els.saveNotesBtn) {
+        App.els.saveNotesBtn.addEventListener('click', () => {
+            localStorage.setItem('notebook-note', App.els.notesArea.value || '');
             showStatus('Note saved locally.', 'success');
         });
     }
@@ -199,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isModifier = event.ctrlKey || event.metaKey;
         if (isModifier && event.key === 'Enter') {
             event.preventDefault();
-            if (App.currentMode === 'attachment' && App.els.translatePageBtn) {
+            if (App.currentMode === 'document' && App.els.translatePageBtn) {
                 App.els.translatePageBtn.click();
             } else if (App.els.translateTextBtn) {
                 App.els.translateTextBtn.click();
@@ -209,31 +241,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadModels();
     restoreNote();
-    switchMode('text');
+    switchWorkspaceTab('text');
     updateSourceMeta();
     checkOllamaStatus();
     setInterval(checkOllamaStatus, 30000);
 });
-
-function updatePDFViewerPage() {
-    // For PDF files, update the iframe viewer to show the correct page
-    if (App.currentFileName) {
-        const fileType = (App.currentFileName || '').split('.').pop().toLowerCase();
-        if (fileType === 'pdf') {
-            const iframe = document.querySelector('.source-iframe');
-            if (iframe) {
-                try {
-                    // Use direct URL parameter to navigate to specific page
-                    // Add timestamp to prevent caching issues and ensure navigation
-                    const timestamp = new Date().getTime();
-                    iframe.src = `/uploads/${encodeURIComponent(App.currentFileName)}#page=${App.currentPage}&t=${timestamp}`;
-                } catch (e) {
-                    console.error('Error updating PDF viewer page:', e);
-                }
-            }
-        }
-    }
-}
 
 function checkOllamaStatus() {
     if (!App.els.ollamaStatus || !App.els.ollamaDot || !App.els.ollamaLabel) {

@@ -1,97 +1,50 @@
-.note-textarea {
-    width: 100%;
-    min-height: 180px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-16);
-    padding: 14px;
-    resize: vertical;
-    color: var(--text);
-    background: rgba(255,255,255,0.06);
-    line-height: 1.6;
-    transition: border-color 0.15s ease, background 0.15s ease;
-    font-family: inherit;
-}
+/* ============================================
+   NOTES — Study Notes Panel
+   ============================================ */
 
-.note-textarea.rtl {
-    direction: rtl;
-    text-align: right;
-}
-
-.note-textarea:focus-visible {
-    outline: 2px solid rgba(139, 92, 246, 0.5);
-    outline-offset: 2px;
-}
-
-.notes-summary {
-    margin-bottom: 10px;
-    padding: 12px;
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.04);
-    color: var(--muted);
-    line-height: 1.6;
-}
-
-.notes-summary strong {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--text);
-    font-weight: 600;
-}
-
-.notes-summary.rtl {
-    direction: rtl;
-    text-align: right;
-}
-
-.notes-summary.rtl strong {
-    text-align: right;
-}
-
-.summary-source {
-    margin-top: 8px;
-    color: var(--muted);
-    font-size: 0.84rem;
-}
-
-.summary-source.rtl {
-    direction: rtl;
-    text-align: right;
-}
-
-.notes-section .section-head {
-    margin-bottom: 12px;
-}
-
-/* Ensure notes textarea has proper placeholder styling */
-.note-textarea::placeholder {
-    color: var(--muted);
-    opacity: 0.6;
-}
-
-/* Better empty state styling */
-.empty-state.centered {
+.notes-section {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 6px;
-    padding: 20px;
+    height: 100%;
 }
 
-.empty-state.centered strong {
+/* ── Notes summary area ── */
+.notes-summary {
+    padding: var(--space-md);
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    min-height: 80px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+/* ── Note textarea ── */
+.note-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: var(--space-md);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
     color: var(--text);
-    font-weight: 600;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: all var(--transition-smooth);
 }
 
-.empty-state.centered span {
-    color: var(--muted);
-    max-width: 280px;
+.note-textarea:hover {
+    border-color: var(--glass-border-hover);
+    background: rgba(0, 0, 0, 0.25);
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .note-textarea {
-        transition: none;
-    }
+.note-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow), inset 0 0 15px rgba(124, 106, 239, 0.04);
+    background: rgba(0, 0, 0, 0.3);
 }
