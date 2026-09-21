@@ -36,7 +36,7 @@ function switchWorkspaceTab(tab) {
     }
 
     if (App.els.panelRag) {
-        App.els.panelRag.classList.toggle('active', tab === 'rag');
+        App.els.panelRag.classList.toggle('active', tab === 'search');
     }
 
     updateRTLState();

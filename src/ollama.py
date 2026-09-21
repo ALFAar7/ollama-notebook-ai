@@ -7,7 +7,7 @@ from src.text_utils import split_text_for_translation
 from src.embedding import generate_embedding as generate_embedding_fn
 
 #OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')
-OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://127.0.0.1:11434')
+OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')
 #DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma4:e2b')
 DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'llama3.2:3b')
 _MODEL_NAME = None

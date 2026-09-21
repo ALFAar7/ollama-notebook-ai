@@ -14,7 +14,7 @@ UPLOAD_FOLDER = os.path.join(PROJECT_ROOT, '..', 'uploads')
 OUTPUT_FOLDER = os.path.join(PROJECT_ROOT, '..', 'outputs')
 HISTORY_FOLDER = os.path.join(PROJECT_ROOT, '..', 'history')
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt'}
-OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://127.0.0.1:11434')
+OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')
 DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma4:e2b')
 _MODEL_NAME = None
 

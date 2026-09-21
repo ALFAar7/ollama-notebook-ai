@@ -9,7 +9,7 @@ import json
 import requests
 from typing import List, Union
 
-OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://127.0.0.1:11434')
+OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')
 OLLAMA_EMBEDDING_MODEL = os.environ.get('OLLAMA_EMBEDDING_MODEL', 'nomic-embed-text')
 EMBEDDING_BATCH_SIZE = int(os.environ.get('OPEN_NOTEBOOK_EMBEDDING_BATCH_SIZE', '50'))
 

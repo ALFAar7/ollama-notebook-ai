@@ -1,7 +1,7 @@
-<!-- Tab panel: RAG workspace -->
-<section id="panelRag" class="tab-panel" role="tabpanel" aria-labelledby="tabRag">
-    <div class="rag-workspace">
-        <div class="rag-panel">
+<!-- Tab panel: Search workspace -->
+<section id="panelSearch" class="tab-panel" role="tabpanel" aria-labelledby="tabSearch">
+    <div class="search-workspace">
+        <div class="search-panel">
             <div class="panel-header">
                 <div>
                     <p class="eyebrow">Semantic Search</p>
@@ -11,11 +11,11 @@
                     <button id="hybridSearchBtn" class="ghost-btn small" title="Run hybrid search">Hybrid</button>
                 </div>
             </div>
-            <div class="rag-search-bar">
-                <input type="search" id="ragSearchInput" class="search-input" placeholder="Search your knowledge base semantically..." aria-label="Search knowledge base">
-                <button id="ragSearchBtn" class="primary-btn small">Search</button>
+            <div class="search-search-bar">
+                <input type="search" id="searchInput" class="search-input" placeholder="Search your knowledge base semantically..." aria-label="Search knowledge base">
+                <button id="searchBtn" class="primary-btn small">Search</button>
             </div>
-            <div id="ragSearchResults" class="rag-results" aria-live="polite">
+            <div id="searchResults" class="search-results" aria-live="polite">
                 <div class="empty-state centered">
                     <strong>No results yet</strong>
                     <span>Search your knowledge base to find related translations and contexts.</span>
@@ -23,30 +23,30 @@
             </div>
         </div>
 
-        <div class="rag-side-panel">
+        <div class="search-side-panel">
             <div class="panel-header">
                 <div>
                     <p class="eyebrow">Vector Store</p>
                     <h2>Knowledge Base</h2>
                 </div>
-                <button id="ragRefreshBtn" class="ghost-btn small" title="Refresh vector store stats">Refresh</button>
+                <button id="searchRefreshBtn" class="ghost-btn small" title="Refresh vector store stats">Refresh</button>
             </div>
-            <div id="ragStats" class="rag-stats">
+            <div id="searchStats" class="search-stats">
                 <div class="empty-state centered">
                     <strong>Loading vector store...</strong>
                 </div>
             </div>
         </div>
 
-        <div class="rag-side-panel">
+        <div class="search-side-panel">
             <div class="panel-header">
                 <div>
                     <p class="eyebrow">Similar Matches</p>
                     <h2>Related Translations</h2>
                 </div>
-                <span class="rag-side-badge" id="ragSimilarCount">0</span>
+                <span class="search-side-badge" id="similarCount">0</span>
             </div>
-            <div id="ragSimilarResults" class="rag-results rag-similar-results">
+            <div id="similarResults" class="search-results search-similar-results">
                 <div class="empty-state centered">
                     <strong>No similar matches</strong>
                     <span>Upload a document or translate text to find similar items.</span>

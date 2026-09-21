@@ -11,3 +11,4 @@ __pycache__/*
 *.fuse*
 .fuse_hidden*
 history/*
+vector_store/translation_embeddings.db

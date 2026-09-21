@@ -27,12 +27,12 @@ function cacheElements() {
     App.els.tabText = document.querySelector('[data-tab="text"]');
     App.els.tabDocument = document.querySelector('[data-tab="document"]');
     App.els.tabNotes = document.querySelector('[data-tab="notes"]');
-    App.els.tabRag = document.querySelector('[data-tab="rag"]');
+    App.els.tabRag = document.querySelector('[data-tab="search"]');
 
     App.els.panelText = document.getElementById('panelText');
     App.els.panelDocument = document.getElementById('panelDocument');
     App.els.panelNotes = document.getElementById('panelNotes');
-    App.els.panelRag = document.getElementById('panelRag');
+    App.els.panelRag = document.getElementById('panelSearch');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         App.els.tabNotes.addEventListener('click', () => switchWorkspaceTab('notes'));
     }
     if (App.els.tabRag) {
-        App.els.tabRag.addEventListener('click', () => switchWorkspaceTab('rag'));
+        App.els.tabRag.addEventListener('click', () => switchWorkspaceTab('search'));
     }
 
     if (App.els.ragToggleBtn) {
