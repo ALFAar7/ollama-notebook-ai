@@ -1,7 +1,10 @@
 import os
 import hashlib
 import requests
+import json
 from src.text_utils import split_text_for_translation
+# Import embedding function for RAG support
+from src.embedding import generate_embedding as generate_embedding_fn
 
 #OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')
 OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://127.0.0.1:11434')
@@ -12,8 +15,15 @@ CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'cach
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 
-def get_translation_cache_path(text, source_lang, target_lang):
+def get_translation_cache_path(text, source_lang, target_lang, context=None):
+    """
+    Generate cache key that includes context if provided.
+    """
     key = f"{text}\u0000{source_lang}\u0000{target_lang}"
+    if context:
+        # Hash context to avoid huge keys
+        context_hash = hashlib.sha256(context.encode('utf-8')).hexdigest()
+        key = f"{key}\u0000{context_hash}"
     filename = hashlib.sha256(key.encode('utf-8')).hexdigest() + '.txt'
     return os.path.join(CACHE_DIR, filename)
 
@@ -52,15 +62,28 @@ def resolve_model_name(preferred=None):
         return preferred or _MODEL_NAME or DEFAULT_MODEL
 
 
-def translate_with_ollama(text, target_language, source_language='auto'):
-    cache_path = get_translation_cache_path(text, source_language, target_language)
+def translate_with_ollama(text, target_language, source_language='auto', context=None):
+    cache_path = get_translation_cache_path(text, source_language, target_language, context)
     cached = load_translation_from_cache(cache_path)
     if cached is not None:
         return cached
 
     model_name = resolve_model_name(DEFAULT_MODEL)
 
-    prompt = f"""Translate the following text from {source_language} to {target_language}.
+    # Build prompt with optional context
+    if context:
+        prompt = f"""Given these previous translations as context for terminology and style:
+
+{context}
+
+Translate the following text from {source_language} to {target_language}.
+Maintain the original formatting as much as possible.
+Only provide the translation, no explanations.
+
+Text to translate:
+{text}"""
+    else:
+        prompt = f"""Translate the following text from {source_language} to {target_language}.
 Maintain the original formatting as much as possible.
 Only provide the translation, no explanations.
 
@@ -86,6 +109,32 @@ Text to translate:
         raise Exception("Translation timed out. Try shorter text or increase timeout.")
     except Exception as e:
         raise Exception(f"Translation failed: {str(e)}")
+
+
+def generate_embedding(text):
+    """
+    Generate embedding for text using Ollama's embedding API.
+    Wrapper around embedding module for consistency.
+    """
+    return generate_embedding_fn(text)
+
+
+def generate_embeddings(texts):
+    """
+    Generate embeddings for a list of texts.
+    Wrapper around embedding module.
+    """
+    from src.embedding import generate_embeddings as generate_embeddings_batch
+    return generate_embeddings_batch(texts)
+
+
+def mean_pool_embeddings(embeddings):
+    """
+    Mean-pool a list of embedding vectors into a single vector.
+    Wrapper around embedding module.
+    """
+    from src.embedding import mean_pool_embeddings as mean_pool_fn
+    return mean_pool_fn(embeddings)
 
 
 def summarize_with_ollama(text, language):

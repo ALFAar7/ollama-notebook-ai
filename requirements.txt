@@ -4,3 +4,6 @@ pdfplumber
 requests
 Werkzeug
 python-docx
+numpy
+langchain-text-splitters
+chromadb

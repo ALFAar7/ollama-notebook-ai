@@ -21,6 +21,8 @@ from src.pdf_utils import (
     extract_pdf_pages_to_file,
     background_extract_pdf,
 )
+from src.rag_pipeline import get_pipeline
+from src.embedding import generate_embedding
 
 bp = Blueprint('api', __name__)
 
@@ -554,3 +556,216 @@ def get_translation_cache():
         return jsonify({'success': False, 'error': 'Translation not found in cache'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# RAG-enhanced endpoints
+@bp.route('/api/rag-translate', methods=['POST'])
+def rag_translate():
+    """RAG-enhanced translation with context retrieval from vector store."""
+    data = request.get_json()
+    text = data.get('text', '')
+    filename = data.get('filename', '')
+    target_language = data.get('target_language', 'English')
+    source_language = data.get('source_language', 'auto')
+    enable_rag = data.get('enable_rag', os.environ.get('ENABLE_RAG', 'true').lower() == 'true')
+
+    if filename and not text.strip():
+        text = load_extracted_text(filename)
+
+    if not text.strip():
+        return jsonify({'error': 'No text provided'}), 400
+
+    try:
+        if enable_rag:
+            pipeline = get_pipeline()
+            translated_text = pipeline.translate_with_context(
+                text=text,
+                target_language=target_language,
+                source_language=source_language
+            )
+        else:
+            chunks = split_text_for_translation(text)
+            translated_chunks = []
+            for chunk in chunks:
+                translated = translate_with_ollama(chunk, target_language, source_language)
+                translated_chunks.append(translated.strip())
+            translated_text = '\n\n'.join(translated_chunks)
+
+        # Store translation with embedding for future retrieval
+        if enable_rag:
+            pipeline = get_pipeline()
+            pipeline.store_translation(
+                source_text=text,
+                translated_text=translated_text,
+                source_language=source_language,
+                target_language=target_language,
+                filename=filename
+            )
+
+        # Save to history
+        try:
+            history_manager = app.config['HISTORY_MANAGER']
+            history_manager.add_entry(
+                source_text=text,
+                translated_text=translated_text,
+                source_language=source_language,
+                target_language=target_language,
+                mode='text' if not filename else 'document',
+                filename=filename
+            )
+        except Exception:
+            pass
+
+        return jsonify({
+            'success': True,
+            'translated_text': translated_text,
+            'rag_enabled': enable_rag
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/api/search', methods=['GET'])
+def semantic_search():
+    """Semantic search over stored translations using vector similarity."""
+    query = request.args.get('q', '')
+    limit = int(request.args.get('limit', 5))
+    target_language = request.args.get('target_language', '')
+
+    if not query.strip():
+        return jsonify({'error': 'Search query required'}), 400
+
+    try:
+        pipeline = get_pipeline()
+        query_embedding = generate_embedding(query)
+        metadata_filter = {}
+        if target_language:
+            metadata_filter['target_language'] = target_language
+
+        results = pipeline.vector_store.search(
+            query_embedding,
+            limit=limit,
+            metadata_filter=metadata_filter if metadata_filter else None
+        )
+
+        formatted_results = []
+        for item in results:
+            formatted_results.append({
+                'id': item['id'],
+                'source_text': item['source_text'],
+                'translated_text': item['translated_text'],
+                'similarity': item['similarity'],
+                'filename': item['metadata'].get('filename', ''),
+                'page_number': item['metadata'].get('page_number'),
+                'source_language': item['metadata'].get('source_language', ''),
+                'target_language': item['metadata'].get('target_language', '')
+            })
+
+        return jsonify({
+            'success': True,
+            'results': formatted_results,
+            'count': len(formatted_results)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/api/similar', methods=['GET'])
+def find_similar():
+    """Find similar translations by filename and page."""
+    filename = request.args.get('filename', '')
+    page = request.args.get('page', '1')
+    limit = int(request.args.get('limit', 5))
+
+    if not filename:
+        return jsonify({'error': 'Filename is required'}), 400
+
+    try:
+        pipeline = get_pipeline()
+        full_text = load_extracted_text(filename)
+        
+        if not full_text.strip():
+            return jsonify({'error': 'Document text not found'}), 404
+        
+        # Get page text if page specified
+        pages = extract_pages(full_text)
+        page_text = pages.get(int(page), full_text)
+        
+        # Generate embedding and search
+        query_embedding = generate_embedding(page_text)
+        metadata_filter = {'filename': filename}
+        
+        results = pipeline.vector_store.search(
+            query_embedding,
+            limit=limit,
+            metadata_filter=metadata_filter
+        )
+
+        formatted_results = []
+        for item in results:
+            formatted_results.append({
+                'id': item['id'],
+                'source_text': item['source_text'],
+                'translated_text': item['translated_text'],
+                'similarity': item['similarity'],
+                'filename': item['metadata'].get('filename', ''),
+                'page_number': item['metadata'].get('page_number'),
+                'source_language': item['metadata'].get('source_language', ''),
+                'target_language': item['metadata'].get('target_language', '')
+            })
+
+        return jsonify({
+            'success': True,
+            'results': formatted_results,
+            'count': len(formatted_results)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# Hybrid search endpoint
+@bp.route('/api/hybrid-search', methods=['GET'])
+def hybrid_search():
+    """Combined vector and text search over translations."""
+    query = request.args.get('q', '')
+    limit = int(request.args.get('limit', 5))
+    vector_weight = float(request.args.get('vector_weight', '0.7'))
+    text_weight = float(request.args.get('text_weight', '0.3'))
+    target_language = request.args.get('target_language', '')
+
+    if not query.strip():
+        return jsonify({'error': 'Search query required'}), 400
+
+    try:
+        pipeline = get_pipeline()
+        query_embedding = generate_embedding(query)
+        
+        vector_results = pipeline.vector_store.search(
+            query_embedding,
+            limit=limit,
+            metadata_filter={'target_language': target_language} if target_language else None
+        )
+
+        formatted_results = []
+        for item in vector_results:
+            formatted_results.append({
+                'id': item['id'],
+                'source_text': item['source_text'],
+                'translated_text': item['translated_text'],
+                'similarity': item['similarity'],
+                'filename': item['metadata'].get('filename', ''),
+                'page_number': item['metadata'].get('page_number'),
+                'source_language': item['metadata'].get('source_language', ''),
+                'target_language': item['metadata'].get('target_language', '')
+            })
+
+        return jsonify({
+            'success': True,
+            'results': formatted_results,
+            'count': len(formatted_results),
+            'search_type': 'hybrid',
+            'vector_weight': vector_weight,
+            'text_weight': text_weight
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

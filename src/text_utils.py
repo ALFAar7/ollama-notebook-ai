@@ -1,4 +1,5 @@
 import re
+from src.chunking import chunk_for_translation
 
 
 def clean_extracted_text(text):
@@ -8,6 +9,26 @@ def clean_extracted_text(text):
 
 
 def split_text_for_translation(text, max_chars=3000):
+    """
+    Split text into chunks for translation.
+    Uses content-type-aware chunking when available, with fallback to legacy splitting.
+    
+    Args:
+        text: Text to split
+        max_chars: Maximum characters per chunk (legacy parameter, used as fallback)
+        
+    Returns:
+        List of text chunks
+    """
+    # Use new chunking module for content-type-aware splitting
+    try:
+        chunks = chunk_for_translation(text)
+        if chunks:
+            return chunks
+    except Exception:
+        pass
+    
+    # Fallback to legacy splitting
     pages = re.split(r'\n\n--- Page \d+ ---\n\n', text)
     chunks = []
     for page in pages:
