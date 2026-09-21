@@ -9,7 +9,7 @@ import uuid
 import sqlite3
 from typing import List, Dict, Optional, Tuple, Callable
 
-VECTOR_STORE_DIR = os.environ.get('CHROMA_DB_DIR', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'vector_store'))
+VECTOR_STORE_DIR = os.environ.get('VECTOR_STORE_DIR') or os.environ.get('CHROMA_DB_DIR') or os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'vector_store')
 COLLECTION_NAME = os.environ.get('VECTOR_COLLECTION', 'translation_embeddings')
 SIMILARITY_THRESHOLD = float(os.environ.get('VECTOR_SIMILARITY_THRESHOLD', '0.3'))
 
@@ -57,10 +57,13 @@ class VectorStore:
         conn.close()
         return item_id
 
-    def search(self, query_embedding: List[float], limit: int = 5, metadata_filter: dict = None, similarity_threshold: float = None) -> List[dict]:
+    def search(self, query_embedding: List[float], limit: int = 5, metadata_filter: dict = None, similarity_threshold: float = None, entry_type: str = None) -> List[dict]:
         """
         Vector search using cosine similarity.
         Returns list of {id, source_text, translated_text, similarity, metadata}.
+
+        Args:
+            entry_type: Optional filter on metadata['type'] (e.g. 'source' or 'translation').
         """
         if similarity_threshold is None:
             similarity_threshold = SIMILARITY_THRESHOLD
@@ -73,12 +76,14 @@ class VectorStore:
 
         results = []
         for row in rows:
+            row_metadata = json.loads(row['metadata']) if row['metadata'] else {}
+            if entry_type is not None and row_metadata.get('type') != entry_type:
+                continue
             embedding = json.loads(row['embedding'])
             similarity = _cosine_similarity(query_embedding, embedding)
             if similarity < similarity_threshold:
                 continue
             if metadata_filter:
-                row_metadata = json.loads(row['metadata'])
                 if not all(row_metadata.get(k) == v for k, v in metadata_filter.items()):
                     continue
             results.append({
@@ -86,7 +91,7 @@ class VectorStore:
                 'source_text': row['source_text'],
                 'translated_text': row['translated_text'],
                 'similarity': similarity,
-                'metadata': json.loads(row['metadata']) if row['metadata'] else {}
+                'metadata': row_metadata
             })
 
         results.sort(key=lambda x: x['similarity'], reverse=True)

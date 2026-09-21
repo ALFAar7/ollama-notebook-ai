@@ -18,7 +18,8 @@ function cacheElements() {
         'pageNumber', 'prevPageBtn', 'nextPageBtn', 'textInput', 'notesArea',
         'translateTextBtn', 'filePreviewSidebar', 'attachmentPreview',
         'sourceFileName', 'sourcePageCount', 'ollamaStatus', 'ollamaDot', 'ollamaLabel',
-        'toastContainer', 'sidebar', 'sidebarOverlay', 'ragToggleBtn'
+        'toastContainer', 'sidebar', 'sidebarOverlay',
+        'searchInput', 'searchBtn', 'searchResults', 'searchStats', 'searchRefreshBtn'
     ];
     ids.forEach(id => {
         App.els[id] = document.getElementById(id);
@@ -113,15 +114,25 @@ document.addEventListener('DOMContentLoaded', () => {
         App.els.tabNotes.addEventListener('click', () => switchWorkspaceTab('notes'));
     }
     if (App.els.tabRag) {
-        App.els.tabRag.addEventListener('click', () => switchWorkspaceTab('search'));
+        App.els.tabRag.addEventListener('click', () => {
+            switchWorkspaceTab('search');
+            loadSearchStats();
+        });
     }
 
-    if (App.els.ragToggleBtn) {
-        App.els.ragToggleBtn.addEventListener('click', () => {
-            const isRagEnabled = App.els.ragToggleBtn.getAttribute('aria-checked') === 'true';
-            App.els.ragToggleBtn.setAttribute('aria-checked', String(!isRagEnabled));
-            showStatus(isRagEnabled ? 'RAG disabled' : 'RAG enabled', 'success');
+    if (App.els.searchBtn) {
+        App.els.searchBtn.addEventListener('click', runKnowledgeSearch);
+    }
+    if (App.els.searchInput) {
+        App.els.searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                runKnowledgeSearch();
+            }
         });
+    }
+    if (App.els.searchRefreshBtn) {
+        App.els.searchRefreshBtn.addEventListener('click', loadSearchStats);
     }
 
     if (App.els.fileInput) {
@@ -277,4 +288,56 @@ function checkOllamaStatus() {
             App.els.ollamaStatus.classList.remove('online');
             App.els.ollamaLabel.textContent = 'Ollama unreachable';
         });
+}
+
+async function runKnowledgeSearch() {
+    const query = (App.els.searchInput && App.els.searchInput.value.trim()) || '';
+    if (!query) {
+        showStatus('Please enter a search query.', 'error');
+        return;
+    }
+
+    if (App.els.searchResults) {
+        App.els.searchResults.innerHTML = '<div class="empty-state centered"><strong>Searching the knowledge base...</strong><span>This may take a moment while results are retrieved and translated.</span></div>';
+    }
+    if (App.els.searchBtn) {
+        App.els.searchBtn.disabled = true;
+        App.els.searchBtn.textContent = 'Searching...';
+    }
+
+    try {
+        const targetLanguage = App.els.targetLanguage ? App.els.targetLanguage.value : 'English';
+        const sourceLanguage = App.els.sourceLanguage ? App.els.sourceLanguage.value : 'auto';
+        const results = await knowledgeSearch(query, targetLanguage, sourceLanguage, 5);
+        renderKnowledgeSearchResults(results);
+        if (results.length === 0) {
+            showStatus('No matching content found in the knowledge base.', 'success');
+        } else {
+            showStatus(`${results.length} result(s) translated.`, 'success');
+        }
+    } catch (error) {
+        console.error(error);
+        if (App.els.searchResults) {
+            App.els.searchResults.innerHTML = '<div class="empty-state centered"><strong>Search failed</strong><span>Could not complete the knowledge search. Check the browser console.</span></div>';
+        }
+        showStatus(error.message || 'Knowledge search failed.', 'error');
+    } finally {
+        if (App.els.searchBtn) {
+            App.els.searchBtn.disabled = false;
+            App.els.searchBtn.textContent = 'Search';
+        }
+    }
+}
+
+async function loadSearchStats() {
+    if (!App.els.searchStats) {
+        return;
+    }
+    try {
+        const stats = await loadVectorStats();
+        renderVectorStats(stats);
+    } catch (error) {
+        console.error(error);
+        renderVectorStats(null);
+    }
 }

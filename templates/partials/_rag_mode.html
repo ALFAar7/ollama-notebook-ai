@@ -4,21 +4,19 @@
         <div class="search-panel">
             <div class="panel-header">
                 <div>
-                    <p class="eyebrow">Semantic Search</p>
+                    <p class="eyebrow">Search</p>
                     <h2>Knowledge Search</h2>
-                </div>
-                <div class="panel-actions">
-                    <button id="hybridSearchBtn" class="ghost-btn small" title="Run hybrid search">Hybrid</button>
                 </div>
             </div>
             <div class="search-search-bar">
-                <input type="search" id="searchInput" class="search-input" placeholder="Search your knowledge base semantically..." aria-label="Search knowledge base">
+                <input type="search" id="searchInput" class="search-input" placeholder="Search your documents..." aria-label="Search documents" autocomplete="off">
                 <button id="searchBtn" class="primary-btn small">Search</button>
             </div>
             <div id="searchResults" class="search-results" aria-live="polite">
                 <div class="empty-state centered">
-                    <strong>No results yet</strong>
-                    <span>Search your knowledge base to find related translations and contexts.</span>
+                    <div class="empty-icon" aria-hidden="true">&#128269;</div>
+                    <strong>Search your knowledge base</strong>
+                    <span>Enter a query to find and translate relevant content from uploaded documents.</span>
                 </div>
             </div>
         </div>
@@ -31,25 +29,9 @@
                 </div>
                 <button id="searchRefreshBtn" class="ghost-btn small" title="Refresh vector store stats">Refresh</button>
             </div>
-            <div id="searchStats" class="search-stats">
+            <div id="searchStats" class="search-stats" aria-live="polite">
                 <div class="empty-state centered">
                     <strong>Loading vector store...</strong>
-                </div>
-            </div>
-        </div>
-
-        <div class="search-side-panel">
-            <div class="panel-header">
-                <div>
-                    <p class="eyebrow">Similar Matches</p>
-                    <h2>Related Translations</h2>
-                </div>
-                <span class="search-side-badge" id="similarCount">0</span>
-            </div>
-            <div id="similarResults" class="search-results search-similar-results">
-                <div class="empty-state centered">
-                    <strong>No similar matches</strong>
-                    <span>Upload a document or translate text to find similar items.</span>
                 </div>
             </div>
         </div>

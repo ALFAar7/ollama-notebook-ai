@@ -89,3 +89,73 @@ function showStatus(message, type) {
         App.els.statusMessage.classList.add('hidden');
     }, 6000);
 }
+
+function renderKnowledgeSearchResults(results) {
+    const container = App.els.searchResults;
+    if (!container) {
+        return;
+    }
+
+    if (!results || results.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state centered">
+                <div class="empty-icon" aria-hidden="true">&#128269;</div>
+                <strong>No results found</strong>
+                <span>Try a different query or upload a document to build the knowledge base.</span>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = results.map((result) => {
+        const citationParts = [];
+        if (result.filename) {
+            citationParts.push(escapeHtml(result.filename));
+        }
+        if (result.page_number) {
+            citationParts.push(`Page ${result.page_number}`);
+        }
+        const citation = citationParts.join(' - ') || '—';
+        const similarity = Math.round((result.similarity || 0) * 100);
+
+        return `
+            <article class="search-result-item">
+                <div class="search-result-meta">
+                    <span class="search-citation">${citation}</span>
+                    <span class="search-result-similarity">Match: ${similarity}%</span>
+                </div>
+                <div class="search-result-body">${escapeHtml(result.translated_text || '')}</div>
+            </article>
+        `;
+    }).join('');
+}
+
+function renderVectorStats(stats) {
+    const container = App.els.searchStats;
+    if (!container) {
+        return;
+    }
+
+    if (!stats) {
+        container.innerHTML = `
+            <div class="empty-state centered">
+                <strong>Unable to load stats</strong>
+                <span>Vector store is not ready.</span>
+            </div>
+        `;
+        return;
+    }
+
+    const rows = [
+        { label: 'Total chunks', value: stats.total_embeddings || 0 },
+        { label: 'Collection', value: stats.collection_name || '—' },
+        { label: 'Database', value: stats.db_path || '—' }
+    ];
+
+    container.innerHTML = rows.map((row) => `
+        <div class="search-stat-row">
+            <span>${escapeHtml(row.label)}</span>
+            <strong>${escapeHtml(String(row.value))}</strong>
+        </div>
+    `).join('');
+}

@@ -12,17 +12,14 @@ async function translateTextMode() {
     App.els.translateTextBtn.textContent = 'Translating...';
     App.els.translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Translating...</strong><span>This may take a moment.</span></div>';
 
-    const ragEnabled = App.els.ragToggleBtn && App.els.ragToggleBtn.getAttribute('aria-checked') === 'true';
-
     try {
-        const response = await fetch(ragEnabled ? '/api/rag-translate' : '/api/translate', {
+        const response = await fetch('/api/translate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 text,
                 source_language: App.els.sourceLanguage.value,
-                target_language: App.els.targetLanguage.value,
-                enable_rag: ragEnabled
+                target_language: App.els.targetLanguage.value
             })
         });
 

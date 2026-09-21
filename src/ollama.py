@@ -3,7 +3,7 @@ import hashlib
 import requests
 import json
 from src.text_utils import split_text_for_translation
-# Import embedding function for RAG support
+# Import embedding function for vector search support
 from src.embedding import generate_embedding as generate_embedding_fn
 
 #OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')

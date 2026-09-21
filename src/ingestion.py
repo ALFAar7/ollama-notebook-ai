@@ -102,7 +102,7 @@ def ingest_text(filename, text, source_language='auto', target_language='English
     if status_key:
         processing_status[status_key] = {
             'status': 'ready',
-            'message': 'RAG embeddings ready',
+            'message': 'Knowledge base ready',
             'page_count': len(chunks)
         }
 

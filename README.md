@@ -1,4 +1,4 @@
-# Notebook Translator
+# Ollama Notebook
 ![alt text](image.png)
 
 A local AI-powered reading workspace that translates documents (PDF, DOCX, TXT) and text using Ollama. Supports multiple languages, page-by-page translation, summarization, study notes, RTL layouts, and history management.
@@ -13,6 +13,7 @@ A local AI-powered reading workspace that translates documents (PDF, DOCX, TXT) 
 - **RTL Support**: Full support for Persian, Arabic, Kurdish (Surani) with right-to-left layout
 - **Local Translation Caching**: Faster repeated translations through caching system
 - **Multi-Language Support**: Auto-detect source language; translate to English, Arabic, Kurdish, Persian, French, German, Spanish
+- **Knowledge Search**: Semantic search across uploaded documents, with results translated to your target language
 
 ## Prerequisites
 
@@ -56,7 +57,7 @@ ollama list
 
 ```bash
 git clone <repository-url>
-cd translator
+cd ollama-notebook
 ```
 
 ### 4. Create and activate a virtual environment
@@ -123,6 +124,13 @@ Open `http://localhost:5000` in your browser.
 - Delete individual entries or clear entire history
 - View statistics (total translations, unique documents, languages used)
 
+### Knowledge Search Mode
+1. **Upload a document** — uploading creates a searchable knowledge base of source chunks
+2. **Switch to Search** — open the Search tab
+3. **Enter a query** — type a question or topic in the search bar
+4. **Review results** — the app finds relevant source chunks via semantic search and translates them to your selected target language
+5. **Inspect citations** — each result shows the source filename and page number
+
 ## Supported Languages
 
 **Source Languages:** Auto-detect | Arabic | English | French | German | Italian | Kurdish | Persian | Russian | Spanish | Chinese
@@ -136,4 +144,4 @@ Open `http://localhost:5000` in your browser.
 - **AI Engine**: Ollama local AI models for translation and summarization
 - **Storage**: Local file system for uploads, outputs, history, and cache
 
-*A notebook translator built with Flask, Ollama, and Gemma4 for local, private document translation.*
+*A notebook built with Flask, Ollama, and Gemma4 for local, private document translation.*
