@@ -57,11 +57,13 @@ class VectorStore:
         conn.close()
         return item_id
 
-    def search(self, query_embedding: List[float], limit: int = 5, metadata_filter: dict = None) -> List[dict]:
+    def search(self, query_embedding: List[float], limit: int = 5, metadata_filter: dict = None, similarity_threshold: float = None) -> List[dict]:
         """
         Vector search using cosine similarity.
         Returns list of {id, source_text, translated_text, similarity, metadata}.
         """
+        if similarity_threshold is None:
+            similarity_threshold = SIMILARITY_THRESHOLD
         if not query_embedding:
             return []
 
@@ -73,7 +75,7 @@ class VectorStore:
         for row in rows:
             embedding = json.loads(row['embedding'])
             similarity = _cosine_similarity(query_embedding, embedding)
-            if similarity < SIMILARITY_THRESHOLD:
+            if similarity < similarity_threshold:
                 continue
             if metadata_filter:
                 row_metadata = json.loads(row['metadata'])

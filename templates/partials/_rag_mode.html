@@ -1,0 +1,57 @@
+<!-- Tab panel: RAG workspace -->
+<section id="panelRag" class="tab-panel" role="tabpanel" aria-labelledby="tabRag">
+    <div class="rag-workspace">
+        <div class="rag-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Semantic Search</p>
+                    <h2>Knowledge Search</h2>
+                </div>
+                <div class="panel-actions">
+                    <button id="hybridSearchBtn" class="ghost-btn small" title="Run hybrid search">Hybrid</button>
+                </div>
+            </div>
+            <div class="rag-search-bar">
+                <input type="search" id="ragSearchInput" class="search-input" placeholder="Search your knowledge base semantically..." aria-label="Search knowledge base">
+                <button id="ragSearchBtn" class="primary-btn small">Search</button>
+            </div>
+            <div id="ragSearchResults" class="rag-results" aria-live="polite">
+                <div class="empty-state centered">
+                    <strong>No results yet</strong>
+                    <span>Search your knowledge base to find related translations and contexts.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="rag-side-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Vector Store</p>
+                    <h2>Knowledge Base</h2>
+                </div>
+                <button id="ragRefreshBtn" class="ghost-btn small" title="Refresh vector store stats">Refresh</button>
+            </div>
+            <div id="ragStats" class="rag-stats">
+                <div class="empty-state centered">
+                    <strong>Loading vector store...</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="rag-side-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Similar Matches</p>
+                    <h2>Related Translations</h2>
+                </div>
+                <span class="rag-side-badge" id="ragSimilarCount">0</span>
+            </div>
+            <div id="ragSimilarResults" class="rag-results rag-similar-results">
+                <div class="empty-state centered">
+                    <strong>No similar matches</strong>
+                    <span>Upload a document or translate text to find similar items.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

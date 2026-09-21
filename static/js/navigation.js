@@ -35,6 +35,10 @@ function switchWorkspaceTab(tab) {
         updateCharCount();
     }
 
+    if (App.els.panelRag) {
+        App.els.panelRag.classList.toggle('active', tab === 'rag');
+    }
+
     updateRTLState();
 }
 

@@ -28,7 +28,8 @@ class HistoryManager:
         mode: str = 'text',
         filename: Optional[str] = None,
         page_number: Optional[int] = None,
-        summary: Optional[str] = None
+        summary: Optional[str] = None,
+        vector_id: Optional[str] = None
     ) -> Dict:
         """Add a new translation entry to history."""
         # Store full text in separate file for complete translations
@@ -39,7 +40,7 @@ class HistoryManager:
         entry = {
             'id': self._generate_id(),
             'timestamp': datetime.now().isoformat(),
-            'source_text': source_text[:500],  # Store first 500 chars for preview
+            'source_text': source_text[:500],
             'translated_text': translated_text[:500],
             'source_language': source_language,
             'target_language': target_language,
@@ -49,7 +50,8 @@ class HistoryManager:
             'summary': summary,
             'source_length': len(source_text),
             'translated_length': len(translated_text),
-            'full_text_id': full_text_id
+            'full_text_id': full_text_id,
+            'vector_id': vector_id
         }
         
         # Load existing history

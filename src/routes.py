@@ -22,6 +22,7 @@ from src.pdf_utils import (
     background_extract_pdf,
 )
 from src.rag_pipeline import get_pipeline
+from src.ingestion import ingest_document
 from src.embedding import generate_embedding
 
 bp = Blueprint('api', __name__)
@@ -104,6 +105,11 @@ def upload_file():
         else:
             return jsonify({'error': 'Unsupported file type'}), 400
 
+        try:
+            ingest_document(filepath, filename)
+        except Exception:
+            pass
+
         pages = extract_pages(text)
         preview_text = get_page_text(text, 1) if len(pages) >= 1 else text[:4000]
         return jsonify({
@@ -135,14 +141,31 @@ def translate_text():
         return jsonify({'error': 'No text provided'}), 400
 
     try:
-        chunks = split_text_for_translation(text)
-        translated_chunks = []
-        for chunk in chunks:
-            translated = translate_with_ollama(chunk, target_language, source_language)
-            translated_chunks.append(translated.strip())
+        enable_rag = os.environ.get('ENABLE_RAG', 'true').lower() == 'true'
 
-        translated_text = '\n\n'.join(translated_chunks)
-        
+        if enable_rag:
+            pipeline = get_pipeline()
+            translated_text = pipeline.translate_with_context(
+                text=text,
+                target_language=target_language,
+                source_language=source_language
+            )
+            pipeline.store_translation(
+                source_text=text,
+                translated_text=translated_text,
+                source_language=source_language,
+                target_language=target_language,
+                filename=filename if filename else None,
+                mode='text' if not filename else 'document'
+            )
+        else:
+            chunks = split_text_for_translation(text)
+            translated_chunks = []
+            for chunk in chunks:
+                translated = translate_with_ollama(chunk, target_language, source_language)
+                translated_chunks.append(translated.strip())
+            translated_text = '\n\n'.join(translated_chunks)
+
         # Save to history
         try:
             history_manager = app.config['HISTORY_MANAGER']
@@ -693,7 +716,7 @@ def find_similar():
         
         # Generate embedding and search
         query_embedding = generate_embedding(page_text)
-        metadata_filter = {'filename': filename}
+        metadata_filter = {'filename': filename, 'page_number': int(page)}
         
         results = pipeline.vector_store.search(
             query_embedding,
@@ -769,3 +792,24 @@ def hybrid_search():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/api/vector-stats', methods=['GET'])
+def vector_stats():
+    """Get vector store statistics."""
+    try:
+        pipeline = get_pipeline()
+        vector_store = pipeline.vector_store
+        conn = vector_store._connect()
+        count = conn.execute('SELECT COUNT(*) FROM embeddings').fetchone()[0]
+        conn.close()
+        return jsonify({
+            'success': True,
+            'stats': {
+                'total_embeddings': count,
+                'collection_name': vector_store.collection_name,
+                'db_path': vector_store.db_path,
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

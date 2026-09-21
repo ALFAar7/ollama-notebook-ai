@@ -70,6 +70,7 @@ def extract_pdf_pages_to_file(pdf_path, filename):
 
 
 def background_extract_pdf(filepath, filename):
+    from src.ingestion import ingest_document
     existing_text = load_extracted_text(filename)
     if existing_text.strip():
         processing_status[filename] = {'status': 'ready', 'message': 'PDF ready', 'page_count': count_pdf_pages(filepath)}
@@ -78,6 +79,10 @@ def background_extract_pdf(filepath, filename):
     try:
         text = extract_text_from_pdf(filepath)
         save_extracted_text(filename, text)
+        try:
+            ingest_document(filepath, filename)
+        except Exception:
+            pass
         processing_status[filename] = {'status': 'ready', 'message': 'PDF ready', 'page_count': count_pdf_pages(filepath)}
     except Exception as exc:
         processing_status[filename] = {'status': 'error', 'message': str(exc), 'page_count': count_pdf_pages(filepath)}

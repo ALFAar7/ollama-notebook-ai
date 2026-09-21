@@ -283,3 +283,68 @@
         margin-left: auto;
     }
 }
+
+/* RAG Toggle */
+.rag-toggle-wrapper {
+    margin-left: 10px;
+}
+
+.rag-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+}
+
+.rag-toggle:hover {
+    background: var(--bg-tertiary);
+}
+
+.rag-toggle-track {
+    width: 44px;
+    height: 24px;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.rag-toggle[aria-checked="true"] .rag-toggle-track {
+    background: var(--success);
+}
+
+.rag-toggle-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--text-primary);
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: all 0.2s ease;
+}
+
+.rag-toggle[aria-checked="true"] .rag-toggle-thumb {
+    left: 23px;
+}
+
+.rag-toggle-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.rag-toggle[aria-checked="true"] .rag-toggle-label {
+    color: var(--success);
+}
+
+.rag-toggle:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}

@@ -18,7 +18,7 @@ function cacheElements() {
         'pageNumber', 'prevPageBtn', 'nextPageBtn', 'textInput', 'notesArea',
         'translateTextBtn', 'filePreviewSidebar', 'attachmentPreview',
         'sourceFileName', 'sourcePageCount', 'ollamaStatus', 'ollamaDot', 'ollamaLabel',
-        'toastContainer', 'sidebar', 'sidebarOverlay'
+        'toastContainer', 'sidebar', 'sidebarOverlay', 'ragToggleBtn'
     ];
     ids.forEach(id => {
         App.els[id] = document.getElementById(id);
@@ -27,10 +27,12 @@ function cacheElements() {
     App.els.tabText = document.querySelector('[data-tab="text"]');
     App.els.tabDocument = document.querySelector('[data-tab="document"]');
     App.els.tabNotes = document.querySelector('[data-tab="notes"]');
+    App.els.tabRag = document.querySelector('[data-tab="rag"]');
 
     App.els.panelText = document.getElementById('panelText');
     App.els.panelDocument = document.getElementById('panelDocument');
     App.els.panelNotes = document.getElementById('panelNotes');
+    App.els.panelRag = document.getElementById('panelRag');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -109,6 +111,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (App.els.tabNotes) {
         App.els.tabNotes.addEventListener('click', () => switchWorkspaceTab('notes'));
+    }
+    if (App.els.tabRag) {
+        App.els.tabRag.addEventListener('click', () => switchWorkspaceTab('rag'));
+    }
+
+    if (App.els.ragToggleBtn) {
+        App.els.ragToggleBtn.addEventListener('click', () => {
+            const isRagEnabled = App.els.ragToggleBtn.getAttribute('aria-checked') === 'true';
+            App.els.ragToggleBtn.setAttribute('aria-checked', String(!isRagEnabled));
+            showStatus(isRagEnabled ? 'RAG disabled' : 'RAG enabled', 'success');
+        });
     }
 
     if (App.els.fileInput) {

@@ -21,6 +21,10 @@
                 <span class="tab-icon" aria-hidden="true">&#128221;</span>
                 <span class="tab-label">Notes</span>
             </button>
+            <button class="workspace-tab-btn" data-tab="rag" role="tab" aria-selected="false" aria-controls="panelRag">
+                <span class="tab-icon" aria-hidden="true">&#128269;</span>
+                <span class="tab-label">RAG</span>
+            </button>
         </nav>
 
         <div class="language-bar">
@@ -52,6 +56,14 @@
                     <option value="German">German</option>
                     <option value="Spanish">Spanish</option>
                 </select>
+            </div>
+            <div class="rag-toggle-wrapper">
+                <button id="ragToggleBtn" class="rag-toggle" role="switch" aria-checked="true" aria-label="Toggle RAG enhancement">
+                    <span class="rag-toggle-track" aria-hidden="true">
+                        <span class="rag-toggle-thumb"></span>
+                    </span>
+                    <span class="rag-toggle-label">RAG</span>
+                </button>
             </div>
         </div>
 
