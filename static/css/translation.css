@@ -224,6 +224,34 @@
     padding-top: var(--space-sm);
 }
 
+/* ── RTL Support for translation output ── */
+.translation-area.rtl,
+.notes-summary.rtl,
+.note-textarea.rtl {
+    direction: rtl;
+    text-align: right;
+}
+
+.translation-area.rtl p {
+    margin: 0 0 1em 0;
+}
+
+.translation-area.rtl blockquote {
+    border-left: none;
+    border-right: 3px solid var(--accent);
+    padding-right: var(--space-md);
+    padding-left: 0;
+    margin-right: 0;
+    margin-left: auto;
+    text-align: right;
+}
+
+.translation-area.rtl ul,
+.translation-area.rtl ol {
+    padding-right: 1.5em;
+    padding-left: 0;
+}
+
 /* ── Copy/Download actions for output ── */
 .output-actions {
     display: flex;

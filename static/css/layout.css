@@ -388,3 +388,10 @@
 .search-stat-row:last-child {
     border-bottom: none;
 }
+
+/* RTL for search results */
+.search-result-body.rtl,
+.search-results.rtl {
+    direction: rtl;
+    text-align: right;
+}

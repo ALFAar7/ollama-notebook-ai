@@ -46,16 +46,14 @@ function renderFilePreview() {
 }
 
 function updateRTLState() {
-    const isRTL = App.els.targetLanguage && (
-        App.els.targetLanguage.value === 'Persian' ||
-        App.els.targetLanguage.value === 'Arabic' ||
-        App.els.targetLanguage.value === 'Kurdish'
-    );
+    const isRTL = isTargetLanguageRTL();
     if (App.els.translationArea) {
         App.els.translationArea.classList.toggle('rtl', isRTL);
+        App.els.translationArea.dir = isRTL ? 'rtl' : 'ltr';
     }
     if (App.els.translationAreaText) {
         App.els.translationAreaText.classList.toggle('rtl', isRTL);
+        App.els.translationAreaText.dir = isRTL ? 'rtl' : 'ltr';
     }
     if (App.els.notesSummary) {
         App.els.notesSummary.classList.toggle('rtl', isRTL);
@@ -96,6 +94,11 @@ function renderKnowledgeSearchResults(results) {
         return;
     }
 
+    const isRTL = isTargetLanguageRTL();
+    container.dir = isRTL ? 'rtl' : 'ltr';
+    container.classList.toggle('rtl', isRTL);
+    container.classList.toggle('ltr', !isRTL);
+
     if (!results || results.length === 0) {
         container.innerHTML = `
             <div class="empty-state centered">
@@ -124,10 +127,15 @@ function renderKnowledgeSearchResults(results) {
                     <span class="search-citation">${citation}</span>
                     <span class="search-result-similarity">Match: ${similarity}%</span>
                 </div>
-                <div class="search-result-body">${escapeHtml(result.translated_text || '')}</div>
+                <div class="search-result-body${isRTL ? ' rtl' : ''}" dir="${isRTL ? 'rtl' : 'ltr'}">${escapeHtml(result.translated_text || '')}</div>
             </article>
         `;
     }).join('');
+}
+
+function isTargetLanguageRTL() {
+    const lang = (App.els.targetLanguage && App.els.targetLanguage.value) || '';
+    return lang === 'Persian' || lang === 'Arabic' || lang === 'Kurdish';
 }
 
 function renderVectorStats(stats) {
