@@ -77,7 +77,6 @@ pip-log.txt
 # intentionally want to ship with a negation, e.g. !docs/sample.pdf
 # ---------------------------------------------------------------------------
 /*.pdf
-/*.png
 /*.jpg
 /*.jpeg
 *.extracted.txt
