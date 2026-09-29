@@ -584,6 +584,7 @@ def knowledge_search():
     query = data.get('query', '')
     target_language = data.get('target_language', 'English')
     source_language = data.get('source_language', 'auto')
+    filename = data.get('filename', '')
     limit = int(data.get('limit', 5))
 
     if not query.strip():
@@ -595,7 +596,8 @@ def knowledge_search():
             query=query,
             target_language=target_language,
             source_language=source_language,
-            limit=limit
+            limit=limit,
+            filename=filename if filename else None
         )
 
         return jsonify({

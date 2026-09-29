@@ -44,6 +44,7 @@ async function uploadAndTranslateFile(file) {
         renderFilePreview();
         updatePageButtons();
         updateSourceMeta();
+        updateSearchScopeState();
         if (App.els.pageNumber) {
             App.els.pageNumber.value = App.currentPage;
         }

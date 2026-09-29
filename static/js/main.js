@@ -20,7 +20,7 @@ function cacheElements() {
         'sourceFileName', 'sourcePageCount', 'ollamaStatus', 'ollamaDot', 'ollamaLabel',
         'toastContainer', 'sidebar', 'sidebarOverlay',
         'searchInput', 'searchBtn', 'searchResults', 'searchStats', 'searchRefreshBtn',
-        'qaInput', 'qaBtn', 'qaAnswer', 'qaSources'
+        'qaInput', 'qaBtn', 'qaAnswer', 'qaSources', 'searchAllDocs', 'searchScopeLabel'
     ];
     ids.forEach(id => {
         App.els[id] = document.getElementById(id);
@@ -39,6 +39,11 @@ function cacheElements() {
 
 document.addEventListener('DOMContentLoaded', () => {
     cacheElements();
+    updateSearchScopeState();
+
+    if (App.els.searchAllDocs) {
+        App.els.searchAllDocs.addEventListener('change', updateSearchScopeState);
+    }
 
     if (App.els.sourceLanguage) {
         App.els.sourceLanguage.addEventListener('change', updateRTLState);
@@ -303,6 +308,43 @@ function checkOllamaStatus() {
         });
 }
 
+function updateSearchScopeState() {
+    const checkbox = App.els.searchAllDocs;
+    const label = App.els.searchScopeLabel;
+    if (!checkbox || !label) {
+        return;
+    }
+    const scope = checkbox.closest('.search-scope');
+    const hasDocument = Boolean(App.currentFileName);
+
+    checkbox.disabled = !hasDocument;
+    if (!hasDocument) {
+        checkbox.checked = true;
+        label.textContent = 'All documents';
+        if (scope) {
+            scope.title = 'No document is open. Upload one to search it on its own.';
+        }
+    } else if (checkbox.checked) {
+        label.textContent = 'All documents';
+        if (scope) {
+            scope.title = 'Search every uploaded document.';
+        }
+    } else {
+        label.textContent = 'This document';
+        if (scope) {
+            scope.title = 'Search only the open document.';
+        }
+    }
+}
+
+function getSearchScopeFilename() {
+    const searchAll = App.els.searchAllDocs && App.els.searchAllDocs.checked;
+    if (searchAll) {
+        return '';
+    }
+    return App.currentFileName || '';
+}
+
 async function runKnowledgeSearch() {
     const query = (App.els.searchInput && App.els.searchInput.value.trim()) || '';
     if (!query) {
@@ -321,12 +363,15 @@ async function runKnowledgeSearch() {
     try {
         const targetLanguage = App.els.targetLanguage ? App.els.targetLanguage.value : 'English';
         const sourceLanguage = App.els.sourceLanguage ? App.els.sourceLanguage.value : 'auto';
-        const results = await knowledgeSearch(query, targetLanguage, sourceLanguage, 5);
+        const scopeFilename = getSearchScopeFilename();
+        const results = await knowledgeSearch(query, targetLanguage, sourceLanguage, scopeFilename, 5);
         renderKnowledgeSearchResults(results);
         if (results.length === 0) {
-            showStatus('No matching content found in the knowledge base.', 'success');
+            showStatus(scopeFilename
+                ? `No matching content found in ${scopeFilename}.`
+                : 'No matching content found in the knowledge base.', 'success');
         } else {
-            showStatus(`${results.length} result(s) translated.`, 'success');
+            showStatus(`${results.length} result(s) translated${scopeFilename ? ` from ${scopeFilename}` : ''}.`, 'success');
         }
     } catch (error) {
         console.error(error);
@@ -376,7 +421,7 @@ async function runQaSearch() {
     try {
         const targetLanguage = App.els.targetLanguage ? App.els.targetLanguage.value : 'English';
         const sourceLanguage = App.els.sourceLanguage ? App.els.sourceLanguage.value : 'auto';
-        const data = await qaSearch(query, targetLanguage, sourceLanguage, App.currentFileName, 5);
+        const data = await qaSearch(query, targetLanguage, sourceLanguage, getSearchScopeFilename(), 5);
 
         if (data.no_context) {
             App.els.qaAnswer.innerHTML = '<div class="empty-state centered"><strong>No relevant content found</strong><span>No matching chunks were found in the knowledge base. Upload and process a document first.</span></div>';

@@ -10,6 +10,10 @@
             </div>
             <div class="search-search-bar">
                 <input type="search" id="searchInput" class="search-input" placeholder="Search your documents..." aria-label="Search documents" autocomplete="off">
+                <label class="search-scope" for="searchAllDocs">
+                    <input type="checkbox" id="searchAllDocs">
+                    <span id="searchScopeLabel">All documents</span>
+                </label>
                 <button id="searchBtn" class="primary-btn small">Search</button>
             </div>
             <div id="searchResults" class="search-results" aria-live="polite">

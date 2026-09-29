@@ -18,7 +18,8 @@ class RAGPipeline:
         query: str,
         target_language: str,
         source_language: str = 'auto',
-        limit: int = 5
+        limit: int = 5,
+        filename: str = None
     ) -> List[Dict]:
         """
         Semantic search over ingested source chunks and translate each result
@@ -29,12 +30,21 @@ class RAGPipeline:
           2. Vector search for relevant source chunks (type: 'source').
           3. Translate each retrieved chunk to target_language.
           4. Return translated results with source citation metadata.
+
+        Args:
+            filename: Restrict the search to a single document. When omitted the
+                whole knowledge base is searched.
         """
         query_embedding = generate_embedding(query)
+
+        metadata_filter = {}
+        if filename:
+            metadata_filter['filename'] = filename
 
         results = self.vector_store.search(
             query_embedding,
             limit=limit,
+            metadata_filter=metadata_filter or None,
             entry_type='source'
         )
 

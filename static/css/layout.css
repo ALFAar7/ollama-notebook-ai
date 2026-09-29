@@ -317,6 +317,40 @@
     border-color: var(--accent);
 }
 
+.search-scope {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 var(--space-sm);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    background: var(--glass);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+
+.search-scope:hover {
+    color: var(--text);
+}
+
+.search-scope input[type="checkbox"] {
+    accent-color: var(--accent);
+    cursor: pointer;
+    margin: 0;
+}
+
+.search-scope:has(input:disabled) {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.search-scope:has(input:disabled) input[type="checkbox"] {
+    cursor: not-allowed;
+}
+
 .search-results {
     flex: 1;
     overflow-y: auto;

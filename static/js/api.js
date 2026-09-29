@@ -11,16 +11,20 @@ async function loadModels() {
     }
 }
 
-async function knowledgeSearch(query, targetLanguage, sourceLanguage = 'auto', limit = 5) {
+async function knowledgeSearch(query, targetLanguage, sourceLanguage = 'auto', filename = '', limit = 5) {
+    const payload = {
+        query,
+        target_language: targetLanguage,
+        source_language: sourceLanguage,
+        limit
+    };
+    if (filename) {
+        payload.filename = filename;
+    }
     const response = await fetch('/api/knowledge-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            query,
-            target_language: targetLanguage,
-            source_language: sourceLanguage,
-            limit
-        })
+        body: JSON.stringify(payload)
     });
     const data = await response.json();
     if (!response.ok || !data.success) {
