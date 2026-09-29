@@ -38,13 +38,23 @@
                 </div>
             </div>
 
-            <!-- Document preview area -->
-            <div id="attachmentPreview" class="attachment-preview" aria-live="polite">
-                <div class="empty-state centered">
-                    <div class="empty-icon" aria-hidden="true">&#128196;</div>
-                    <strong>Load a document to translate</strong>
-                    <span>Upload a PDF, DOCX, or TXT from the sidebar to begin</span>
+            <!-- Document preview area (resizable on all edges and corners) -->
+            <div id="previewResizer" class="preview-resizer">
+                <div id="attachmentPreview" class="attachment-preview" aria-live="polite">
+                    <div class="empty-state centered">
+                        <div class="empty-icon" aria-hidden="true">&#128196;</div>
+                        <strong>Load a document to translate</strong>
+                        <span>Upload a PDF, DOCX, or TXT from the sidebar to begin</span>
+                    </div>
                 </div>
+                <span class="resize-handle resize-n" data-dir="n" role="separator" tabindex="0" aria-label="Resize preview height from the top" title="Drag to resize. Double-click to reset."></span>
+                <span class="resize-handle resize-s" data-dir="s" role="separator" tabindex="0" aria-label="Resize preview height from the bottom" title="Drag to resize. Double-click to reset."></span>
+                <span class="resize-handle resize-e" data-dir="e" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Resize preview width from the right" title="Drag to resize. Double-click to reset."></span>
+                <span class="resize-handle resize-w" data-dir="w" role="separator" tabindex="0" aria-orientation="vertical" aria-label="Resize preview width from the left" title="Drag to resize. Double-click to reset."></span>
+                <span class="resize-handle resize-nw" data-dir="nw" role="separator" tabindex="0" aria-label="Resize preview from the top-left corner" title="Drag to resize. Double-click to reset."></span>
+                <span class="resize-handle resize-ne" data-dir="ne" role="separator" tabindex="0" aria-label="Resize preview from the top-right corner" title="Drag to resize. Double-click to reset."></span>
+                <span class="resize-handle resize-sw" data-dir="sw" role="separator" tabindex="0" aria-label="Resize preview from the bottom-left corner" title="Drag to resize. Double-click to reset."></span>
+                <span class="resize-handle resize-se" data-dir="se" role="separator" tabindex="0" aria-label="Resize preview from the bottom-right corner" title="Drag to resize. Double-click to reset."></span>
             </div>
         </article>
 

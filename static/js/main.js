@@ -44,6 +44,7 @@ function cacheElements() {
 document.addEventListener('DOMContentLoaded', () => {
     cacheElements();
     updateSearchScopeState();
+    initPreviewResize();
 
     if (App.els.searchAllDocs) {
         App.els.searchAllDocs.addEventListener('change', updateSearchScopeState);

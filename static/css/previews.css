@@ -2,6 +2,118 @@
    PREVIEWS — PDF & Document Previews
    ============================================ */
 
+/* ── Resizable preview wrapper ──
+   Holds the sizing handles. The preview itself has its innerHTML replaced on
+   every page change, so handles live out here to survive that. */
+.preview-resizer {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    max-width: 100%;
+}
+
+/* Once the user picks a size the box stops stretching and takes that size. */
+.preview-resizer.is-resized {
+    flex: 0 0 auto;
+    max-height: none;
+}
+
+.preview-resizer > .attachment-preview {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── Resize handles ── */
+.resize-handle {
+    position: absolute;
+    z-index: 5;
+    touch-action: none;
+    background: transparent;
+    border-radius: 2px;
+    transition: background-color 0.12s ease;
+}
+
+.resize-handle::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    background: var(--glass-border);
+    border-radius: 2px;
+    opacity: 0.75;
+    transition: opacity 0.12s ease;
+}
+
+.resize-handle:hover::after,
+.resize-handle:focus-visible::after,
+.resize-handle.is-dragging::after {
+    opacity: 1;
+    background: var(--accent);
+}
+
+.resize-handle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+/* Edge handles: thin strips straddling each border. */
+.resize-n,
+.resize-s {
+    left: 12px;
+    right: 12px;
+    height: 10px;
+    cursor: ns-resize;
+}
+.resize-n { top: -5px; }
+.resize-s { bottom: -5px; }
+.resize-n::after { width: 34px; height: 3px; }
+.resize-s::after { width: 34px; height: 3px; }
+
+.resize-e,
+.resize-w {
+    top: 12px;
+    bottom: 12px;
+    width: 10px;
+    cursor: ew-resize;
+}
+.resize-e { right: -5px; }
+.resize-w { left: -5px; }
+.resize-e::after { width: 3px; height: 34px; }
+.resize-w::after { width: 3px; height: 34px; }
+
+/* Corner handles: small square pads. */
+.resize-nw,
+.resize-ne,
+.resize-sw,
+.resize-se {
+    width: 14px;
+    height: 14px;
+}
+.resize-nw { top: -7px; left: -7px; cursor: nwse-resize; }
+.resize-ne { top: -7px; right: -7px; cursor: nesw-resize; }
+.resize-sw { bottom: -7px; left: -7px; cursor: nesw-resize; }
+.resize-se { bottom: -7px; right: -7px; cursor: nwse-resize; }
+.resize-nw::after,
+.resize-ne::after,
+.resize-sw::after,
+.resize-se::after {
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+}
+
+/* Suppress text selection and pointer flicker while dragging. */
+body.is-resizing-preview {
+    user-select: none;
+    cursor: inherit;
+}
+
+body.is-resizing-preview * {
+    cursor: inherit !important;
+}
+
 /* ── Attachment preview container (fills panel body) ── */
 .attachment-preview {
     flex: 1;
