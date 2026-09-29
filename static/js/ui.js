@@ -1,3 +1,89 @@
+const PDF_ZOOM_STEPS = [50, 75, 100, 125, 150, 200, 300, 400];
+
+function getPdfViewerUrl(filename, page, zoom, fitWidth) {
+    const url = `/uploads/${encodeURIComponent(filename)}`;
+    const params = [];
+    if (page && page > 0) {
+        params.push(`page=${page}`);
+    }
+    if (fitWidth) {
+        params.push('view=FitWidth');
+    } else if (zoom) {
+        params.push(`zoom=${zoom}`);
+    }
+    return params.length ? `${url}#${params.join('&')}` : url;
+}
+
+function renderPdfToolbar() {
+    return `
+        <div class="pdf-toolbar" role="toolbar" aria-label="PDF zoom controls">
+            <button class="pdf-tool" type="button" data-pdf-action="zoom-out" title="Zoom out" aria-label="Zoom out">&minus;</button>
+            <span class="pdf-zoom-value" id="pdfZoomValue" aria-live="polite">${App.pdfFitWidth ? 'Fit' : `${App.pdfZoom}%`}</span>
+            <button class="pdf-tool" type="button" data-pdf-action="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+            <button class="pdf-tool pdf-tool-wide" type="button" data-pdf-action="fit" title="Fit the page width to this panel">Fit</button>
+        </div>
+    `;
+}
+
+function syncPdfViewerSource() {
+    const frame = App.viewerFrame;
+    if (!frame || App.viewerFileName !== App.currentFileName) {
+        return;
+    }
+    const url = getPdfViewerUrl(App.currentFileName, App.currentPage, App.pdfZoom, App.pdfFitWidth);
+    // Assigning a URL that differs only by fragment is a same-document
+    // navigation, so the viewer moves pages without re-downloading the PDF.
+    if (frame.getAttribute('src') !== url) {
+        frame.setAttribute('src', url);
+    }
+    updatePdfZoomLabel();
+}
+
+function updatePdfZoomLabel() {
+    const label = document.getElementById('pdfZoomValue');
+    if (label) {
+        label.textContent = App.pdfFitWidth ? 'Fit' : `${App.pdfZoom}%`;
+    }
+}
+
+function stepPdfZoom(direction) {
+    if (App.pdfFitWidth) {
+        App.pdfFitWidth = false;
+    }
+    const current = App.pdfZoom;
+    if (direction > 0) {
+        const next = PDF_ZOOM_STEPS.find((step) => step > current);
+        App.pdfZoom = next || PDF_ZOOM_STEPS[PDF_ZOOM_STEPS.length - 1];
+    } else {
+        const lower = [...PDF_ZOOM_STEPS].reverse().find((step) => step < current);
+        App.pdfZoom = lower || PDF_ZOOM_STEPS[0];
+    }
+    syncPdfViewerSource();
+}
+
+function togglePdfFitWidth() {
+    App.pdfFitWidth = !App.pdfFitWidth;
+    if (!App.pdfFitWidth && !App.pdfZoom) {
+        App.pdfZoom = 100;
+    }
+    syncPdfViewerSource();
+}
+
+function handlePdfToolbarClick(event) {
+    const button = event.target.closest('[data-pdf-action]');
+    if (!button || !App.els.attachmentPreview || !App.els.attachmentPreview.contains(button)) {
+        return;
+    }
+    const action = button.getAttribute('data-pdf-action');
+    if (action === 'zoom-in') {
+        stepPdfZoom(1);
+    } else if (action === 'zoom-out') {
+        stepPdfZoom(-1);
+    } else if (action === 'fit') {
+        togglePdfFitWidth();
+    }
+}
+
 function renderFilePreview() {
     const fileType = (App.currentFileName || '').split('.').pop().toLowerCase();
     const currentPageText = (App.pages[App.currentPage - 1] || '').trim();
@@ -14,35 +100,61 @@ function renderFilePreview() {
                 <span>Upload a PDF, DOCX, or TXT file to preview it here.</span>
             </div>
         `;
-    const mainMarkup = App.currentFileName
-        ? fileType === 'pdf'
-            ? `<div class="pdf-viewer"><iframe class="viewer-frame" title="PDF Preview" src="/uploads/${encodeURIComponent(App.currentFileName)}"></iframe></div>`
-            : currentPageText
-                ? `
-                    <div class="preview-content">
-                        <div class="preview-caption">Page ${App.currentPage} of ${App.pages.length}</div>
-                        <div class="preview-text">${escapeHtml(currentPageText)}</div>
-                    </div>
-                `
-                : `
-                    <div class="empty-state centered">
-                        <strong>${fileType === 'docx' ? '&#128214;' : fileType === 'txt' ? '&#128196;' : fileType === 'pdf' ? '&#128215;' : '&#128206;'} ${escapeHtml(App.currentFileName)}</strong>
-                        <span>This page has no extractable text yet.</span>
-                    </div>
-                `
-        : `
+
+    if (App.els.filePreviewSidebar) {
+        App.els.filePreviewSidebar.innerHTML = sidebarMarkup;
+    }
+    if (!App.els.attachmentPreview) {
+        return;
+    }
+
+    if (!App.currentFileName) {
+        App.viewerFileName = '';
+        App.viewerFrame = null;
+        App.els.attachmentPreview.innerHTML = `
             <div class="empty-state centered">
                 <strong>Upload a source file</strong>
                 <span>Once a document is uploaded, its pages appear here.</span>
             </div>
         `;
+        return;
+    }
 
-    if (App.els.filePreviewSidebar) {
-        App.els.filePreviewSidebar.innerHTML = sidebarMarkup;
+    if (fileType === 'pdf') {
+        const existingFrame = App.els.attachmentPreview.querySelector('.viewer-frame');
+        if (existingFrame && App.viewerFileName === App.currentFileName) {
+            // Same document: keep the viewer alive so zoom, scroll and the
+            // embedded viewer state survive a page change.
+            syncPdfViewerSource();
+        } else {
+            App.els.attachmentPreview.innerHTML = `
+                <div class="pdf-viewer">
+                    ${renderPdfToolbar()}
+                    <iframe class="viewer-frame" title="PDF Preview" src="${getPdfViewerUrl(App.currentFileName, App.currentPage, App.pdfZoom, App.pdfFitWidth)}"></iframe>
+                </div>
+            `;
+            App.viewerFileName = App.currentFileName;
+            App.viewerFrame = App.els.attachmentPreview.querySelector('.viewer-frame');
+            updatePdfZoomLabel();
+        }
+        return;
     }
-    if (App.els.attachmentPreview) {
-        App.els.attachmentPreview.innerHTML = mainMarkup;
-    }
+
+    App.viewerFileName = '';
+    App.viewerFrame = null;
+    App.els.attachmentPreview.innerHTML = currentPageText
+        ? `
+            <div class="preview-content">
+                <div class="preview-caption">Page ${App.currentPage} of ${App.pages.length}</div>
+                <div class="preview-text">${escapeHtml(currentPageText)}</div>
+            </div>
+        `
+        : `
+            <div class="empty-state centered">
+                <strong>${fileType === 'docx' ? '&#128214;' : '&#128196;'} ${escapeHtml(App.currentFileName)}</strong>
+                <span>This page has no extractable text yet.</span>
+            </div>
+        `;
 }
 
 function updateRTLState() {

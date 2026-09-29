@@ -6,6 +6,10 @@ const App = {
     translatedText: '',
     currentMode: 'text',
     processingTimer: null,
+    pdfZoom: 100,
+    pdfFitWidth: false,
+    viewerFileName: '',
+    viewerFrame: null,
     els: {}
 };
 
@@ -43,6 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (App.els.searchAllDocs) {
         App.els.searchAllDocs.addEventListener('change', updateSearchScopeState);
+    }
+
+    if (App.els.attachmentPreview) {
+        App.els.attachmentPreview.addEventListener('click', handlePdfToolbarClick);
     }
 
     if (App.els.sourceLanguage) {
