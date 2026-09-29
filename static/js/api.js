@@ -37,3 +37,25 @@ async function loadVectorStats() {
     }
     return data.stats;
 }
+
+async function qaSearch(query, targetLanguage, sourceLanguage = 'auto', filename = '', limit = 5) {
+    const payload = {
+        query,
+        target_language: targetLanguage,
+        source_language: sourceLanguage,
+        limit
+    };
+    if (filename) {
+        payload.filename = filename;
+    }
+    const response = await fetch('/api/qa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+        throw new Error(data.error || 'QA request failed');
+    }
+    return data;
+}

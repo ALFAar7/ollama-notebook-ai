@@ -241,7 +241,7 @@ def translate_page():
 @bp.route('/api/page-text')
 def get_page_text_route():
     filename = request.args.get('filename', '')
-    page_number = request.args.get('page', 1)
+    page_number = int(request.args.get('page', 1))
 
     if not filename:
         return jsonify({'error': 'No filename provided'}), 400
@@ -602,6 +602,40 @@ def knowledge_search():
             'success': True,
             'results': results,
             'count': len(results)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/api/qa', methods=['POST'])
+def question_answering():
+    """Answer a natural-language question using retrieved document chunks."""
+    data = request.get_json()
+    query = data.get('query', '')
+    target_language = data.get('target_language', 'English')
+    source_language = data.get('source_language', 'auto')
+    filename = data.get('filename', '')
+    limit = int(data.get('limit', 5))
+
+    if not query.strip():
+        return jsonify({'error': 'Search query required'}), 400
+
+    try:
+        pipeline = get_pipeline()
+        result = pipeline.question_and_answer(
+            query=query,
+            target_language=target_language,
+            source_language=source_language,
+            filename=filename if filename else None,
+            limit=limit
+        )
+
+        return jsonify({
+            'success': True,
+            'answer': result['answer'],
+            'sources': result['sources'],
+            'no_context': result['no_context'],
+            'count': len(result['sources'])
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500

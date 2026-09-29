@@ -21,6 +21,28 @@
             </div>
         </div>
 
+        <!-- Q&A section -->
+        <div class="qa-section">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">Question</p>
+                    <h2>Ask About Your Documents</h2>
+                </div>
+            </div>
+            <div class="search-search-bar">
+                <input type="search" id="qaInput" class="search-input" placeholder="Ask a question about your uploaded documents..." aria-label="Ask a question" autocomplete="off">
+                <button id="qaBtn" class="primary-btn small">Ask</button>
+            </div>
+            <div id="qaAnswer" class="qa-answer" aria-live="polite">
+                <div class="empty-state centered">
+                    <div class="empty-icon" aria-hidden="true">&#129528;</div>
+                    <strong>Ask a question</strong>
+                    <span>Enter a question about your uploaded documents to get an AI-generated answer with citations.</span>
+                </div>
+            </div>
+            <div id="qaSources" class="qa-sources" aria-live="polite"></div>
+        </div>
+
         <div class="search-side-panel">
             <div class="panel-header">
                 <div>

@@ -395,3 +395,54 @@
     direction: rtl;
     text-align: right;
 }
+
+/* ── QA section ── */
+.qa-section {
+    margin-top: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.qa-answer {
+    flex: 1;
+    min-height: 200px;
+    padding: var(--space-lg);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    overflow-y: auto;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.qa-sources {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0 0;
+}
+
+.qa-source-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+}
+
+.qa-source-citation {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.qa-source-similarity {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}

@@ -16,7 +16,7 @@ function renderFilePreview() {
         `;
     const mainMarkup = App.currentFileName
         ? fileType === 'pdf'
-            ? `<iframe class="source-iframe" title="PDF Preview" src="/uploads/${encodeURIComponent(App.currentFileName)}"></iframe>`
+            ? `<div class="pdf-viewer"><iframe class="viewer-frame" title="PDF Preview" src="/uploads/${encodeURIComponent(App.currentFileName)}"></iframe></div>`
             : currentPageText
                 ? `
                     <div class="preview-content">

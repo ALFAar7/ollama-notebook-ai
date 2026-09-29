@@ -111,6 +111,29 @@ Text to translate:
         raise Exception(f"Translation failed: {str(e)}")
 
 
+def generate_with_ollama(prompt, target_language='English', temperature=0.3, num_ctx=8192, timeout=300):
+    """Generate a response from Ollama using an arbitrary prompt."""
+    model_name = resolve_model_name(DEFAULT_MODEL)
+
+    payload = {
+        "model": model_name,
+        "prompt": prompt,
+        "stream": False,
+        "options": {"temperature": temperature, "num_ctx": num_ctx},
+    }
+
+    try:
+        response = requests.post(f'{OLLAMA_URL}/api/generate', json=payload, timeout=timeout)
+        response.raise_for_status()
+        return response.json().get('response', '').strip()
+    except requests.exceptions.ConnectionError:
+        raise Exception("Could not connect to Ollama. Make sure Ollama is running.")
+    except requests.exceptions.Timeout:
+        raise Exception("Request timed out. Try a shorter query or increase timeout.")
+    except Exception as e:
+        raise Exception(f"Generation failed: {str(e)}")
+
+
 def generate_embedding(text):
     """
     Generate embedding for text using Ollama's embedding API.

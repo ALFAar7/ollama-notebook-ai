@@ -2,12 +2,25 @@
    PREVIEWS — PDF & Document Previews
    ============================================ */
 
+/* ── Attachment preview container (fills panel body) ── */
+.attachment-preview {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+}
+
 /* ── PDF viewer ── */
 .pdf-viewer {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.2);
+    flex: 1;
+    min-height: 0;
+    background: #1a1a2e;
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -17,8 +30,41 @@
     flex: 1;
     border: none;
     width: 100%;
-    min-height: 400px;
+    height: 100%;
+    min-height: 0;
     background: #1a1a2e;
+}
+
+/* ── Text document preview content ── */
+.preview-content {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.preview-caption {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.preview-text {
+    flex: 1;
+    min-height: 0;
+    padding: var(--space-md);
+    margin: 0;
+    overflow-y: auto;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 /* ── Image preview ── */

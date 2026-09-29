@@ -19,7 +19,8 @@ function cacheElements() {
         'translateTextBtn', 'filePreviewSidebar', 'attachmentPreview',
         'sourceFileName', 'sourcePageCount', 'ollamaStatus', 'ollamaDot', 'ollamaLabel',
         'toastContainer', 'sidebar', 'sidebarOverlay',
-        'searchInput', 'searchBtn', 'searchResults', 'searchStats', 'searchRefreshBtn'
+        'searchInput', 'searchBtn', 'searchResults', 'searchStats', 'searchRefreshBtn',
+        'qaInput', 'qaBtn', 'qaAnswer', 'qaSources'
     ];
     ids.forEach(id => {
         App.els[id] = document.getElementById(id);
@@ -133,6 +134,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (App.els.searchRefreshBtn) {
         App.els.searchRefreshBtn.addEventListener('click', loadSearchStats);
+    }
+
+    if (App.els.qaBtn) {
+        App.els.qaBtn.addEventListener('click', runQaSearch);
+    }
+    if (App.els.qaInput) {
+        App.els.qaInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                runQaSearch();
+            }
+        });
     }
 
     if (App.els.fileInput) {
@@ -340,4 +353,68 @@ async function loadSearchStats() {
         console.error(error);
         renderVectorStats(null);
     }
+}
+
+async function runQaSearch() {
+    const query = (App.els.qaInput && App.els.qaInput.value.trim()) || '';
+    if (!query) {
+        showStatus('Please enter a question.', 'error');
+        return;
+    }
+
+    if (App.els.qaAnswer) {
+        App.els.qaAnswer.innerHTML = '<div class="empty-state centered"><strong>Thinking...</strong><span>Analyzing your documents and generating an answer.</span></div>';
+    }
+    if (App.els.qaSources) {
+        App.els.qaSources.innerHTML = '';
+    }
+    if (App.els.qaBtn) {
+        App.els.qaBtn.disabled = true;
+        App.els.qaBtn.textContent = 'Thinking...';
+    }
+
+    try {
+        const targetLanguage = App.els.targetLanguage ? App.els.targetLanguage.value : 'English';
+        const sourceLanguage = App.els.sourceLanguage ? App.els.sourceLanguage.value : 'auto';
+        const data = await qaSearch(query, targetLanguage, sourceLanguage, App.currentFileName, 5);
+
+        if (data.no_context) {
+            App.els.qaAnswer.innerHTML = '<div class="empty-state centered"><strong>No relevant content found</strong><span>No matching chunks were found in the knowledge base. Upload and process a document first.</span></div>';
+            showStatus('No relevant content found in knowledge base.', 'error');
+            return;
+        }
+
+        App.els.qaAnswer.innerHTML = formatText(data.answer || 'No answer was generated.');
+        renderQaSources(data.sources);
+        showStatus('Answer generated from your documents.', 'success');
+    } catch (error) {
+        console.error(error);
+        App.els.qaAnswer.innerHTML = '<div class="empty-state centered"><strong>QA failed</strong><span>Could not generate an answer. Check the browser console.</span></div>';
+        App.els.qaSources.innerHTML = '';
+        showStatus(error.message || 'QA request failed.', 'error');
+    } finally {
+        if (App.els.qaBtn) {
+            App.els.qaBtn.disabled = false;
+            App.els.qaBtn.textContent = 'Ask';
+        }
+    }
+}
+
+function renderQaSources(sources) {
+    if (!App.els.qaSources || !sources || sources.length === 0) {
+        return;
+    }
+    const citationParts = [];
+    App.els.qaSources.innerHTML = sources.map((src) => {
+        const parts = [];
+        if (src.filename) parts.push(escapeHtml(src.filename));
+        if (src.page_number) parts.push(`Page ${src.page_number}`);
+        const citation = parts.join(' - ') || '—';
+        return `
+            <div class="qa-source-item">
+                <div class="qa-source-citation">${citation}</div>
+                <div class="qa-source-similarity">Relevance: ${Math.round((src.similarity || 0) * 100)}%</div>
+            </div>
+        `;
+    }).join('');
 }

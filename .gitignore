@@ -1,14 +1,112 @@
-venv
-uploads/*
-cache
-cache/*
-*.pyc
+# ---------------------------------------------------------------------------
+# Secrets / local configuration
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
 __pycache__/
-__pycache__/*
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python tooling caches
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+nosetests.xml
+.cache
+
+# ---------------------------------------------------------------------------
+# Application runtime data (local-only, regenerated at runtime)
+# ---------------------------------------------------------------------------
+# User-uploaded source documents and text extracted from them
+uploads/
+# Translation history and cached full texts
+history/
+# Extracted text cache
+cache/
+# Generated output documents
+outputs/
+src/cache/
+# RAG / vector store (SQLite + embedding artifacts)
+vector_store/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# ---------------------------------------------------------------------------
+# Logs
+# ---------------------------------------------------------------------------
+*.log
+logs/
+pip-log.txt
+
+# ---------------------------------------------------------------------------
+# Source documents kept locally (not part of the repository)
+# Source documents are user content, never project source. Add any asset you
+# intentionally want to ship with a negation, e.g. !docs/sample.pdf
+# ---------------------------------------------------------------------------
+/*.pdf
+/*.png
+/*.jpg
+/*.jpeg
+*.extracted.txt
+
+# ---------------------------------------------------------------------------
+# Temporary files / editor / OS / IDE
+# ---------------------------------------------------------------------------
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
 .fuse*
-.conntinue
-.kilo
-*.fuse*
 .fuse_hidden*
-history/*
-vector_store/translation_embeddings.db
+*.fuse*
+.conntinue
+.fuse3*
+
+# ---------------------------------------------------------------------------
+# Agent / local tooling state
+# ---------------------------------------------------------------------------
+.kilo/
+.kilocode/
+.opencode/
+.agent/
+AGENTS.local.md

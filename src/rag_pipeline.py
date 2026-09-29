@@ -6,7 +6,7 @@ with on-the-fly translation of retrieved results to the user's target language.
 from typing import List, Dict
 from src.vector_store import VectorStore
 from src.embedding import generate_embedding
-from src.ollama import translate_with_ollama
+from src.ollama import translate_with_ollama, generate_with_ollama
 
 
 class RAGPipeline:
@@ -55,6 +55,83 @@ class RAGPipeline:
             })
 
         return translated_results
+
+    def question_and_answer(
+        self,
+        query: str,
+        target_language: str,
+        source_language: str = 'auto',
+        filename: str = None,
+        limit: int = 5
+    ) -> Dict:
+        """
+        Answer a natural-language question using retrieved document chunks.
+
+        Steps:
+          1. Embed the query.
+          2. Vector search for relevant source chunks (type: 'source').
+          3. Build a prompt with the retrieved context and the user's question.
+          4. Generate an answer with Ollama in the target language.
+        """
+        query_embedding = generate_embedding(query)
+
+        metadata_filter = {'type': 'source'}
+        if filename:
+            metadata_filter['filename'] = filename
+
+        results = self.vector_store.search(
+            query_embedding,
+            limit=limit,
+            metadata_filter=metadata_filter,
+            entry_type='source'
+        )
+
+        if not results:
+            return {
+                'answer': '',
+                'sources': [],
+                'no_context': True,
+            }
+
+        context_chunks = [item.get('source_text', '') for item in results]
+        context = '\n\n'.join(context_chunks)[:6000]
+
+        prompt = f"""Answer the following question based on the provided context. If the context does not contain enough information to answer, say so briefly.
+
+Context:
+{context}
+
+Question: {query}
+
+Provide a clear, concise answer in {target_language}:
+"""
+
+        try:
+            answer = generate_with_ollama(
+                prompt,
+                target_language=target_language,
+                temperature=0.3,
+                num_ctx=8192,
+                timeout=300
+            )
+        except Exception:
+            answer = ''
+
+        sources = []
+        for item in results:
+            metadata = item.get('metadata', {})
+            sources.append({
+                'filename': metadata.get('filename', ''),
+                'page_number': metadata.get('page_number'),
+                'similarity': round(item.get('similarity', 0.0), 4),
+                'source_text': item.get('source_text', ''),
+            })
+
+        return {
+            'answer': answer,
+            'sources': sources,
+            'no_context': False,
+        }
 
     def store_translation(
         self,
