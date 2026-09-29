@@ -8,8 +8,8 @@ from src.embedding import generate_embedding as generate_embedding_fn
 
 #OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')
 OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://192.168.1.3:11434')
-#DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma4:e2b')
-DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'llama3.2:3b')
+DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma4:e2b')
+#DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'llama3.2:3b')
 _MODEL_NAME = None
 CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'cache')
 os.makedirs(CACHE_DIR, exist_ok=True)
