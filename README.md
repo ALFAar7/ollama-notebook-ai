@@ -11,7 +11,7 @@ A local AI-powered reading workspace that translates documents (PDF, DOCX, TXT) 
 - **Auto-generated Summaries**: Generate summaries in the target language from translated content
 - **Study Notes**: Capture key ideas, questions, and follow-up prompts as you study documents
 - **History Management**: View, search, filter, delete, and clear translation history with statistics
-- **RTL Support**: Full support for Persian, Arabic, Kurdish (Surani) with right-to-left layout across translations, search results, answers, and notes
+- **RTL Support**: Full support for Kurdish (Sorani), Persian, Arabic  with right-to-left layout across translations, search results, answers, and notes
 - **Local Translation Caching**: Faster repeated translations through caching system
 - **Multi-Language Support**: Auto-detect source language; translate to English, Arabic, Kurdish, Persian, French, German, Spanish
 - **Knowledge Search**: Semantic search over uploaded documents, scoped to the current document or the whole library, with results translated to your target language
@@ -175,31 +175,8 @@ remove its chunks, so re-uploading the same document indexes it again.
 ## Architecture
 
 - **Backend**: Python Flask API with RESTful endpoints
-- **Frontend**: Responsive HTML/CSS/vanilla-JS UI, served from `templates/` and `static/`
-- **AI Engine**: Ollama local models for translation and embeddings
-- **Search**: Custom SQLite vector store (`src/vector_store.py`) with an in-memory `numpy` similarity matrix, cosine similarity, and metadata filtering
-- **Storage**: Local filesystem — `uploads/`, `outputs/`, `history/`, `cache/`, and the `vector_store/` database. All of these are git-ignored and regenerated locally
+- **Frontend**: Responsive HTML/CSS/JavaScript UI
+- **AI Engine**: Ollama local AI models for translation and summarization
+- **Storage**: Local file system for uploads, outputs, history, and cache
 
-### Project Layout
-
-```
-app.py                  Entry point
-src/
-  app.py                Flask app + config
-  routes.py             HTTP endpoints
-  vector_store.py       SQLite vector store + in-memory index
-  rag_pipeline.py       Search and question-answering
-  ingestion.py          Extract, chunk, embed
-  chunking.py           Text chunking
-  embedding.py          Ollama embedding calls
-  ollama.py             Ollama translate/chat client
-  history.py            Translation history
-  file_utils.py         Extraction helpers
-  pdf_utils.py          PDF text extraction
-  text_utils.py         Text utilities
-  misc.py               Shared mutable state (in-flight processing status)
-templates/              Jinja2 templates
-static/                 CSS and JavaScript
-```
-
-*Local, private document translation built with Flask, Ollama, and Gemma4.*
+*A notebook built with Flask, Ollama, and Gemma4 for local, private document translation.*
