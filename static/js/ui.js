@@ -167,6 +167,14 @@ function updateRTLState() {
         App.els.translationAreaText.classList.toggle('rtl', isRTL);
         App.els.translationAreaText.dir = isRTL ? 'rtl' : 'ltr';
     }
+    if (App.els.qaAnswer) {
+        App.els.qaAnswer.classList.toggle('rtl', isRTL);
+        App.els.qaAnswer.dir = isRTL ? 'rtl' : 'ltr';
+    }
+    if (App.els.qaSources) {
+        App.els.qaSources.classList.toggle('rtl', isRTL);
+        App.els.qaSources.dir = isRTL ? 'rtl' : 'ltr';
+    }
     if (App.els.notesSummary) {
         App.els.notesSummary.classList.toggle('rtl', isRTL);
     }

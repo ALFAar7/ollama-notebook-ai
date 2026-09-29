@@ -453,6 +453,21 @@
     word-break: break-word;
 }
 
+/* RTL for the answer and its citations */
+.qa-answer.rtl,
+.qa-sources.rtl {
+    direction: rtl;
+    text-align: right;
+}
+
+.qa-answer.rtl p {
+    margin: 0 0 1em 0;
+}
+
+.qa-answer.rtl p:last-child {
+    margin-bottom: 0;
+}
+
 .qa-sources {
     display: flex;
     flex-direction: column;
