@@ -7,13 +7,15 @@ A local AI-powered reading workspace that translates documents (PDF, DOCX, TXT) 
 
 - **Translate Text or Documents**: Upload PDF, DOCX, or TXT files for instant translation
 - **Page-by-Page Translation**: Navigate through document pages and translate individually or all at once
+- **Readable PDF Preview**: Zoom controls (including fit-to-width) and a preview panel you can resize from any edge or corner
 - **Auto-generated Summaries**: Generate summaries in the target language from translated content
 - **Study Notes**: Capture key ideas, questions, and follow-up prompts as you study documents
 - **History Management**: View, search, filter, delete, and clear translation history with statistics
-- **RTL Support**: Full support for Persian, Arabic, Kurdish (Surani) with right-to-left layout
+- **RTL Support**: Full support for Persian, Arabic, Kurdish (Surani) with right-to-left layout across translations, search results, answers, and notes
 - **Local Translation Caching**: Faster repeated translations through caching system
 - **Multi-Language Support**: Auto-detect source language; translate to English, Arabic, Kurdish, Persian, French, German, Spanish
-- **Knowledge Search**: Semantic search across uploaded documents, with results translated to your target language
+- **Knowledge Search**: Semantic search over uploaded documents, scoped to the current document or the whole library, with results translated to your target language
+- **Instant Search**: Embeddings are held in an in-memory matrix, so queries return in milliseconds instead of scanning the whole database
 
 ## Prerequisites
 
@@ -41,17 +43,28 @@ After installing, ensure Ollama is running:
 ollama --version
 ```
 
-### 2. Pull a Model
+### 2. Pull Models
 
-Pull any model you want to use for translation (e.g., Llama 3.1):
+The app uses two models: one for translation, and one for embeddings.
+
 ```bash
-ollama pull llama3.1
+# Translation model (this is the app's default)
+ollama pull gemma4:e2b
+
+# Embedding model (needed by the Knowledge Search / RAG features)
+ollama pull nomic-embed-text
 ```
 
-Verify it's available:
+Verify both are available:
 ```bash
 ollama list
 ```
+
+> **The embedding model is easy to miss.** If `nomic-embed-text` is missing,
+> uploading a document still appears to succeed but the knowledge base stays
+> empty — ingestion errors are deliberately swallowed so a failed index does
+> not interrupt your upload. Pull it before relying on Search. To use a
+> different translation model, set `OLLAMA_MODEL` (see [Configuration](#configuration)).
 
 ### 3. Clone and set up this project
 
@@ -76,31 +89,44 @@ pip install -r requirements.txt
 
 ## Configuration
 
-The app connects to Ollama via environment variables. Set them before running the server if you need custom values:
+The app reads its settings from **environment variables** using `os.environ`.
+
+> **There is no `.env` loader.** The bundled `.env.example` is a reference
+> template only — nothing in the code reads a `.env` file. Copying it to
+> `.env` will have no effect until you load those values into the environment
+> yourself (`export $(grep -v '^#' .env | xargs)`, `set -a; . ./.env; set +a`,
+> or a `direnv`/shell profile). Use one of those, or pass variables inline.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `OLLAMA_URL` | `http://192.168.1.3:11434` | Ollama server URL |
-| `OLLAMA_MODEL` | (auto-detected) | Model name in Ollama |
+| `OLLAMA_MODEL` | `gemma4:e2b` | Model used for translation and chat |
+| `OLLAMA_EMBEDDING_MODEL` | `nomic-embed-text` | Model used to embed document chunks |
+| `OPEN_NOTEBOOK_EMBEDDING_BATCH_SIZE` | `50` | Chunks per embedding batch request |
+| `VECTOR_STORE_DIR` | `./vector_store` | Directory holding the vector database |
+| `VECTOR_COLLECTION` | `translation_embeddings` | Name of the SQLite file inside that directory |
+| `VECTOR_SIMILARITY_THRESHOLD` | `0.3` | Minimum cosine similarity for a search hit |
+| `CHROMA_DB_DIR` | — | Legacy alias for `VECTOR_STORE_DIR` (used only if the latter is unset) |
 
 **Example:**
 ```bash
 export OLLAMA_URL=http://localhost:11434
-ollama pull llama3.1
+export OLLAMA_MODEL=gemma4:e2b
 python app.py
 ```
 
-**Note:** If both the server and Ollama run on the same machine, set `OLLAMA_URL` to `http://localhost:11434` or `http://127.0.0.1:11434`.
+**Note:** The default `OLLAMA_URL` points at a LAN address. If Ollama runs on the
+same machine, set it to `http://localhost:11434` or `http://127.0.0.1:11434`.
 
 ## Running the App
 
 ```bash
 source venv/bin/activate
-ollama pull llama3.1   # if you haven't already
 python app.py
 ```
 
-Open `http://localhost:5000` in your browser.
+Open `http://localhost:5000` in your browser. The app runs in Flask debug mode,
+so the server restarts automatically when you edit a file.
 
 ## Usage Guide
 
@@ -112,10 +138,13 @@ Open `http://localhost:5000` in your browser.
 
 ### Attachment / Document Mode
 1. **Upload a document**: Drag and drop a PDF, DOCX, or TXT file into the sidebar
-2. **View pages**: Navigate through document pages with previous/next buttons or page number input
-3. **Translate a page**: Click **Translate Page** to translate the current page
-4. **Translate all pages**: Click **Translate All** to process every page at once
-5. **Generate summary**: After translation, generate a study notes summary from the content
+2. **View pages**: Navigate through document pages with previous/next buttons or page number input. For PDFs the viewer follows the page controls, so paging and the preview stay in sync
+3. **Adjust the preview**:
+   - **Zoom** — use the `-` / percentage / `+` buttons in the corner of the PDF viewer, or **Fit** to scale the page width to the panel. Double-click a resize handle to reset
+   - **Resize** — drag any edge or corner handle of the preview to make it larger or smaller. The opposite edge stays put. Handles are keyboard reachable: focus one and use the arrow keys (hold Shift for bigger steps), Enter resets
+4. **Translate a page**: Click **Translate Page** to translate the current page
+5. **Translate all pages**: Click **Translate All** to process every page at once
+6. **Generate summary**: After translation, generate a study notes summary from the content
 
 ### History Mode
 - View all past translations organized by document and language
@@ -125,11 +154,17 @@ Open `http://localhost:5000` in your browser.
 - View statistics (total translations, unique documents, languages used)
 
 ### Knowledge Search Mode
-1. **Upload a document** — uploading creates a searchable knowledge base of source chunks
+1. **Upload a document** — uploading indexes its chunks into the knowledge base
 2. **Switch to Search** — open the Search tab
-3. **Enter a query** — type a question or topic in the search bar
-4. **Review results** — the app finds relevant source chunks via semantic search and translates them to your selected target language
-5. **Inspect citations** — each result shows the source filename and page number
+3. **Choose a scope** — the toggle next to the search bar switches between **This document** (default, when a document is open) and **All documents**. The Ask box below shares the same scope
+4. **Enter a query** — type a question or topic in the search bar
+5. **Review results** — the app finds relevant source chunks via semantic search and translates them to your selected target language
+6. **Ask a question** — the same scope applies to the Ask box, which returns a written answer with citations
+7. **Inspect citations** — each result shows the source filename and page number
+
+All documents live in a single SQLite vector database
+(`vector_store/translation_embeddings.db`). Deleting an uploaded file does not
+remove its chunks, so re-uploading the same document indexes it again.
 
 ## Supported Languages
 
@@ -140,8 +175,31 @@ Open `http://localhost:5000` in your browser.
 ## Architecture
 
 - **Backend**: Python Flask API with RESTful endpoints
-- **Frontend**: Responsive HTML/CSS/JavaScript UI
-- **AI Engine**: Ollama local AI models for translation and summarization
-- **Storage**: Local file system for uploads, outputs, history, and cache
+- **Frontend**: Responsive HTML/CSS/vanilla-JS UI, served from `templates/` and `static/`
+- **AI Engine**: Ollama local models for translation and embeddings
+- **Search**: Custom SQLite vector store (`src/vector_store.py`) with an in-memory `numpy` similarity matrix, cosine similarity, and metadata filtering
+- **Storage**: Local filesystem — `uploads/`, `outputs/`, `history/`, `cache/`, and the `vector_store/` database. All of these are git-ignored and regenerated locally
 
-*A notebook built with Flask, Ollama, and Gemma4 for local, private document translation.*
+### Project Layout
+
+```
+app.py                  Entry point
+src/
+  app.py                Flask app + config
+  routes.py             HTTP endpoints
+  vector_store.py       SQLite vector store + in-memory index
+  rag_pipeline.py       Search and question-answering
+  ingestion.py          Extract, chunk, embed
+  chunking.py           Text chunking
+  embedding.py          Ollama embedding calls
+  ollama.py             Ollama translate/chat client
+  history.py            Translation history
+  file_utils.py         Extraction helpers
+  pdf_utils.py          PDF text extraction
+  text_utils.py         Text utilities
+  misc.py               Shared mutable state (in-flight processing status)
+templates/              Jinja2 templates
+static/                 CSS and JavaScript
+```
+
+*Local, private document translation built with Flask, Ollama, and Gemma4.*
