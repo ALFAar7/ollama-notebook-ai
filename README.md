@@ -105,7 +105,7 @@ The app reads its settings from **environment variables** using `os.environ`.
 | `OPEN_NOTEBOOK_EMBEDDING_BATCH_SIZE` | `50` | Chunks per embedding batch request |
 | `VECTOR_STORE_DIR` | `./vector_store` | Directory holding the vector database |
 | `VECTOR_COLLECTION` | `translation_embeddings` | Name of the SQLite file inside that directory |
-| `VECTOR_SIMILARITY_THRESHOLD` | `0.3` | Minimum cosine similarity for a search hit |
+| `VECTOR_SIMILARITY_THRESHOLD` | `0.60` | Minimum cosine similarity for a search hit. Calibrated with real queries against a single English book. Lower it (0.45-0.5) if you index many unrelated documents; raise it (0.65+) for a tightly-matched corpus. |
 | `CHROMA_DB_DIR` | — | Legacy alias for `VECTOR_STORE_DIR` (used only if the latter is unset) |
 
 **Example:**

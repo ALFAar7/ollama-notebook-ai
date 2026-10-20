@@ -662,3 +662,53 @@ def vector_stats():
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/vector-store/documents', methods=['GET'])
+def vector_store_documents():
+    """List the documents currently indexed in the knowledge base."""
+    try:
+        pipeline = get_pipeline()
+        vector_store = pipeline.vector_store
+        documents = vector_store.documents()
+        return jsonify({
+            'success': True,
+            'documents': documents,
+            'total_embeddings': vector_store.count(),
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/vector-store', methods=['DELETE'])
+def clear_vector_store():
+    """Remove every embedding from the knowledge base."""
+    try:
+        pipeline = get_pipeline()
+        vector_store = pipeline.vector_store
+        removed = vector_store.count()
+        vector_store.clear()
+        return jsonify({
+            'success': True,
+            'removed': removed,
+            'total_embeddings': vector_store.count(),
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/vector-store/<path:filename>', methods=['DELETE'])
+def remove_document_from_vector_store(filename):
+    """Remove every chunk belonging to one document from the knowledge base."""
+    try:
+        pipeline = get_pipeline()
+        vector_store = pipeline.vector_store
+        removed = vector_store.delete_by_metadata({'filename': filename})
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'removed': removed,
+            'total_embeddings': vector_store.count(),
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

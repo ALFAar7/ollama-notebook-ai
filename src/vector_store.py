@@ -12,7 +12,12 @@ from typing import List, Dict, Optional, Tuple, Callable
 
 VECTOR_STORE_DIR = os.environ.get('VECTOR_STORE_DIR') or os.environ.get('CHROMA_DB_DIR') or os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'vector_store')
 COLLECTION_NAME = os.environ.get('VECTOR_COLLECTION', 'translation_embeddings')
-SIMILARITY_THRESHOLD = float(os.environ.get('VECTOR_SIMILARITY_THRESHOLD', '0.3'))
+# Calibrated against this corpus with REAL user queries (see docs/SEARCH-TUNING.md).
+# For this single English book: on-topic queries score 0.64-0.82 against their
+# best chunk, off-topic queries score 0.42-0.58. The gap is [0.58, 0.64], so 0.60
+# returns results for every on-topic query and nothing for any off-topic one.
+# A threshold of 0.3 is far below the noise floor and filters nothing.
+SIMILARITY_THRESHOLD = float(os.environ.get('VECTOR_SIMILARITY_THRESHOLD', '0.60'))
 
 # Rows held in the in-memory similarity matrix. A 768-dim float32 vector costs
 # ~3 KB, so this cap is roughly 600 MB. Beyond it the matrix is not built and
@@ -250,6 +255,101 @@ class VectorStore:
         conn.commit()
         conn.close()
         self._invalidate_index()
+
+    def delete_by_metadata(self, metadata_filter: dict) -> int:
+        """
+        Delete every embedding whose metadata matches the given key/value pairs.
+
+        The metadata column holds JSON, so matching happens in SQL with a
+        json_extract() lookup rather than by loading the whole table.
+
+        Args:
+            metadata_filter: Exact-match pairs, e.g. {'filename': 'book.pdf'}.
+
+        Returns:
+            The number of rows removed.
+        """
+        if not metadata_filter:
+            return 0
+        conn = self._connect()
+        try:
+            where = ' AND '.join(
+                "json_extract(metadata, '$.' || ?) = ?" for _ in metadata_filter
+            )
+            params = []
+            for key, value in metadata_filter.items():
+                params.extend([key, value])
+            cursor = conn.execute(
+                f'DELETE FROM embeddings WHERE {where}', params
+            )
+            deleted = cursor.rowcount
+            conn.commit()
+        finally:
+            conn.close()
+        self._invalidate_index()
+        return deleted
+
+    def count(self, metadata_filter: dict = None) -> int:
+        """Number of stored embeddings, optionally filtered by metadata."""
+        conn = self._connect()
+        try:
+            if metadata_filter:
+                where = ' AND '.join(
+                    "json_extract(metadata, '$.' || ?) = ?" for _ in metadata_filter
+                )
+                params = []
+                for key, value in metadata_filter.items():
+                    params.extend([key, value])
+                row = conn.execute(
+                    f'SELECT COUNT(*) FROM embeddings WHERE {where}', params
+                ).fetchone()
+            else:
+                row = conn.execute('SELECT COUNT(*) FROM embeddings').fetchone()
+            return int(row[0]) if row else 0
+        finally:
+            conn.close()
+
+    def documents(self) -> List[dict]:
+        """
+        Summarise the knowledge base per source document.
+
+        Returns one entry per distinct filename with its chunk count, so the UI
+        can show what is indexed and let the user drop a single document.
+        """
+        conn = self._connect()
+        try:
+            rows = conn.execute(
+                'SELECT metadata FROM embeddings'
+            ).fetchall()
+        finally:
+            conn.close()
+
+        summary = {}
+        for row in rows:
+            try:
+                metadata = json.loads(row['metadata']) if row['metadata'] else {}
+            except (TypeError, ValueError):
+                metadata = {}
+            filename = metadata.get('filename') or ''
+            entry = summary.setdefault(filename, {
+                'filename': filename,
+                'chunks': 0,
+                'pages': set(),
+                'type': metadata.get('type', 'source'),
+            })
+            entry['chunks'] += 1
+            page = metadata.get('page_number')
+            if page:
+                entry['pages'].add(int(page))
+
+        documents = []
+        for entry in summary.values():
+            pages = entry.pop('pages')
+            entry['page_count'] = len(pages)
+            entry['max_page'] = max(pages) if pages else None
+            documents.append(entry)
+        documents.sort(key=lambda item: (-item['chunks'], item['filename']))
+        return documents
 
     def clear(self):
         conn = self._connect()

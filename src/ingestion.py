@@ -68,6 +68,10 @@ def ingest_text(filename, text, source_language='auto', target_language='English
     """
     Ingest extracted document text into the vector store.
     Returns count of stored chunks.
+
+    Re-ingesting a document replaces its previous chunks instead of appending
+    to them, so uploading the same file twice does not duplicate every chunk
+    in the knowledge base.
     """
     if not text or not text.strip():
         return 0
@@ -75,6 +79,12 @@ def ingest_text(filename, text, source_language='auto', target_language='English
     pipeline = get_pipeline()
     chunks = split_text_for_translation(text)
     stored_ids = []
+
+    # Drop the previous indexing of this document first - see the note above.
+    try:
+        pipeline.vector_store.delete_by_metadata({'filename': filename})
+    except Exception:
+        pass
 
     for index, chunk in enumerate(chunks):
         if not chunk.strip():
