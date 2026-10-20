@@ -1,0 +1,483 @@
+/* ==========================================================================
+   workspace.css — shared surfaces for the Search, Notes and History modes.
+
+   Ownership map (no selector is defined in two files):
+     workspace.css  → search surfaces + the canonical result / note / history
+                      card structures shared by the three modes.
+     notes.css      → notes-only layout shell and responsive behaviour.
+     history.css    → history-only layout shell, legacy script class names
+                      and the list/stats responsive behaviour.
+
+   Colours come exclusively from tokens.css. Flat surfaces only: no image
+   fills on text or buttons, no blur filters.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Search mode — layout shell
+   -------------------------------------------------------------------------- */
+
+.search-mode {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    flex: 1;
+    min-height: 0;
+}
+
+.search-card,
+.qa-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-top: var(--space-5);
+}
+
+.search-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.search-row .input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.qa-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0 var(--space-6);
+}
+
+.qa-row .input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.scope-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.scope-row .label {
+    margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Search mode — result list
+   -------------------------------------------------------------------------- */
+
+.result-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: 0 var(--space-6) var(--space-6);
+    min-height: 0;
+}
+
+.result-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    box-shadow: var(--shadow-card);
+}
+
+.result-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    font-size: var(--font-size-12);
+    color: var(--ink-500);
+}
+
+.result-card__citation {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 600;
+    color: var(--ink-700);
+}
+
+.result-card__body {
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-prose);
+    color: var(--ink-950);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.result-card__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+/* Similarity meter — the .meter / .meter__fill primitives (including the
+   --high / --mid / --low fills) are owned by components.css. This only sizes
+   the track inside a result card. */
+.similarity-meter {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--font-size-12);
+    color: var(--ink-500);
+}
+
+.similarity-meter .meter {
+    flex: none;
+    width: calc(var(--space-8) * 2);
+}
+
+/* --------------------------------------------------------------------------
+   Search mode — Q&A citations
+   -------------------------------------------------------------------------- */
+
+.source-citation-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: 0 var(--space-6) var(--space-6);
+}
+
+.source-citation-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-control);
+    font-size: var(--font-size-12);
+    color: var(--ink-700);
+}
+
+.source-citation {
+    font-weight: 600;
+    color: var(--ink-950);
+}
+
+.source-citation__relevance {
+    font-size: var(--font-size-12);
+    color: var(--ink-500);
+}
+
+/* --------------------------------------------------------------------------
+   Notes mode — card structure
+   -------------------------------------------------------------------------- */
+
+.note-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.note-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    box-shadow: var(--shadow-card);
+}
+
+.note-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.note-card__title {
+    flex: 1 1 240px;
+    min-width: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: var(--tracking-display);
+}
+
+.note-card__body {
+    min-height: 120px;
+    resize: vertical;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-prose);
+}
+
+.note-card__source {
+    flex: 0 0 auto;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-card__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.summary-body {
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-prose);
+    color: var(--ink-950);
+}
+
+.summary-body .empty-state {
+    padding: var(--space-6) 0;
+}
+
+.summary-text {
+    margin: var(--space-3) 0 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.summary-source {
+    margin: var(--space-3) 0 0;
+    font-size: var(--font-size-12);
+    color: var(--ink-500);
+}
+
+.note-card__saved {
+    flex: 0 0 auto;
+}
+
+.note-card.is-saved {
+    border-color: var(--success);
+}
+
+/* RTL notes use the Arabic stack and start-aligned text. */
+.note-card.is-rtl {
+    text-align: start;
+    font-family: var(--font-arabic);
+}
+
+.note-card.is-rtl .note-card__body,
+.note-card.is-rtl .note-card__title {
+    font-family: var(--font-arabic);
+    text-align: start;
+    direction: rtl;
+}
+
+/* --------------------------------------------------------------------------
+   History mode — canonical card structure
+   -------------------------------------------------------------------------- */
+
+.history-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+}
+
+.history-view {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: 0 var(--space-6) var(--space-6);
+    min-height: 0;
+}
+
+.history-view[hidden] {
+    display: none;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.history-entry {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    box-shadow: var(--shadow-card);
+    transition: border-color var(--motion-fast);
+}
+
+.history-entry:hover {
+    border-color: var(--line-strong);
+}
+
+.history-entry__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.history-entry__mode {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-12);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-700);
+}
+
+.history-entry__timestamp {
+    margin-inline-start: auto;
+    font-size: var(--font-size-12);
+    color: var(--ink-500);
+}
+
+.history-entry__langs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.history-entry__preview {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    font-size: var(--font-size-13);
+    line-height: var(--line-height-body);
+    color: var(--ink-700);
+}
+
+.history-entry__preview p {
+    margin: 0;
+}
+
+.history-entry__preview-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.history-entry__preview-label {
+    font-size: var(--font-size-11);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-500);
+}
+
+.history-entry__preview-text {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.history-entry__file {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-entry__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.lang-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--space-3);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    font-size: var(--font-size-12);
+    color: var(--ink-700);
+}
+
+/* --------------------------------------------------------------------------
+   History mode — statistics
+   -------------------------------------------------------------------------- */
+
+.history-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    box-shadow: var(--shadow-card);
+}
+
+.stat-card h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--font-size-26);
+    letter-spacing: var(--tracking-display);
+    color: var(--ink-950);
+}
+
+.stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--font-size-13);
+    color: var(--ink-700);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-row strong {
+    color: var(--ink-950);
+}
+
+/* --------------------------------------------------------------------------
+   RTL — content regions flip, the chrome stays LTR
+   -------------------------------------------------------------------------- */
+
+#qaAnswer[dir="rtl"],
+#searchResults[dir="rtl"] {
+    text-align: start;
+    font-family: var(--font-arabic);
+}
+
+.result-card__body.rtl {
+    text-align: start;
+    font-family: var(--font-arabic);
+}

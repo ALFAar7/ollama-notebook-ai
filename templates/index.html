@@ -1,16 +1,60 @@
 {% extends "base.html" %}
 {% block content %}
 <main id="main" class="app-shell" tabindex="-1">
-    {% include "partials/_header.html" %}
-    <div class="workspace-layout">
-        <div class="workspace-content">
+    {% include "partials/_rail.html" %}
+
+    <div class="app-main">
+        {% include "partials/_topbar.html" %}
+
+        <div class="canvas">
+            <!-- Translation settings bar (Text + Document modes) -->
+            <div class="settings-bar" id="settingsBar">
+                <div class="settings-bar__group">
+                    <label class="label" for="sourceLanguage">From</label>
+                    <select id="sourceLanguage" class="select" aria-label="Source language">
+                        <option value="auto">Auto detect</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="English" selected>English</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Kurdish">Kurdish</option>
+                        <option value="Persian">Persian</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Chinese">Chinese</option>
+                    </select>
+                </div>
+
+                <button type="button" id="swapLanguagesBtn" class="icon-btn"
+                        aria-label="Swap source and target languages" title="Swap languages">
+                    <svg class="icon" aria-hidden="true"><use href="#i-arrow-swap"></use></svg>
+                </button>
+
+                <div class="settings-bar__group">
+                    <label class="label" for="targetLanguage">To</label>
+                    <select id="targetLanguage" class="select" aria-label="Target language">
+                        <option value="English">English</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="Kurdish">Kurdish</option>
+                        <option value="Persian" selected>Persian</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
+                    </select>
+                    <span class="badge badge--brand" id="rtlIndicator" hidden>RTL</span>
+                </div>
+            </div>
+
+            <!-- Mode panels -->
             {% include "partials/_text_mode.html" %}
             {% include "partials/_attachment_mode.html" %}
-            {% include "partials/_notes.html" %}
             {% include "partials/_rag_mode.html" %}
+            {% include "partials/_notes.html" %}
+            {% include "partials/_history_mode.html" %}
         </div>
-        {% include "partials/_sidebar.html" %}
     </div>
+
+    {% include "partials/_sources.html" %}
 </main>
-<div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
 {% endblock %}

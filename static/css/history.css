@@ -1,293 +1,111 @@
-/* History Panel */
-.history-panel {
+/* ==========================================================================
+   history.css — History mode only.
+
+   The canonical card structure (.history-panel, .history-view, .history-list,
+   .history-entry, .history-stats, .stat-grid, .stat-card, .stat-row) lives in
+   workspace.css. This file owns the history-specific layout shell, the class
+   names the history script renders, and the responsive / RTL behaviour.
+
+   Every colour and metric comes from tokens.css. The seven undeclared
+   variables the previous revision relied on have been removed; only the
+   documented token names appear below.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Layout shell
+   -------------------------------------------------------------------------- */
+
+.history-layout {
     display: flex;
     flex-direction: column;
-    height: 100%;
-}
-
-.history-panel .panel-header {
-    padding: var(--space-lg);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.history-panel .header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-md);
-}
-
-.history-panel .panel-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.history-actions {
-    display: flex;
-    gap: var(--space-sm);
-}
-
-.history-search {
-    margin-top: var(--space-md);
-}
-
-.search-input {
-    width: 100%;
-    padding: var(--space-sm) var(--space-md);
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    transition: border-color 0.2s ease;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--accent-primary);
-}
-
-.search-input::placeholder {
-    color: var(--text-muted);
-}
-
-/* History Views */
-.history-view {
     flex: 1;
-    overflow-y: auto;
-    padding: var(--space-md);
+    min-height: 0;
 }
 
-/* History List */
-.history-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-.history-entry {
-    background: var(--surface-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: var(--space-md);
-    transition: all 0.2s ease;
-}
-
-.history-entry:hover {
-    border-color: var(--accent-primary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.history-entry-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: var(--space-sm);
-}
-
-.history-entry-meta {
-    flex: 1;
-}
-
-.history-entry-languages {
+.history-toolbar {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
-}
-
-.history-entry-timestamp {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-.history-entry-actions {
-    display: flex;
-    gap: var(--space-xs);
-}
-
-.history-entry-actions .icon-btn {
-    min-width: auto;
-    width: 32px;
-    height: 32px;
-    font-size: 0.85rem;
-}
-
-.history-entry-actions .ghost-btn.small {
-    min-height: 32px;
-}
-
-.history-entry-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-md);
-    margin-top: var(--space-sm);
-}
-
-.history-text-block {
-    background: var(--surface-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: var(--space-sm);
-}
-
-.history-text-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-}
-
-.history-text-content {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-.history-entry-badges {
-    display: flex;
-    gap: var(--space-xs);
-    margin-top: var(--space-sm);
+    gap: var(--space-3);
     flex-wrap: wrap;
 }
 
-.history-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    background: var(--surface-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
+.history-search {
+    padding-top: var(--space-5);
 }
 
-.history-badge-icon {
-    font-size: 0.85rem;
+.history-search .input {
+    width: 100%;
 }
 
-/* History Stats */
-.history-stats {
+/* --------------------------------------------------------------------------
+   Statistics — class names emitted by the history script
+   -------------------------------------------------------------------------- */
+
+.stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--space-lg);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
 }
 
-.stat-card {
-    background: var(--surface-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: var(--space-lg);
-    transition: all 0.2s ease;
+.stat-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
 }
 
-.stat-card:hover {
-    border-color: var(--accent-primary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.stat-section h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--font-size-16);
+    letter-spacing: var(--tracking-display);
+    color: var(--ink-950);
 }
 
-.stat-card-header {
+.stat-badges {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-md);
+    gap: var(--space-3);
+    flex-wrap: wrap;
 }
 
-.stat-icon {
-    font-size: 1.5rem;
-}
-
-.stat-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--space-sm);
+.stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    font-size: var(--font-size-12);
+    color: var(--ink-700);
 }
 
 .stat-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
 }
 
-.stat-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-xs) 0;
-    font-size: 0.9rem;
-}
-
-.stat-item-label {
-    color: var(--text-secondary);
-}
-
-.stat-item-value {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-/* Danger Button */
-.danger-btn {
-    color: var(--error) !important;
-}
-
-.danger-btn:hover {
-    background: rgba(239, 68, 68, 0.1) !important;
-    border-color: var(--error) !important;
-}
-
-/* RTL Support for History */
-[dir="rtl"] .history-entry-content {
+/* --------------------------------------------------------------------------
+   RTL — only the content regions flip {
     direction: rtl;
+    text-align: start;
+    font-family: var(--font-arabic);
 }
 
-[dir="rtl"] .history-text-content {
-    text-align: right;
+[dir="rtl"] .history-entry {
+    text-align: start;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .history-entry-content {
-        grid-template-columns: 1fr;
-    }
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
 
-    .history-stats {
-        grid-template-columns: 1fr;
-    }
+@media (max-width: 900px) {
+}
 
-    .history-panel .header-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-sm);
-    }
-
-    .history-actions {
+@media (max-width: 720px) {
+    .history-toolbar {
         width: 100%;
+        justify-content: space-between;
     }
-
-    .history-actions button {
-        flex: 1;
-    }
-}
-
-/* Empty State in History Context */
-.history-view .empty-state {
-    margin-top: var(--space-xl);
 }

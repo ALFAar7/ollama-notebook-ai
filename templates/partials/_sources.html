@@ -1,0 +1,76 @@
+<!-- Sources drawer — upload, current source, file library, endpoint -->
+<aside id="sourcesDrawer" class="sources-drawer" aria-label="Sources">
+    <div class="sources-drawer__header">
+        <div>
+            <p class="eyebrow">Workspace</p>
+            <h2 class="panel__title">Sources</h2>
+        </div>
+        <button type="button" id="sourcesClose" class="icon-btn" aria-label="Close sources panel">
+            <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
+    </div>
+
+    <div class="sources-drawer__body">
+        <!-- Upload drop zone -->
+        <label id="uploadCard" class="upload-card" for="fileInput">
+            <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>
+            <span class="upload-card__title">Drop a PDF, DOCX or TXT</span>
+            <span class="upload-card__hint">or click to browse</span>
+        </label>
+        <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
+
+        <!-- Current source -->
+        <section class="source-card" aria-labelledby="sourceCardTitle">
+            <h3 class="source-card__title" id="sourceCardTitle">Current source</h3>
+            <dl class="source-card__meta">
+                <dt>File</dt>
+                <dd id="sourceFileName">No file</dd>
+                <dt>Type</dt>
+                <dd id="sourceFileType">—</dd>
+                <dt>Pages</dt>
+                <dd id="sourcePageCount">—</dd>
+                <dt>Chunks</dt>
+                <dd id="sourceChunks">—</dd>
+            </dl>
+            <span class="badge badge--neutral source-card__status" id="sourceCardStatus">No source loaded</span>
+        </section>
+
+        <!-- File library -->
+        <section class="file-library" id="fileLibrary" aria-labelledby="fileLibraryTitle">
+            <div class="file-library__header">
+                <h3 class="file-library__title" id="fileLibraryTitle">File library</h3>
+                <button type="button" id="fileLibraryRefresh" class="icon-btn"
+                        aria-label="Refresh file library" title="Refresh file library">
+                    <svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>
+                </button>
+            </div>
+            <ul class="file-library__list" id="fileLibraryList"></ul>
+        </section>
+
+        <!-- Knowledge base (vector store) -->
+        <section class="knowledge-base" id="knowledgeBase" aria-labelledby="knowledgeBaseTitle">
+            <div class="knowledge-base__header">
+                <h3 class="knowledge-base__title" id="knowledgeBaseTitle">Knowledge base</h3>
+                <span class="badge badge--neutral" id="knowledgeChunkCount">—</span>
+            </div>
+            <p class="knowledge-base__text" id="knowledgeBaseText">
+                Indexed chunks used by Search and Ask. Removing them does not delete the uploaded file.
+            </p>
+            <ul class="knowledge-base__list" id="knowledgeBaseList"></ul>
+            <button type="button" id="clearKnowledgeBaseBtn" class="btn btn--ghost btn--sm btn--danger">
+                <svg class="icon btn__icon" aria-hidden="true"><use href="#i-trash"></use></svg>
+                <span class="btn__label">Clear knowledge base</span>
+            </button>
+        </section>
+
+        <!-- Ollama endpoint -->
+        <section class="source-card" aria-labelledby="ollamaCardTitle">
+            <h3 class="source-card__title" id="ollamaCardTitle">Ollama</h3>
+            <p class="source-card__text">Local Ollama</p>
+            <button type="button" id="ollamaRetryBtn" class="btn btn--secondary btn--sm">
+                <span class="btn__label">Retry</span>
+            </button>
+        </section>
+    </div>
+</aside>
+<div id="sourcesOverlay" class="drawer-overlay" hidden></div>

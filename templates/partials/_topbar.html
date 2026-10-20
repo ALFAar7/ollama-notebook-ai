@@ -1,0 +1,48 @@
+<!-- Slim top bar — brand, context, model, status, theme, sources -->
+<header class="topbar" id="topbar" role="banner">
+    <div class="topbar__left">
+        <button type="button" id="railToggle" class="icon-btn topbar__rail-toggle"
+                aria-label="Open navigation" aria-controls="rail" aria-expanded="false">
+            <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
+        </button>
+        <a class="brand" href="#main">
+            <span class="brand__mark" aria-hidden="true">
+                <svg class="icon"><use href="#i-sparkle"></use></svg>
+            </span>
+            <span class="brand__word">Ollama Notebook</span>
+        </a>
+    </div>
+
+    <div class="topbar__context">
+        <span class="context-label" id="contextLabel">New translation</span>
+    </div>
+
+    <div class="topbar__right">
+        <div class="topbar__popover">
+            <button type="button" id="knowledgeToggle" class="icon-btn"
+                    aria-label="Knowledge base" aria-controls="knowledgePopover" aria-expanded="false">
+                <svg class="icon" aria-hidden="true"><use href="#i-sparkle"></use></svg>
+            </button>
+            <div id="knowledgePopover" class="dropdown knowledge-popover" hidden>
+                <div id="knowledgeStats" class="knowledge-popover__body"></div>
+            </div>
+        </div>
+
+        <span class="model-badge" id="modelBadge">—</span>
+
+        <span class="ollama-status" id="ollamaStatus" aria-live="polite">
+            <span class="status-dot" id="ollamaDot" aria-hidden="true"></span>
+            <span class="status-label" id="ollamaLabel">Checking Ollama…</span>
+        </span>
+
+        <button type="button" id="themeToggle" class="icon-btn"
+                aria-label="Toggle dark theme" aria-pressed="false">
+            <svg class="icon" aria-hidden="true"><use href="#i-moon"></use></svg>
+        </button>
+
+        <button type="button" id="sourcesToggle" class="icon-btn"
+                aria-label="Toggle sources panel" aria-controls="sourcesDrawer" aria-expanded="false">
+            <svg class="icon" aria-hidden="true"><use href="#i-panel"></use></svg>
+        </button>
+    </div>
+</header>

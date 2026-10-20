@@ -1,87 +1,193 @@
-/* ============================================
-   BASE STYLES — Glassmorphism Foundation
-   ============================================ */
+/* base.css — reset, page shell, typography, utilities.
+   Every colour, space, radius and shadow value comes from tokens.css. */
 
-*, *::before, *::after {
+/* ------------------------------------------------------------------ reset */
+
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
-/* ── Skip to content ── */
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    padding: 8px 16px;
-    background: var(--glass-strong);
-    color: var(--text);
-    z-index: 10000;
-    text-decoration: none;
-    border-radius: 0 0 var(--radius-sm) 0;
-    transition: top var(--transition-smooth);
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    height: 100%;
 }
 
-.skip-link:focus {
-    top: 0;
-}
-
-/* ── Body ── */
-body {
+body,
+h1, h2, h3, h4, h5, h6,
+p, figure, blockquote, dl, dd,
+ul, ol, pre,
+form, fieldset, legend,
+table, tr, th, td,
+article, aside, footer, header,
+main, nav, section, details,
+hr {
     margin: 0;
-    min-height: 100vh;
+    padding: 0;
+}
+
+body {
+    min-height: 100%;
+}
+
+ul[class],
+ol[class] {
+    list-style: none;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+svg {
+    fill: none;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    background: none;
+    border: 0;
+}
+
+textarea {
+    resize: vertical;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* -------------------------------------------------------------- page shell */
+
+html {
+    background-color: var(--canvas);
+    color-scheme: light;
+}
+
+/* Opt-in dark theme: native widgets (select arrow, scrollbars) follow it. */
+html[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+body {
     font-family: var(--font-sans);
-    color: var(--text);
-    background: var(--bg-deep);
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-950);
+    background-color: var(--canvas);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
 }
 
-/* Subtle background pattern */
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(124, 106, 239, 0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(34, 211, 238, 0.04) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
+/* -------------------------------------------------------------- typography */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: var(--ink-950);
 }
 
-/* ── Form elements ── */
-button,
-input,
-select,
-textarea {
-    font: inherit;
-    margin: 0;
+h1 { font-size: 26px; }
+h2 { font-size: 20px; }
+h3 { font-size: 16px; }
+h4 { font-size: 14px; }
+
+p {
+    line-height: 1.7;
 }
 
-/* ── Placeholders ── */
-.text-input-area::placeholder,
-.note-textarea::placeholder {
-    color: var(--text-muted);
-    opacity: 0.7;
+code,
+pre,
+kbd,
+samp {
+    font-family: var(--font-mono);
 }
 
-/* ── Focus management ── */
-.text-input-area:focus,
-.note-textarea:focus {
+a {
+    color: var(--brand);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+small {
+    font-size: 12px;
+}
+
+strong {
+    font-weight: 600;
+}
+
+/* small muted uppercase label */
+.eyebrow {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+}
+
+/* ------------------------------------------------------------- focus ring */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[role="radio"]:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: var(--r-control);
+}
+
+:focus:not(:focus-visible) {
     outline: none;
 }
 
-.text-input-area:focus-visible,
-.note-textarea:focus-visible {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
+/* ------------------------------------------------------------- scrollbars */
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
 }
 
-/* ── Scrollbar styling ── */
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -89,21 +195,21 @@ textarea {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
+    background-color: var(--line);
+    border: 2px solid var(--canvas);
+    border-radius: var(--r-control);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.18);
+    background-color: var(--ink-500);
 }
 
-/* ── Selection ── */
-::selection {
-    background: rgba(124, 106, 239, 0.3);
-    color: var(--text);
+/* --------------------------------------------------------------- utilities */
+
+.hidden {
+    display: none !important;
 }
 
-/* ── Screen reader only ── */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -116,74 +222,57 @@ textarea {
     border: 0;
 }
 
-/* ── Utility classes ── */
-.hidden {
-    display: none !important;
+.skip-link {
+    position: absolute;
+    top: calc(-1 * var(--space-8) - var(--space-4));
+    left: var(--space-4);
+    z-index: var(--z-overlay);
+    padding: var(--space-3) var(--space-5);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--canvas);
+    background-color: var(--ink-950);
+    border-radius: var(--r-control);
+    box-shadow: var(--shadow-overlay);
+    text-decoration: none;
+    transition: top var(--motion-fast);
 }
 
-.text-gradient {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.skip-link:focus,
+.skip-link:focus-visible {
+    top: var(--space-4);
+    text-decoration: none;
 }
 
-/* ── Keyframe animations ── */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+/* -------------------------------------------------------------- rtl helper */
+
+.rtl {
+    direction: rtl;
+    text-align: start;
+    font-family: var(--font-arabic);
 }
 
-@keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-12px); }
-    to { opacity: 1; transform: translateY(0); }
+.rtl .icon,
+.rtl .btn__icon {
+    direction: ltr;
 }
 
-@keyframes slideInLeft {
-    from { opacity: 0; transform: translateX(-20px); }
-    to { opacity: 1; transform: translateX(0); }
-}
+/* --------------------------------------------------------- reduced motion */
 
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(124, 106, 239, 0.15); }
-    50% { box-shadow: 0 0 30px rgba(124, 106, 239, 0.3); }
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
-}
-
-/* ── Prefers reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

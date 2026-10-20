@@ -1,65 +1,64 @@
-<!-- Tab panel: Search workspace -->
-<section id="panelSearch" class="tab-panel" role="tabpanel" aria-labelledby="tabSearch">
-    <div class="search-workspace">
-        <div class="search-panel">
-            <div class="panel-header">
+<!-- Tab panel: Search workspace (stacked search + Q&A, segmented scope) -->
+<section id="panelSearch" class="tab-panel" role="tabpanel" aria-labelledby="tabSearch" tabindex="0">
+    <div class="search-mode">
+
+        <!-- Knowledge search -->
+        <div class="panel search-card">
+            <div class="panel__header">
                 <div>
                     <p class="eyebrow">Search</p>
-                    <h2>Knowledge Search</h2>
+                    <h2 class="panel__title">Knowledge Search</h2>
                 </div>
             </div>
-            <div class="search-search-bar">
-                <input type="search" id="searchInput" class="search-input" placeholder="Search your documents..." aria-label="Search documents" autocomplete="off">
-                <label class="search-scope" for="searchAllDocs">
-                    <input type="checkbox" id="searchAllDocs">
-                    <span id="searchScopeLabel">All documents</span>
-                </label>
-                <button id="searchBtn" class="primary-btn small">Search</button>
+            <div class="panel__body search-controls">
+                <div class="search-row">
+                    <input type="search" id="searchInput" class="input" placeholder="Search your documents…" aria-label="Search documents" autocomplete="off">
+                    <button type="button" id="searchBtn" class="btn btn--primary btn--md">
+                        <svg class="btn__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+                        <span class="btn__label">Search</span>
+                    </button>
+                </div>
+                <div class="scope-row">
+                    <span class="label">Scope</span>
+                    <div class="segmented" role="group" aria-label="Search scope">
+                        <button type="button" id="searchScopeThis" class="segmented__item is-active" aria-pressed="true">This document</button>
+                        <button type="button" id="searchScopeAll" class="segmented__item" aria-pressed="false">All documents</button>
+                    </div>
+                </div>
             </div>
-            <div id="searchResults" class="search-results" aria-live="polite">
-                <div class="empty-state centered">
-                    <div class="empty-icon" aria-hidden="true">&#128269;</div>
-                    <strong>Search your knowledge base</strong>
-                    <span>Enter a query to find and translate relevant content from uploaded documents.</span>
+            <div id="searchResults" class="result-list" aria-live="polite">
+                <div class="empty-state">
+                    <svg class="icon empty-state__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+                    <p class="empty-state__title">Search your knowledge base</p>
+                    <p class="empty-state__text">Enter a query to find relevant content from your uploaded documents.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Q&A section -->
-        <div class="qa-section">
-            <div class="panel-header">
+        <!-- Question answering -->
+        <div class="panel qa-card">
+            <div class="panel__header">
                 <div>
                     <p class="eyebrow">Question</p>
-                    <h2>Ask About Your Documents</h2>
+                    <h2 class="panel__title">Ask about your documents</h2>
                 </div>
             </div>
-            <div class="search-search-bar">
-                <input type="search" id="qaInput" class="search-input" placeholder="Ask a question about your uploaded documents..." aria-label="Ask a question" autocomplete="off">
-                <button id="qaBtn" class="primary-btn small">Ask</button>
+            <div class="qa-row">
+                <input type="search" id="qaInput" class="input" placeholder="Ask a question about your uploaded documents…" aria-label="Ask a question" autocomplete="off">
+                <button type="button" id="qaBtn" class="btn btn--primary btn--md">
+                    <svg class="btn__icon" aria-hidden="true"><use href="#i-sparkle"></use></svg>
+                    <span class="btn__label">Ask</span>
+                </button>
             </div>
-            <div id="qaAnswer" class="qa-answer" aria-live="polite">
-                <div class="empty-state centered">
-                    <div class="empty-icon" aria-hidden="true">&#129528;</div>
-                    <strong>Ask a question</strong>
-                    <span>Enter a question about your uploaded documents to get an AI-generated answer with citations.</span>
+            <div id="qaAnswer" class="panel__body" aria-live="polite">
+                <div class="empty-state">
+                    <svg class="icon empty-state__icon" aria-hidden="true"><use href="#i-sparkle"></use></svg>
+                    <p class="empty-state__title">No answer yet</p>
+                    <p class="empty-state__text">Ask a question and the answer will cite the passages it used.</p>
                 </div>
             </div>
-            <div id="qaSources" class="qa-sources" aria-live="polite"></div>
+            <div id="qaSources" class="source-citation-list" aria-live="polite"></div>
         </div>
 
-        <div class="search-side-panel">
-            <div class="panel-header">
-                <div>
-                    <p class="eyebrow">Vector Store</p>
-                    <h2>Knowledge Base</h2>
-                </div>
-                <button id="searchRefreshBtn" class="ghost-btn small" title="Refresh vector store stats">Refresh</button>
-            </div>
-            <div id="searchStats" class="search-stats" aria-live="polite">
-                <div class="empty-state centered">
-                    <strong>Loading vector store...</strong>
-                </div>
-            </div>
-        </div>
     </div>
 </section>

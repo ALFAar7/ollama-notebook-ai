@@ -1,3 +1,11 @@
+/**
+ * Ollama Notebook — application glue.
+ *
+ * Owns: the element cache, top-level event wiring, and the boot sequence.
+ * Feature logic lives in the per-feature modules (navigation, ui, translation,
+ * notes, history, upload, search).
+ */
+
 const App = {
     pdfText: '',
     pages: [],
@@ -13,462 +21,354 @@ const App = {
     els: {}
 };
 
+/**
+ * Every id the UI may reference. Missing elements are tolerated: the cache
+ * stores null and every consumer guards its lookup.
+ */
+const ELEMENT_IDS = [
+    // Translation settings bar (lives in index.html, above the mode panels)
+    'settingsBar', 'rtlIndicator', 'sourceLanguage', 'targetLanguage', 'swapLanguagesBtn',
+
+    // Global chrome
+    'rail', 'railToggle', 'topbar', 'themeToggle', 'modelBadge', 'ollamaStatus',
+    'ollamaDot', 'ollamaLabel', 'sourcesToggle', 'sourcesDrawer', 'sourcesClose',
+    'sourcesOverlay', 'knowledgeToggle', 'knowledgePopover', 'knowledgeStats',
+    'toastContainer', 'contextLabel',
+
+    // Modes
+    'tabText', 'tabDocument', 'tabNotes', 'tabSearch', 'tabHistory',
+    'panelText', 'panelDocument', 'panelNotes', 'panelSearch', 'panelHistory',
+
+    // Text mode
+    'textInput', 'charCount', 'wordCount', 'clearTextBtn', 'copySourceBtn',
+    'translateTextBtn', 'translationAreaText', 'copyTranslationBtnText',
+    'downloadTranslationBtnText', 'retryTranslationBtnText', 'textModeLoading',
+
+    // Document mode
+    'sourceTitleFile', 'sourceStatus', 'copyOriginalBtn', 'prevPageBtn',
+    'pageNumber', 'nextPageBtn', 'zoomOutBtn', 'zoomValue', 'zoomInBtn',
+    'fitWidthBtn', 'translatePageBtn', 'translateAllBtn', 'addToNotesBtn',
+    'attachmentPreview', 'attachmentLoading', 'translateAllProgress',
+
+    // Search mode
+    'searchInput', 'searchBtn', 'searchScopeThis', 'searchScopeAll',
+    'searchResults', 'qaInput', 'qaBtn', 'qaAnswer', 'qaSources',
+
+    // Notes mode
+    'notesList', 'notesSummary', 'summarizeBtn', 'notesEmptyState',
+
+    // History mode
+    'historyPanel', 'historySearchInput', 'historyListView', 'historyStatsView',
+    'historyList', 'historyStats', 'historyViewList', 'historyViewStats',
+    'clearHistoryBtn',
+
+    // Sources
+    'fileInput', 'uploadCard', 'sourceFileName', 'sourcePageCount',
+    'sourceFileType', 'sourceChunks', 'sourceCardStatus', 'fileLibrary',
+    'fileLibraryList', 'fileLibraryRefresh',
+
+    // Knowledge base (vector store)
+    'knowledgeBase', 'knowledgeBaseList', 'knowledgeBaseText',
+    'knowledgeChunkCount', 'clearKnowledgeBaseBtn'
+];
+
 function cacheElements() {
-    const ids = [
-        'fileInput', 'translationArea', 'translationAreaText', 'translatePageBtn',
-        'translateAllBtn', 'statusMessage', 'sourceLanguage', 'targetLanguage',
-        'copyOriginalBtn', 'copyTranslationBtnAttachment', 'copyTranslationBtnText',
-        'copySourceBtn', 'clearTextBtn', 'clearNotesBtn', 'saveNotesBtn', 'modelBadge',
-        'pageNumber', 'prevPageBtn', 'nextPageBtn', 'textInput', 'notesArea',
-        'translateTextBtn', 'filePreviewSidebar', 'attachmentPreview',
-        'sourceFileName', 'sourcePageCount', 'ollamaStatus', 'ollamaDot', 'ollamaLabel',
-        'toastContainer', 'sidebar', 'sidebarOverlay',
-        'searchInput', 'searchBtn', 'searchResults', 'searchStats', 'searchRefreshBtn',
-        'qaInput', 'qaBtn', 'qaAnswer', 'qaSources', 'searchAllDocs', 'searchScopeLabel'
-    ];
-    ids.forEach(id => {
+    ELEMENT_IDS.forEach((id) => {
         App.els[id] = document.getElementById(id);
     });
 
-    App.els.tabText = document.querySelector('[data-tab="text"]');
-    App.els.tabDocument = document.querySelector('[data-tab="document"]');
-    App.els.tabNotes = document.querySelector('[data-tab="notes"]');
-    App.els.tabRag = document.querySelector('[data-tab="search"]');
-
-    App.els.panelText = document.getElementById('panelText');
-    App.els.panelDocument = document.getElementById('panelDocument');
-    App.els.panelNotes = document.getElementById('panelNotes');
-    App.els.panelRag = document.getElementById('panelSearch');
+    // Legacy ids kept only so the old paths degrade gracefully instead of throwing.
+    App.els.attachmentPreview = App.els.attachmentPreview
+        || document.getElementById('attachmentPreview');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    cacheElements();
-    updateSearchScopeState();
-    initPreviewResize();
+/** Call a global function if it exists, without throwing if the module failed to load. */
+function callIfAvailable(name, ...args) {
+    if (typeof window[name] === 'function') {
+        return window[name](...args);
+    }
+    return undefined;
+}
 
-    if (App.els.searchAllDocs) {
-        App.els.searchAllDocs.addEventListener('change', updateSearchScopeState);
+function wireSourceText() {
+    const input = App.els.textInput;
+    if (!input) {
+        return;
     }
 
-    if (App.els.attachmentPreview) {
-        App.els.attachmentPreview.addEventListener('click', handlePdfToolbarClick);
-    }
-
-    if (App.els.sourceLanguage) {
-        App.els.sourceLanguage.addEventListener('change', updateRTLState);
-    }
-    if (App.els.targetLanguage) {
-        App.els.targetLanguage.addEventListener('change', updateRTLState);
-    }
-
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-    if (sidebarToggle && App.els.sidebar) {
-        sidebarToggle.addEventListener('click', () => {
-            const isOpen = App.els.sidebar.classList.toggle('open');
-            sidebarToggle.setAttribute('aria-expanded', isOpen);
-            if (isOpen && closeSidebarBtn) {
-                setTimeout(() => closeSidebarBtn.focus(), 50);
-            }
-        });
-    }
-
-    if (closeSidebarBtn && App.els.sidebar) {
-        closeSidebarBtn.addEventListener('click', () => {
-            App.els.sidebar.classList.remove('open');
-            if (sidebarToggle) {
-                sidebarToggle.setAttribute('aria-expanded', 'false');
-                sidebarToggle.focus();
-            }
-        });
-    }
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && App.els.sidebar && App.els.sidebar.classList.contains('open')) {
-            App.els.sidebar.classList.remove('open');
-            if (sidebarToggle) {
-                sidebarToggle.setAttribute('aria-expanded', 'false');
-                sidebarToggle.focus();
-            }
+    input.addEventListener('input', () => {
+        const output = App.els.translationAreaText;
+        if (output && !App.translatedText) {
+            output.innerHTML = `
+                <div class="empty-state">
+                    <svg class="icon empty-state__icon" aria-hidden="true"><use href="#i-text"></use></svg>
+                    <p class="empty-state__title">Ready to translate</p>
+                    <p class="empty-state__text">Your translation will appear here.</p>
+                </div>
+            `;
         }
+        callIfAvailable('updateCharCount');
+        callIfAvailable('setOutputActionsEnabled', false);
     });
+}
 
-    const langDetails = document.querySelector('.lang-details');
-    if (langDetails) {
-        const updateLangDetails = () => {
-            if (window.innerWidth >= 1080) {
-                langDetails.setAttribute('open', '');
-            } else {
-                langDetails.removeAttribute('open');
+function wireTextActions() {
+    if (App.els.clearTextBtn) {
+        App.els.clearTextBtn.addEventListener('click', () => {
+            if (App.els.textInput) {
+                App.els.textInput.value = '';
             }
-        };
-        updateLangDetails();
-        window.addEventListener('resize', updateLangDetails);
-    }
-
-    if (App.els.statusMessage) {
-        App.els.statusMessage.setAttribute('aria-live', 'polite');
-    }
-
-    if (App.els.textInput) {
-        App.els.textInput.addEventListener('input', () => {
-            if (App.els.textInput.value.trim()) {
-                App.els.translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Paste text into the notebook</strong><span>Click Translate to turn this into a polished translation.</span></div>';
+            App.translatedText = '';
+            if (App.els.translationAreaText) {
+                App.els.translationAreaText.innerHTML = `
+                    <div class="empty-state">
+                        <svg class="icon empty-state__icon" aria-hidden="true"><use href="#i-sparkle"></use></svg>
+                        <p class="empty-state__title">Your translation will appear here</p>
+                        <p class="empty-state__text">Paste text and click Translate to begin.</p>
+                    </div>
+                `;
             }
-            updateCharCount();
-        });
-    }
-
-    if (App.els.tabText) {
-        App.els.tabText.addEventListener('click', () => switchWorkspaceTab('text'));
-    }
-    if (App.els.tabDocument) {
-        App.els.tabDocument.addEventListener('click', () => switchWorkspaceTab('document'));
-    }
-    if (App.els.tabNotes) {
-        App.els.tabNotes.addEventListener('click', () => switchWorkspaceTab('notes'));
-    }
-    if (App.els.tabRag) {
-        App.els.tabRag.addEventListener('click', () => {
-            switchWorkspaceTab('search');
-            loadSearchStats();
-        });
-    }
-
-    if (App.els.searchBtn) {
-        App.els.searchBtn.addEventListener('click', runKnowledgeSearch);
-    }
-    if (App.els.searchInput) {
-        App.els.searchInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                runKnowledgeSearch();
-            }
-        });
-    }
-    if (App.els.searchRefreshBtn) {
-        App.els.searchRefreshBtn.addEventListener('click', loadSearchStats);
-    }
-
-    if (App.els.qaBtn) {
-        App.els.qaBtn.addEventListener('click', runQaSearch);
-    }
-    if (App.els.qaInput) {
-        App.els.qaInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                runQaSearch();
-            }
-        });
-    }
-
-    if (App.els.fileInput) {
-        App.els.fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) uploadAndTranslateFile(file);
-        });
-    }
-
-    const uploadCard = document.querySelector('.upload-card');
-    if (uploadCard) {
-        uploadCard.addEventListener('dragover', (event) => {
-            event.preventDefault();
-            uploadCard.classList.add('dragging');
-        });
-        uploadCard.addEventListener('dragleave', () => {
-            uploadCard.classList.remove('dragging');
-        });
-        uploadCard.addEventListener('drop', (event) => {
-            event.preventDefault();
-            uploadCard.classList.remove('dragging');
-            const file = event.dataTransfer.files[0];
-            if (file) uploadAndTranslateFile(file);
-        });
-    }
-
-    if (App.els.translatePageBtn) {
-        App.els.translatePageBtn.addEventListener('click', translateCurrentPage);
-    }
-    if (App.els.translateAllBtn) {
-        App.els.translateAllBtn.addEventListener('click', translateAllPages);
-    }
-    if (App.els.pageNumber) {
-        App.els.pageNumber.addEventListener('change', () => {
-            goToPage(Number(App.els.pageNumber.value));
-        });
-    }
-    if (App.els.prevPageBtn) {
-        App.els.prevPageBtn.addEventListener('click', () => goToPage(App.currentPage - 1));
-    }
-    if (App.els.nextPageBtn) {
-        App.els.nextPageBtn.addEventListener('click', () => goToPage(App.currentPage + 1));
-    }
-
-    if (App.els.copyOriginalBtn) {
-        App.els.copyOriginalBtn.addEventListener('click', async () => {
-            const pageText = App.pages[App.currentPage - 1] || '';
-            if (!pageText.trim()) {
-                showStatus('No extracted text to copy.', 'error');
-                return;
-            }
-            await copyToClipboard(pageText);
-            showStatus('Current page text copied.', 'success');
-        });
-    }
-
-    if (App.els.copyTranslationBtnText) {
-        App.els.copyTranslationBtnText.addEventListener('click', async () => {
-            const text = App.els.translationAreaText.textContent || '';
-            if (!text.trim()) {
-                showStatus('No translated text to copy.', 'error');
-                return;
-            }
-            await copyToClipboard(text);
-            showStatus('Translation copied.', 'success');
-        });
-    }
-
-    if (App.els.copyTranslationBtnAttachment) {
-        App.els.copyTranslationBtnAttachment.addEventListener('click', async () => {
-            const text = App.els.translationArea.textContent || '';
-            if (!text.trim()) {
-                showStatus('No translated text to copy.', 'error');
-                return;
-            }
-            await copyToClipboard(text);
-            showStatus('Translation copied.', 'success');
+            callIfAvailable('updateCharCount');
+            callIfAvailable('setOutputActionsEnabled', false);
+            callIfAvailable('showToast', 'Workspace cleared.', 'success');
         });
     }
 
     if (App.els.copySourceBtn) {
         App.els.copySourceBtn.addEventListener('click', async () => {
-            const text = App.els.textInput.value || '';
+            const text = App.els.textInput ? App.els.textInput.value : '';
             if (!text.trim()) {
-                showStatus('Nothing to copy yet.', 'error');
+                callIfAvailable('showToast', 'Nothing to copy yet.', 'error');
                 return;
             }
-            await copyToClipboard(text);
-            showStatus('Source copied.', 'success');
-        });
-    }
-
-    if (App.els.clearTextBtn) {
-        App.els.clearTextBtn.addEventListener('click', () => {
-            App.els.textInput.value = '';
-            App.els.translationAreaText.innerHTML = '<div class="empty-state centered"><strong>Clear workspace</strong><span>Start a fresh notebook entry whenever you want.</span></div>';
-            showStatus('Notebook cleared.', 'success');
-        });
-    }
-
-    if (App.els.clearNotesBtn) {
-        App.els.clearNotesBtn.addEventListener('click', () => {
-            App.els.notesArea.value = '';
-            showStatus('Notes cleared.', 'success');
-        });
-    }
-
-    if (App.els.saveNotesBtn) {
-        App.els.saveNotesBtn.addEventListener('click', () => {
-            localStorage.setItem('notebook-note', App.els.notesArea.value || '');
-            showStatus('Note saved locally.', 'success');
+            await callIfAvailable('copyToClipboard', text);
+            callIfAvailable('showToast', 'Source copied.', 'success');
         });
     }
 
     if (App.els.translateTextBtn) {
-        App.els.translateTextBtn.addEventListener('click', translateTextMode);
+        App.els.translateTextBtn.addEventListener('click', () => {
+            callIfAvailable('translateTextMode');
+        });
+    }
+}
+
+function wireDocumentActions() {
+    if (App.els.translatePageBtn) {
+        App.els.translatePageBtn.addEventListener('click', () => {
+            callIfAvailable('translateCurrentPage');
+        });
+    }
+    if (App.els.translateAllBtn) {
+        App.els.translateAllBtn.addEventListener('click', () => {
+            callIfAvailable('translateAllPages');
+        });
+    }
+    if (App.els.pageNumber) {
+        App.els.pageNumber.addEventListener('change', () => {
+            callIfAvailable('goToPage', Number(App.els.pageNumber.value));
+        });
+    }
+    if (App.els.prevPageBtn) {
+        App.els.prevPageBtn.addEventListener('click', () => {
+            callIfAvailable('goToPage', App.currentPage - 1);
+        });
+    }
+    if (App.els.nextPageBtn) {
+        App.els.nextPageBtn.addEventListener('click', () => {
+            callIfAvailable('goToPage', App.currentPage + 1);
+        });
+    }
+    if (App.els.copyOriginalBtn) {
+        App.els.copyOriginalBtn.addEventListener('click', async () => {
+            const pageText = App.pages[App.currentPage - 1] || '';
+            if (!pageText.trim()) {
+                callIfAvailable('showToast', 'No extracted text to copy.', 'error');
+                return;
+            }
+            await callIfAvailable('copyToClipboard', pageText);
+            callIfAvailable('showToast', 'Current page text copied.', 'success');
+        });
+    }
+    if (App.els.addToNotesBtn) {
+        App.els.addToNotesBtn.addEventListener('click', () => {
+            if (!App.translatedText) {
+                callIfAvailable('showToast', 'Translate the page before adding it to notes.', 'info');
+                return;
+            }
+            callIfAvailable('addTranslationToNotes');
+        });
+    }
+}
+
+function wireUpload() {
+    if (App.els.fileInput) {
+        App.els.fileInput.addEventListener('change', (event) => {
+            const file = event.target.files && event.target.files[0];
+            if (file) {
+                callIfAvailable('uploadAndTranslateFile', file);
+            }
+        });
+    }
+}
+
+function wireRail() {
+    const rail = App.els.rail;
+    if (!rail) {
+        return;
     }
 
-    document.addEventListener('keydown', (event) => {
-        const isModifier = event.ctrlKey || event.metaKey;
-        if (isModifier && event.key === 'Enter') {
-            event.preventDefault();
-            if (App.currentMode === 'document' && App.els.translatePageBtn) {
-                App.els.translatePageBtn.click();
-            } else if (App.els.translateTextBtn) {
-                App.els.translateTextBtn.click();
-            }
+    rail.addEventListener('click', (event) => {
+        const tab = event.target.closest('[role="tab"]');
+        if (tab && tab.dataset.mode) {
+            callIfAvailable('switchWorkspaceTab', tab.dataset.mode);
         }
     });
 
-    loadModels();
-    restoreNote();
-    switchWorkspaceTab('text');
-    updateSourceMeta();
-    checkOllamaStatus();
-    setInterval(checkOllamaStatus, 30000);
-});
+    if (App.els.railToggle) {
+        App.els.railToggle.addEventListener('click', () => {
+            const isOpen = rail.classList.toggle('is-open');
+            App.els.railToggle.setAttribute('aria-expanded', String(isOpen));
+        });
+    }
 
-function checkOllamaStatus() {
-    if (!App.els.ollamaStatus || !App.els.ollamaDot || !App.els.ollamaLabel) {
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') {
+            return;
+        }
+        if (rail.classList.contains('is-open')) {
+            rail.classList.remove('is-open');
+            App.els.railToggle.setAttribute('aria-expanded', 'false');
+            if (App.els.railToggle) {
+                App.els.railToggle.focus();
+            }
+        }
+    });
+}
+
+function wireLanguageSelects() {
+    ['sourceLanguage', 'targetLanguage'].forEach((id) => {
+        const select = App.els[id];
+        if (!select) {
+            return;
+        }
+        select.addEventListener('change', () => {
+            callIfAvailable('updateRTLState');
+        });
+    });
+
+    if (App.els.swapLanguagesBtn) {
+        App.els.swapLanguagesBtn.addEventListener('click', () => {
+            const from = App.els.sourceLanguage;
+            const to = App.els.targetLanguage;
+            if (!from || !to) {
+                return;
+            }
+            const previous = from.value;
+            from.value = to.value;
+            to.value = previous === 'auto' ? 'English' : previous;
+            callIfAvailable('updateRTLState');
+        });
+    }
+}
+
+function wireModelBadge() {
+    const badge = App.els.modelBadge;
+    if (!badge) {
         return;
     }
-    fetch('/api/ollama-status')
-        .then(response => response.json())
-        .then(data => {
-            const isOnline = data.ollama_online === true;
-            App.els.ollamaStatus.classList.toggle('online', isOnline);
-            App.els.ollamaStatus.classList.toggle('offline', !isOnline);
-            App.els.ollamaLabel.textContent = isOnline ? 'Ollama running' : 'Ollama unreachable';
+    fetch('/api/models')
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success && data.models && data.models.length) {
+                const model = data.models.find((name) => name.toLowerCase().includes('gemma4'))
+                    || data.models[0];
+                badge.textContent = model;
+                badge.title = `Active Ollama model: ${model}`;
+            } else {
+                badge.textContent = 'No model';
+            }
         })
         .catch(() => {
-            App.els.ollamaStatus.classList.add('offline');
-            App.els.ollamaStatus.classList.remove('online');
-            App.els.ollamaLabel.textContent = 'Ollama unreachable';
+            badge.textContent = 'Offline';
         });
 }
 
-function updateSearchScopeState() {
-    const checkbox = App.els.searchAllDocs;
-    const label = App.els.searchScopeLabel;
-    if (!checkbox || !label) {
-        return;
-    }
-    const scope = checkbox.closest('.search-scope');
-    const hasDocument = Boolean(App.currentFileName);
-
-    checkbox.disabled = !hasDocument;
-    if (!hasDocument) {
-        checkbox.checked = true;
-        label.textContent = 'All documents';
-        if (scope) {
-            scope.title = 'No document is open. Upload one to search it on its own.';
-        }
-    } else if (checkbox.checked) {
-        label.textContent = 'All documents';
-        if (scope) {
-            scope.title = 'Search every uploaded document.';
-        }
-    } else {
-        label.textContent = 'This document';
-        if (scope) {
-            scope.title = 'Search only the open document.';
-        }
-    }
-}
-
-function getSearchScopeFilename() {
-    const searchAll = App.els.searchAllDocs && App.els.searchAllDocs.checked;
-    if (searchAll) {
-        return '';
-    }
-    return App.currentFileName || '';
-}
-
-async function runKnowledgeSearch() {
-    const query = (App.els.searchInput && App.els.searchInput.value.trim()) || '';
-    if (!query) {
-        showStatus('Please enter a search query.', 'error');
+/**
+ * Poll the Ollama status endpoint and reflect it in the top bar.
+ * The status card in the sources drawer reads the same state.
+ */
+function checkOllamaStatus() {
+    const dot = App.els.ollamaDot;
+    const label = App.els.ollamaLabel;
+    const status = App.els.ollamaStatus;
+    if (!dot && !label) {
         return;
     }
 
-    if (App.els.searchResults) {
-        App.els.searchResults.innerHTML = '<div class="empty-state centered"><strong>Searching the knowledge base...</strong><span>This may take a moment while results are retrieved and translated.</span></div>';
-    }
-    if (App.els.searchBtn) {
-        App.els.searchBtn.disabled = true;
-        App.els.searchBtn.textContent = 'Searching...';
-    }
-
-    try {
-        const targetLanguage = App.els.targetLanguage ? App.els.targetLanguage.value : 'English';
-        const sourceLanguage = App.els.sourceLanguage ? App.els.sourceLanguage.value : 'auto';
-        const scopeFilename = getSearchScopeFilename();
-        const results = await knowledgeSearch(query, targetLanguage, sourceLanguage, scopeFilename, 5);
-        renderKnowledgeSearchResults(results);
-        if (results.length === 0) {
-            showStatus(scopeFilename
-                ? `No matching content found in ${scopeFilename}.`
-                : 'No matching content found in the knowledge base.', 'success');
-        } else {
-            showStatus(`${results.length} result(s) translated${scopeFilename ? ` from ${scopeFilename}` : ''}.`, 'success');
-        }
-    } catch (error) {
-        console.error(error);
-        if (App.els.searchResults) {
-            App.els.searchResults.innerHTML = '<div class="empty-state centered"><strong>Search failed</strong><span>Could not complete the knowledge search. Check the browser console.</span></div>';
-        }
-        showStatus(error.message || 'Knowledge search failed.', 'error');
-    } finally {
-        if (App.els.searchBtn) {
-            App.els.searchBtn.disabled = false;
-            App.els.searchBtn.textContent = 'Search';
-        }
-    }
+    fetch('/api/ollama-status')
+        .then((response) => response.json())
+        .then((data) => {
+            const online = data.ollama_online === true;
+            if (dot) {
+                dot.classList.toggle('online', online);
+                dot.classList.toggle('offline', !online);
+            }
+            if (status) {
+                status.classList.toggle('online', online);
+                status.classList.toggle('offline', !online);
+            }
+            if (label) {
+                label.textContent = online ? 'Ollama running' : 'Ollama unreachable';
+            }
+        })
+        .catch(() => {
+            if (dot) {
+                dot.classList.remove('online');
+                dot.classList.add('offline');
+            }
+            if (status) {
+                status.classList.remove('online');
+                status.classList.add('offline');
+            }
+            if (label) {
+                label.textContent = 'Ollama unreachable';
+            }
+        });
 }
 
-async function loadSearchStats() {
-    if (!App.els.searchStats) {
-        return;
+function boot() {
+    cacheElements();
+
+    callIfAvailable('initUI');
+    callIfAvailable('initUpload');
+    callIfAvailable('initSearch');
+    callIfAvailable('initNavigation');
+
+    wireRail();
+    wireLanguageSelects();
+    wireSourceText();
+    wireTextActions();
+    wireDocumentActions();
+    wireUpload();
+    wireModelBadge();
+
+    if (typeof initPreviewResize === 'function') {
+        initPreviewResize();
     }
-    try {
-        const stats = await loadVectorStats();
-        renderVectorStats(stats);
-    } catch (error) {
-        console.error(error);
-        renderVectorStats(null);
-    }
+
+    callIfAvailable('updateCharCount');
+    callIfAvailable('updateSourceMeta');
+    callIfAvailable('updateRTLState');
+    callIfAvailable('setOutputActionsEnabled', false);
+    callIfAvailable('switchWorkspaceTab', 'text');
+
+    checkOllamaStatus();
+    window.setInterval(checkOllamaStatus, 30000);
 }
 
-async function runQaSearch() {
-    const query = (App.els.qaInput && App.els.qaInput.value.trim()) || '';
-    if (!query) {
-        showStatus('Please enter a question.', 'error');
-        return;
-    }
-
-    if (App.els.qaAnswer) {
-        App.els.qaAnswer.innerHTML = '<div class="empty-state centered"><strong>Thinking...</strong><span>Analyzing your documents and generating an answer.</span></div>';
-    }
-    if (App.els.qaSources) {
-        App.els.qaSources.innerHTML = '';
-    }
-    if (App.els.qaBtn) {
-        App.els.qaBtn.disabled = true;
-        App.els.qaBtn.textContent = 'Thinking...';
-    }
-
-    try {
-        const targetLanguage = App.els.targetLanguage ? App.els.targetLanguage.value : 'English';
-        const sourceLanguage = App.els.sourceLanguage ? App.els.sourceLanguage.value : 'auto';
-        const data = await qaSearch(query, targetLanguage, sourceLanguage, getSearchScopeFilename(), 5);
-
-        if (data.no_context) {
-            App.els.qaAnswer.innerHTML = '<div class="empty-state centered"><strong>No relevant content found</strong><span>No matching chunks were found in the knowledge base. Upload and process a document first.</span></div>';
-            showStatus('No relevant content found in knowledge base.', 'error');
-            return;
-        }
-
-        App.els.qaAnswer.innerHTML = formatText(data.answer || 'No answer was generated.');
-        renderQaSources(data.sources);
-        showStatus('Answer generated from your documents.', 'success');
-    } catch (error) {
-        console.error(error);
-        App.els.qaAnswer.innerHTML = '<div class="empty-state centered"><strong>QA failed</strong><span>Could not generate an answer. Check the browser console.</span></div>';
-        App.els.qaSources.innerHTML = '';
-        showStatus(error.message || 'QA request failed.', 'error');
-    } finally {
-        if (App.els.qaBtn) {
-            App.els.qaBtn.disabled = false;
-            App.els.qaBtn.textContent = 'Ask';
-        }
-    }
-}
-
-function renderQaSources(sources) {
-    if (!App.els.qaSources || !sources || sources.length === 0) {
-        return;
-    }
-    const citationParts = [];
-    App.els.qaSources.innerHTML = sources.map((src) => {
-        const parts = [];
-        if (src.filename) parts.push(escapeHtml(src.filename));
-        if (src.page_number) parts.push(`Page ${src.page_number}`);
-        const citation = parts.join(' - ') || '—';
-        return `
-            <div class="qa-source-item">
-                <div class="qa-source-citation">${citation}</div>
-                <div class="qa-source-similarity">Relevance: ${Math.round((src.similarity || 0) * 100)}%</div>
-            </div>
-        `;
-    }).join('');
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+} else {
+    boot();
 }

@@ -1,0 +1,131 @@
+/* ==========================================================================
+   tokens.css — the single source of design tokens.
+   No other stylesheet may declare :root custom properties.
+   ========================================================================== */
+
+:root {
+    /* colour — light (default) */
+    --canvas:      #f8f7f4;
+    --chrome:      #f8f4e9;
+    --surface:     #ffffff;
+    --surface-2:   #f4f4f5;
+    --line:        #e4e4e7;
+    --line-strong: #3f3f46;
+    --ink-950:     #09090b;
+    --ink-700:     #3f3f46;
+    --ink-500:     #71717a;
+    --brand:       #e8590c;
+    --brand-ink:   #ffffff;
+    --success:     #15803d;
+    --danger:      #b91c1c;
+    --warning:     #b45309;
+
+    /* subtle translucent washes derived from the above */
+    --brand-wash:   rgba(232, 89, 12, .10);
+    --success-wash: rgba(21, 128, 61, .10);
+    --danger-wash:  rgba(185, 28, 28, .10);
+    --overlay:      rgba(9, 9, 11, .40);
+
+    /* type — families */
+    --font-display: "Space Grotesk", "Inter", sans-serif;
+    --font-sans:    "Inter", system-ui, sans-serif;
+    --font-arabic:  "Cairo", "Inter", sans-serif;
+    --font-mono:    ui-monospace, "JetBrains Mono", monospace;
+
+    /* type — scale */
+    --font-size-11: 11px;
+    --font-size-12: 12px;
+    --font-size-13: 13px;
+    --font-size-14: 14px;
+    --font-size-16: 16px;
+    --font-size-20: 20px;
+    --font-size-26: 26px;
+    --font-size-34: 34px;
+
+    /* type — line height */
+    --line-height-body:   1.5;
+    --line-height-prose:  1.7;
+    --line-height-tight:  1.25;
+
+    /* type — display headings tracking */
+    --tracking-display: -0.02em;
+
+    /* space */
+    --space-1: 2px;
+    --space-2: 4px;
+    --space-3: 8px;
+    --space-4: 12px;
+    --space-5: 16px;
+    --space-6: 24px;
+    --space-7: 32px;
+    --space-8: 48px;
+
+    /* radius */
+    --r-control: 9px;
+    --r-field:   10px;
+    --r-card:    14px;
+    --r-panel:   20px;
+    --r-shell:   12px;
+    --r-pill:    999px;
+
+    /* elevation — two levels only */
+    --shadow-card:    0 1px 2px rgba(0, 0, 0, .04);
+    --shadow-overlay: 0 8px 24px rgba(0, 0, 0, .08);
+
+    /* motion */
+    --motion-fast: 120ms cubic-bezier(.4, 0, .2, 1);
+    --motion-base: 200ms cubic-bezier(.4, 0, .2, 1);
+
+    /* z-index */
+    --z-base:    1;
+    --z-sticky:  100;
+    --z-drawer:  200;
+    --z-overlay: 300;
+    --z-toast:   400;
+
+    /* focus */
+    --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--brand);
+}
+
+/* --------------------------------------------------------------------------
+   Dark theme — opt-in via data-theme="dark" on <html>
+   -------------------------------------------------------------------------- */
+
+[data-theme="dark"] {
+    --canvas:      #0b0b0e;
+    --chrome:      #08080a;
+    --surface:     #131317;
+    --surface-2:   #1b1b20;
+    --line:        #27272a;
+    --line-strong: #3f3f46;
+    --ink-950:     #fafafa;
+    --ink-700:     #a1a1aa;
+    --ink-500:     #71717a;
+    --brand:       #fb923c;
+    --brand-ink:   #1a1207;
+    --success:     #4ade80;
+    --danger:      #f87171;
+    --warning:     #fbbf24;
+
+    --brand-wash:   rgba(251, 146, 60, .14);
+    --success-wash: rgba(74, 222, 128, .14);
+    --danger-wash:  rgba(248, 113, 113, .14);
+    --overlay:      rgba(0, 0, 0, .60);
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion — neutralise every transition and animation globally.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        transition-delay: 0ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -1,16 +1,57 @@
-<!-- Tab panel: Notes workspace -->
-<section id="panelNotes" class="tab-panel" role="tabpanel" aria-labelledby="tabNotes">
-    <article class="panel panel-source">
-        <div class="panel-header">
-            <div>
-                <p class="eyebrow">Notes</p>
-                <h2 id="notesTitle">Study notes</h2>
+<!-- Tab panel: Notes workspace (summary card + note cards) -->
+<section id="panelNotes" class="tab-panel" role="tabpanel" aria-labelledby="tabNotes" tabindex="0">
+    <div class="notes-mode">
+
+        <!-- Summary of the current translation -->
+        <div class="panel notes-summary-card">
+            <div class="panel__header">
+                <div>
+                    <p class="eyebrow">Summary</p>
+                    <h2 class="panel__title">Current translation summary</h2>
+                </div>
+                <button type="button" id="summarizeBtn" class="btn btn--secondary btn--md">
+                    <svg class="btn__icon" aria-hidden="true"><use href="#i-sparkle"></use></svg>
+                    <span class="btn__label">Summarize current translation</span>
+                </button>
             </div>
-            <div class="panel-actions">
-                <button id="clearNotesBtn" class="ghost-btn small" title="Clear all notes">Clear</button>
-                <button id="saveNotesBtn" class="primary-btn small" title="Save notes">Save</button>
+            <div id="notesSummary" class="panel__body summary-body" aria-live="polite">
+                <div class="empty-state">
+                    <svg class="icon empty-state__icon" aria-hidden="true"><use href="#i-sparkle"></use></svg>
+                    <p class="empty-state__title">No summary yet</p>
+                    <p class="empty-state__text">Translate something, then summarise it here.</p>
+                </div>
             </div>
         </div>
-        <textarea id="notesArea" class="note-textarea" placeholder="Write your notes here..." aria-describedby="notesTitle"></textarea>
-    </article>
+
+        <!-- Note cards -->
+        <div id="notesList" class="note-list"></div>
+
+        <div id="notesEmptyState" class="empty-state">
+            <svg class="icon empty-state__icon" aria-hidden="true"><use href="#i-note"></use></svg>
+            <p class="empty-state__title">No notes yet</p>
+            <p class="empty-state__text">Notes you save appear here.</p>
+        </div>
+
+        <!-- Structural template for a single note card; cloned by the notes script. -->
+        <template id="noteTemplate">
+            <article class="note-card">
+                <div class="note-card__head">
+                    <input type="text" id="noteTitle" class="input note-card__title" placeholder="Note title" aria-label="Note title" autocomplete="off">
+                    <span class="note-card__source badge badge--neutral">No source</span>
+                </div>
+                <textarea id="noteBody" class="textarea note-card__body" placeholder="Write your note…" aria-label="Note body"></textarea>
+                <div class="note-card__actions">
+                    <button type="button" id="saveNoteBtn" class="btn btn--primary btn--sm">
+                        <svg class="btn__icon" aria-hidden="true"><use href="#i-check"></use></svg>
+                        <span class="btn__label">Save</span>
+                    </button>
+                    <button type="button" id="deleteNoteBtn" class="btn btn--ghost btn--sm btn--danger">
+                        <svg class="btn__icon" aria-hidden="true"><use href="#i-trash"></use></svg>
+                        <span class="btn__label">Delete</span>
+                    </button>
+                </div>
+            </article>
+        </template>
+
+    </div>
 </section>

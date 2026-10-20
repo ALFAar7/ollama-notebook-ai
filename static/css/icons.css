@@ -1,0 +1,94 @@
+/* ==========================================================================
+   icons.css — styling for the inline SVG sprite.
+   The <symbol> definitions live in templates/base.html (sprite block);
+   this file only styles how they are used.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Base icon
+   -------------------------------------------------------------------------- */
+
+.icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: middle;
+    overflow: visible;
+}
+
+/* Symbol content inherits the stroke/fill set on the <svg> wrapper.
+   Explicitly re-assert on <use> so symbols stay consistent. */
+.icon use {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Legacy attribute fallback: browsers that only understand xlink:href still
+   resolve the symbol; the wrapper styling above applies either way. */
+.icon use[xlink\:href] {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* --------------------------------------------------------------------------
+   Size modifiers
+   -------------------------------------------------------------------------- */
+
+.icon--sm {
+    width: 16px;
+    height: 16px;
+}
+
+.icon--lg {
+    width: 24px;
+    height: 24px;
+}
+
+/* --------------------------------------------------------------------------
+   Button icons
+   -------------------------------------------------------------------------- */
+
+.btn__icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: middle;
+}
+
+.btn__icon use {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion — icons do not animate, but any inherited spin is stopped.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .icon,
+    .btn__icon {
+        animation: none !important;
+        transition: none !important;
+    }
+}

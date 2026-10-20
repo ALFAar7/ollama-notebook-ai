@@ -1,50 +1,59 @@
-/* ============================================
-   NOTES — Study Notes Panel
-   ============================================ */
+/* ==========================================================================
+   notes.css — Notes mode only.
 
-.notes-section {
+   The canonical note-card structure (.note-list, .note-card, .note-card__head,
+   .note-card__title, .note-card__body, .note-card__source, .note-card__actions,
+   .summary-body, .note-card.is-rtl) lives in workspace.css so the shared
+   surface rules stay in one place. This file owns the notes-specific layout
+   shell and the notes-only responsive behaviour.
+
+   Every colour and metric comes from tokens.css.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Layout shell
+   -------------------------------------------------------------------------- */
+
+.notes-mode {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    gap: var(--space-5);
+    flex: 1;
+    min-height: 0;
 }
 
-/* ── Notes summary area ── */
-.notes-summary {
-    padding: var(--space-md);
-    background: rgba(0, 0, 0, 0.15);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-md);
-    min-height: 80px;
-    max-height: 200px;
-    overflow-y: auto;
-    font-size: 0.85rem;
-    line-height: 1.6;
-    color: var(--text-secondary);
+.notes-summary-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
-/* ── Note textarea ── */
-.note-textarea {
-    width: 100%;
-    min-height: 200px;
-    padding: var(--space-md);
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-md);
-    color: var(--text);
-    font-size: 0.88rem;
-    line-height: 1.6;
-    resize: vertical;
-    transition: all var(--transition-smooth);
+/* The summary card is pinned to the top of the notes column. */
+.notes-summary-card .panel__body {
+    min-height: var(--space-7);
 }
 
-.note-textarea:hover {
-    border-color: var(--glass-border-hover);
-    background: rgba(0, 0, 0, 0.25);
+.notes-mode .note-list {
+    flex: 0 0 auto;
 }
 
-.note-textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow), inset 0 0 15px rgba(124, 106, 239, 0.04);
-    background: rgba(0, 0, 0, 0.3);
+/* The empty state is hidden by the notes script once a card exists. */
+.notes-mode .empty-state {
+    padding: var(--space-7) var(--space-6);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+    .notes-mode .panel__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    .notes-mode .note-card {
+        padding: var(--space-4);
+    }
 }

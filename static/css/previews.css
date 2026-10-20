@@ -1,16 +1,33 @@
-/* ============================================
-   PREVIEWS — PDF & Document Previews
-   ============================================ */
+/* ==========================================================================
+   previews.css — document preview surfaces (PDF viewer, text preview).
 
-/* ── Resizable preview wrapper ──
+   Ownership:
+     components.css → .btn, .btn--ghost, .btn--sm, .badge, .empty-state
+     this file      → the preview shell, the PDF viewer and the resize handles.
+
+   The resize-handle geometry is load-bearing: static/js/resize.js drags
+   these elements and stores the resulting box, so the offsets, sizes and
+   data-dir values below must not change. Only the colours, borders and
+   radii are restyled onto the token palette.
+
+   Colours, spacing and radii come exclusively from tokens.css.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Resizable preview wrapper
+
    Holds the sizing handles. The preview itself has its innerHTML replaced on
-   every page change, so handles live out here to survive that. */
+   every page change, so the handles live out here to survive that.
+   -------------------------------------------------------------------------- */
+
 .preview-resizer {
     position: relative;
     display: flex;
     flex: 1 1 auto;
     min-width: 0;
-    min-height: 0;
+    /* The preview keeps a usable minimum height: the resizer must never
+       squeeze the box below the size the drag handles work with. */
+    min-height: 12rem;
     max-width: 100%;
 }
 
@@ -25,7 +42,12 @@
     min-width: 0;
 }
 
-/* ── Resize handles ── */
+/* --------------------------------------------------------------------------
+   Resize handles
+
+   Geometry below is unchanged from the previous implementation.
+   -------------------------------------------------------------------------- */
+
 .resize-handle {
     position: absolute;
     z-index: 5;
@@ -40,21 +62,21 @@
     position: absolute;
     inset: 0;
     margin: auto;
-    background: var(--glass-border);
+    background: var(--ink-500);
     border-radius: 2px;
     opacity: 0.75;
-    transition: opacity 0.12s ease;
+    transition: opacity 0.12s ease, background-color 0.12s ease;
 }
 
 .resize-handle:hover::after,
 .resize-handle:focus-visible::after,
 .resize-handle.is-dragging::after {
     opacity: 1;
-    background: var(--accent);
+    background: var(--brand);
 }
 
 .resize-handle:focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--brand);
     outline-offset: 1px;
 }
 
@@ -114,28 +136,39 @@ body.is-resizing-preview * {
     cursor: inherit !important;
 }
 
-/* ── Attachment preview container (fills panel body) ── */
+/* --------------------------------------------------------------------------
+   Attachment preview container (fills the panel body)
+   -------------------------------------------------------------------------- */
+
 .attachment-preview {
     flex: 1;
     min-height: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-field);
 }
 
-/* ── PDF viewer ── */
+/* --------------------------------------------------------------------------
+   PDF viewer
+   -------------------------------------------------------------------------- */
+
+/* The empty state fills the preview box and stays centred in it. */
+.attachment-preview > .empty-state {
+    flex: 1;
+}
+
 .pdf-viewer {
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-height: 280px;
+    min-height: 12rem;
     position: relative;
-    background: #1a1a2e;
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-field);
     overflow: hidden;
 }
 
@@ -143,55 +176,34 @@ body.is-resizing-preview * {
 .pdf-toolbar {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: var(--space-1);
     flex: 0 0 auto;
-    padding: 4px 6px;
-    background: rgba(10, 10, 20, 0.92);
-    border-bottom: 1px solid var(--glass-border);
+    padding: var(--space-1) var(--space-2);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-control);
+    box-shadow: var(--shadow-overlay);
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: var(--space-3);
+    right: var(--space-3);
     z-index: 2;
-    border-radius: var(--radius-md);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
+/* The toolbar buttons are .btn instances; only the sizing is local. */
 .pdf-tool {
     min-width: 26px;
-    height: 26px;
-    padding: 0 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    border-radius: var(--radius-sm, 6px);
-    background: transparent;
-    color: var(--text);
-    font-size: 0.95rem;
-    line-height: 1;
-    cursor: pointer;
-}
-
-.pdf-tool:hover {
-    background: var(--glass);
-    border-color: var(--glass-border);
-}
-
-.pdf-tool:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
+    padding: 0 var(--space-2);
 }
 
 .pdf-tool-wide {
-    font-size: 0.75rem;
-    padding: 0 8px;
+    font-size: var(--font-size-12);
+    padding: 0 var(--space-3);
 }
 
 .pdf-zoom-value {
     min-width: 42px;
     text-align: center;
-    font-size: 0.75rem;
-    color: var(--text-muted);
+    font-size: var(--font-size-11);
     font-variant-numeric: tabular-nums;
 }
 
@@ -200,10 +212,13 @@ body.is-resizing-preview * {
     border: none;
     width: 100%;
     min-height: 0;
-    background: #1a1a2e;
+    background: var(--surface-2);
 }
 
-/* ── Text document preview content ── */
+/* --------------------------------------------------------------------------
+   Text document preview content
+   -------------------------------------------------------------------------- */
+
 .preview-content {
     flex: 1;
     min-height: 0;
@@ -213,67 +228,24 @@ body.is-resizing-preview * {
 }
 
 .preview-caption {
-    font-size: 0.72rem;
+    font-size: var(--font-size-11);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--text-muted);
-    padding: var(--space-sm) var(--space-md);
-    border-bottom: 1px solid var(--glass-border);
+    color: var(--ink-500);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--line);
 }
 
 .preview-text {
     flex: 1;
     min-height: 0;
-    padding: var(--space-md);
+    padding: var(--space-4);
     margin: 0;
     overflow-y: auto;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: var(--text-secondary);
+    font-size: var(--font-size-13);
+    line-height: var(--line-height-body);
+    color: var(--ink-700);
     white-space: pre-wrap;
     word-break: break-word;
-}
-
-/* ── Image preview ── */
-.image-preview {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-lg);
-    background: rgba(0, 0, 0, 0.15);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    min-height: 300px;
-}
-
-.image-preview img {
-    max-width: 100%;
-    max-height: 500px;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    transition: transform var(--transition-smooth);
-}
-
-.image-preview img:hover {
-    transform: scale(1.02);
-}
-
-/* ── Preview panel in sidebar ── */
-.preview-panel {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    padding: var(--space-md);
-    background: rgba(0, 0, 0, 0.15);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-md);
-}
-
-.preview-panel .preview-label {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
 }

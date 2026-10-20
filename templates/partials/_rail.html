@@ -1,0 +1,38 @@
+<!-- Left rail — workspace mode switcher -->
+<nav class="rail" id="rail" role="tablist" aria-label="Workspace modes" aria-orientation="vertical">
+    <div class="rail__brand" aria-hidden="true">
+        <span class="rail__brand-mark">
+            <svg class="icon"><use href="#i-sparkle"></use></svg>
+        </span>
+    </div>
+
+    <button type="button" id="tabText" class="rail__tab is-active" role="tab"
+            data-tab="text" data-mode="text" aria-controls="panelText" aria-selected="true" tabindex="0">
+        <svg class="icon" aria-hidden="true"><use href="#i-text"></use></svg>
+        <span class="rail__label">Text</span>
+    </button>
+    <button type="button" id="tabDocument" class="rail__tab" role="tab"
+            data-tab="document" data-mode="document" aria-controls="panelDocument" aria-selected="false" tabindex="-1">
+        <svg class="icon" aria-hidden="true"><use href="#i-doc"></use></svg>
+        <span class="rail__label">Document</span>
+    </button>
+    <button type="button" id="tabNotes" class="rail__tab" role="tab"
+            data-tab="notes" data-mode="notes" aria-controls="panelNotes" aria-selected="false" tabindex="-1">
+        <svg class="icon" aria-hidden="true"><use href="#i-note"></use></svg>
+        <span class="rail__label">Notes</span>
+    </button>
+    <button type="button" id="tabSearch" class="rail__tab" role="tab"
+            data-tab="search" data-mode="search" aria-controls="panelSearch" aria-selected="false" tabindex="-1">
+        <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+        <span class="rail__label">Search</span>
+    </button>
+    <button type="button" id="tabHistory" class="rail__tab" role="tab"
+            data-tab="history" data-mode="history" aria-controls="panelHistory" aria-selected="false" tabindex="-1">
+        <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
+        <span class="rail__label">History</span>
+    </button>
+
+    <div class="rail__footer" aria-hidden="true">
+        <span class="rail__footer-text">Local workspace</span>
+    </div>
+</nav>

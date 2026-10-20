@@ -1,344 +1,255 @@
-/* ============================================
-   TRANSLATION — Source & Output Styling
-   ============================================ */
+/* ==========================================================================
+   translation.css — Text and Document mode canvases.
 
-/* ── Translation workspace ── */
-.translation-workspace {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-    flex: 1;
+   Ownership:
+     components.css → .panel, .panel__*, .btn*, .badge, .empty-state,
+                      .progress, .kbd, .input, .textarea, .hint, .label
+     layout.css     → .tab-panel, .canvas, .settings-bar
+     this file      → .workspace-split, .splitter, .output-body and the
+                      control clusters that only these two panels use.
+
+   Colours, spacing and radii come exclusively from tokens.css. Flat
+   surfaces only: no gradients, no blur filters, no hard-coded colours.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Two-column split (fixes plan defect L1)
+   -------------------------------------------------------------------------- */
+
+.workspace-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+    gap: 0;
+    align-items: stretch;
+    /* The split fills the space the chrome leaves behind, so the primary
+       action of each panel stays above the fold. The column bodies scroll
+       instead of the page. */
+    height: calc(100vh - 12rem);
+    min-height: 22rem;
+    grid-template-rows: minmax(0, 1fr);
 }
 
-/* ── Source text input area ── */
-.text-input-area {
-    width: 100%;
-    min-height: 280px;
-    padding: var(--space-lg);
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    color: var(--text);
-    font-size: 0.95rem;
-    line-height: 1.7;
-    resize: vertical;
-    transition: all var(--transition-smooth);
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+.panel-source,
+.panel-output {
+    min-width: 0;
 }
 
-.text-input-area:hover {
-    border-color: var(--glass-border-hover);
-    background: rgba(0, 0, 0, 0.25);
+/* The body of each panel takes the remaining height, so the preview and the
+   output area can grow instead of collapsing to their content. When the
+   column is shorter than its content the body scrolls on its own. */
+.panel-source > .panel__body,
+.panel-output > .panel__body {
+    flex: 1 1 0;
+    overflow: auto;
 }
 
-.text-input-area:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow), inset 0 0 20px rgba(124, 106, 239, 0.05);
-    background: rgba(0, 0, 0, 0.3);
+/* The header carries the title and the output actions. When the column is
+   narrow the actions drop to their own row instead of squeezing the title. */
+.panel-source > .panel__header,
+.panel-output > .panel__header {
+    flex-wrap: wrap;
 }
 
-/* ── Translation action row ── */
-.action-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: var(--space-md);
-    padding: var(--space-md) 0;
-    width: 100%;
+.panel-source > .panel__header .panel__title,
+.panel-output > .panel__header .panel__title {
+    white-space: nowrap;
 }
 
-/* ── Translate button (large CTA) ── */
-.translate-cta {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    max-width: 320px;
-    margin: 0 auto;
-    padding: 16px 32px;
-    border: none;
-    border-radius: var(--radius-pill);
-    background: var(--gradient-primary);
-    color: white;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    box-shadow: 0 8px 32px rgba(124, 106, 239, 0.35);
-    transition: all var(--transition-smooth);
+/* The middle column is the divider itself, so both panels stay flush
+   against it and the grid keeps two equal halves. */
+.panel-source {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+}
+
+.panel-output {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Splitter
+   -------------------------------------------------------------------------- */
+
+.splitter {
     position: relative;
-    overflow: hidden;
+    width: 1px;
+    background-color: var(--line);
+    cursor: col-resize;
+    touch-action: none;
 }
 
-.translate-cta::before {
-    content: '';
+.splitter::after {
+    content: "";
     position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    top: 50%;
+    left: 50%;
+    width: 3px;
+    height: 40px;
+    transform: translate(-50%, -50%);
+    border-radius: var(--r-pill);
+    background-color: var(--line-strong);
     opacity: 0;
-    transition: opacity var(--transition-base);
+    transition: opacity var(--motion-fast);
 }
 
-.translate-cta:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(124, 106, 239, 0.5);
-}
-
-.translate-cta:hover::before {
+.splitter:hover::after,
+.splitter:focus-visible::after {
     opacity: 1;
 }
 
-.translate-cta:active {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(124, 106, 239, 0.3);
+.splitter:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
 }
 
-/* Translate button loading state */
-.translate-cta.loading {
-    pointer-events: none;
-    opacity: 0.85;
+/* --------------------------------------------------------------------------
+   Output panel body
+   -------------------------------------------------------------------------- */
+
+.output-body {
+    display: block;
+    min-height: 12rem;
+    overflow: auto;
+    line-height: var(--line-height-prose);
+    font-family: var(--font-sans);
+    color: var(--ink-950);
 }
 
-.translate-cta.loading .cta-text {
-    opacity: 0;
+/* The placeholder keeps the panel from collapsing to its own height. */
+.output-body > .empty-state {
+    min-height: 12rem;
 }
 
-.translate-cta.loading::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border: 2.5px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
+.output-body p {
+    margin: 0 0 0.9em;
 }
 
-/* ── Arrow between source and output ── */
-.translation-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    margin: 0 auto;
-    border-radius: 50%;
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    color: var(--accent);
-    font-size: 1.2rem;
-    animation: float 3s ease-in-out infinite;
-}
-
-/* ── Translation output area ── */
-.translation-area {
-    min-height: 280px;
-    padding: var(--space-lg);
-    background: rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(124, 106, 239, 0.08);
-    border-radius: var(--radius-lg);
-    color: var(--text);
-    font-size: 0.95rem;
-    line-height: 1.75;
-    overflow-y: auto;
-    transition: all var(--transition-smooth);
-    animation: fadeInUp 0.3s ease;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.translation-area p {
-    margin: 0 0 1em 0;
-}
-
-.translation-area p:last-child {
+.output-body p:last-child {
     margin-bottom: 0;
 }
 
-.translation-area:hover {
-    border-color: rgba(124, 106, 239, 0.16);
+.output-body.rtl,
+[dir="rtl"].output-body {
+    text-align: start;
+    font-family: var(--font-arabic);
 }
 
-/* ── Empty translation state ── */
-.translation-area:empty::before {
-    content: 'Translation will appear here...';
-    color: var(--text-muted);
-    font-style: italic;
+/* The source textarea flips with the target language too. */
+.textarea.rtl,
+[dir="rtl"].textarea {
+    text-align: start;
+    font-family: var(--font-arabic);
 }
+.translate-actions,
 
-/* ── Translation content styling ── */
-.translation-area h1,
-.translation-area h2,
-.translation-area h3 {
-    color: var(--text);
-    margin-top: 1.2em;
-    margin-bottom: 0.5em;
-}
+.page-controls,
 
-.translation-area p {
-    margin: 0.8em 0;
-}
+.zoom-cluster,
 
-.translation-area code {
-    background: var(--glass);
-    padding: 2px 6px;
-    border-radius: var(--radius-xs);
-    font-family: var(--font-mono);
-    font-size: 0.9em;
-}
+.source-strip,
 
-.translation-area pre {
-    background: rgba(0, 0, 0, 0.3);
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    overflow-x: auto;
-}
-
-.translation-area blockquote {
-    border-left: 3px solid var(--accent);
-    padding-left: var(--space-md);
-    margin-left: 0;
-    color: var(--text-secondary);
-}
-
-.translation-area ul,
-.translation-area ol {
-    padding-left: 1.5em;
-}
-
-.translation-area li {
-    margin: 0.3em 0;
-}
-
-/* ── Word count indicator ── */
-.word-count {
-    font-size: 0.72rem;
-    font-weight: 500;
-    color: var(--text-dim);
-    text-align: right;
-    padding-top: var(--space-sm);
-}
-
-/* ── RTL Support for translation output ── */
-.translation-area.rtl,
-.notes-summary.rtl,
-.note-textarea.rtl {
-    direction: rtl;
-    text-align: right;
-}
-
-.translation-area.rtl p {
-    margin: 0 0 1em 0;
-}
-
-.translation-area.rtl blockquote {
-    border-left: none;
-    border-right: 3px solid var(--accent);
-    padding-right: var(--space-md);
-    padding-left: 0;
-    margin-right: 0;
-    margin-left: auto;
-    text-align: right;
-}
-
-.translation-area.rtl ul,
-.translation-area.rtl ol {
-    padding-right: 1.5em;
-    padding-left: 0;
-}
-
-/* ── Copy/Download actions for output ── */
-.output-actions {
+.output-actions  {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-md) 0 0;
-    justify-content: flex-end;
+    gap: var(--space-3);
+    flex-wrap: wrap;
 }
 
-/* ── Document mode split ── */
-.workspace-split {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: var(--space-lg);
-    flex: 1;
-    min-height: 0;
-}
-
-/* ── Page controls ── */
-.page-controls {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: 0 var(--space-lg);
-    min-height: 52px;
-}
-
-.page-control {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-}
-
-.page-control input {
-    width: 50px;
-    padding: 6px 8px;
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    text-align: center;
-    font-size: 0.85rem;
-}
-
-.page-control input:focus {
-    outline: none;
-    border-color: var(--accent);
-}
-
-/* ── Attachment actions row ── */
-.attachment-actions {
-    display: flex;
-    align-items: center;
+/* The counters sit left, the actions right. */
+.source-footer {
     justify-content: space-between;
-    padding: var(--space-sm) 0;
+    gap: var(--space-2) var(--space-4);
+    flex-wrap: wrap;
+}
+
+.source-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.translate-actions,
+.output-actions {
+    margin-inline-start: auto;
+}
+
+.output-actions {
+    margin-inline-start: 0;
+}
+
+/* Page navigation: number input between the two chevrons. */
+/* The source textarea fills the panel body and shrinks with it, so the
+   hint below it never gets pushed out of view. */
+.panel-source .textarea {
+    min-height: 6rem;
+    flex: 1 1 auto;
+}
+
+.page-input {
+    width: 64px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The indeterminate state is driven by the translation script: it animates
+   the bar itself, so the bar has to be full width for the sweep to show. */
+.progress.is-indeterminate .progress__bar {
     width: 100%;
 }
 
-.translate-controls-inline {
+/* The progress track and the note under the document output. */
+.output-footer {
     display: flex;
-    align-items: center;
-    gap: var(--space-sm);
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--line);
+    background-color: var(--surface-2);
 }
 
-/* ── Responsive ── */
-@media (max-width: 1024px) {
+.output-footer .progress {
+    width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — single column below the two-column breakpoint
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 899px) {
     .workspace-split {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .text-input-area {
-        min-height: 200px;
-        padding: var(--space-md);
-        font-size: 0.95rem;
+        grid-template-columns: minmax(0, 1fr);
     }
 
-    .translation-area {
-        min-height: 200px;
-        padding: var(--space-md);
+    .panel-source,
+    .panel-output {
+        border-radius: var(--r-panel);
     }
 
-    .translate-cta {
-        padding: 14px 24px;
-        font-size: 0.95rem;
+    /* The divider turns into a horizontal rule between the two panels. */
+    .splitter {
+        width: 100%;
+        height: 1px;
+        cursor: row-resize;
+    }
+
+    .splitter::after {
+        width: 40px;
+        height: 3px;
+    }
+
+    .output-body {
+        min-height: 10rem;
+    }
+
+    .workspace-split {
+        height: auto;
+        grid-template-rows: auto;
+    }
+
+    .translate-actions,
+    .output-actions {
+        margin-inline-start: 0;
     }
 }
